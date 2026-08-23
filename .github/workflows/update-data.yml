@@ -1,0 +1,110 @@
+name: Update course data
+
+# Scrapes registration.boun.edu.tr, commits fresh data, rebuilds the site and
+# deploys it to GitHub Pages. Runs daily so a newly published semester shows
+# up within 24h without any manual step.
+#
+# One-time setup: Repository -> Settings -> Pages -> Source: "GitHub Actions".
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # daily at 05:00 UTC (08:00 Istanbul)
+  workflow_dispatch:
+    inputs:
+      semester:
+        description: 'Force a specific semester, e.g. "2026/2027-1" (empty = auto)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: update-course-data
+  cancel-in-progress: false
+
+jobs:
+  scrape-and-deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Scrape course schedules
+        id: scrape
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.semester }}" ]; then
+            ARGS="--semester ${{ inputs.semester }}"
+          fi
+          node tools/scrape.mjs $ARGS
+
+      - name: Commit new data
+        id: commit
+        run: |
+          if [ -z "$(git status --porcelain public/data)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No data changes."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/data
+            git commit -m "chore(data): update course schedules from registration.boun.edu.tr"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build site
+        if: steps.commit.outputs.changed == 'true'
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+        if: steps.commit.outputs.changed == 'true'
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.commit.outputs.changed == 'true'
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        if: steps.commit.outputs.changed == 'true'
+
+  notify-failure:
+    needs: scrape-and-deploy
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or comment on a failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="Course data update failed (run ${{ github.run_number }})"
+          BODY="Automated scrape from registration.boun.edu.tr failed.
+          Old data was kept and the deployed site is unchanged.
+
+          Failed run: $RUN_URL"
+
+          OPEN_ISSUE=$(gh issue list --repo ${{ github.repository }} \
+            --label automation-failure --state open --json number --jq '.[0].number')
+
+          if [ -n "$OPEN_ISSUE" ]; then
+            gh issue comment "$OPEN_ISSUE" --repo ${{ github.repository }} --body "$BODY"
+          else
+            gh issue create --repo ${{ github.repository }} \
+              --title "$TITLE" --body "$BODY" --label automation-failure
+          fi

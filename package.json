@@ -7,12 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "scrape": "node tools/scrape.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.1",
     "@tsconfig/svelte": "^5.0.4",
     "@types/node": "^24.3.1",
+    "cheerio": "^1.2.0",
     "svelte": "^5.38.1",
     "svelte-check": "^4.3.1",
     "typescript": "~5.8.3",
