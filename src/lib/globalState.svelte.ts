@@ -276,3 +276,31 @@ const curSemCategories = $derived.by(() => {
 export function getCurSemCategories() {
   return curSemCategories;
 }
+
+export type PrereqInfo = {
+  prereqs: string[];
+  coreqs: string[];
+  consent: boolean;
+  gpa: string | null;
+};
+
+let prereqData = $state<Record<string, PrereqInfo> | null>(null); // Prerequisite data keyed by course code ("CMPE150")
+let prereqLoadStarted = false;
+
+// Fetch prerequisite data once; missing/404/error leaves prereqData null
+export async function loadPrereqs(): Promise<void> {
+  if (prereqLoadStarted) return;
+  prereqLoadStarted = true;
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/prereqs.json`);
+    if (res.ok) {
+      prereqData = (await res.json()) as Record<string, PrereqInfo>;
+    }
+  } catch {
+    // Data unavailable; app works without prerequisites
+  }
+}
+
+export function getPrereqsFor(code: string): PrereqInfo | null {
+  return prereqData ? (prereqData[code] ?? null) : null;
+}

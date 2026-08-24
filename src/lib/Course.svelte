@@ -8,6 +8,7 @@
     setHoveredCourse,
     delCourse,
     addCourse,
+    getPrereqsFor,
   } from "./globalState.svelte";
 
   let { course, courseName, striped, currentSemester, selected } = $props();
@@ -39,6 +40,8 @@
       encodeURIComponent(bodyLines.join("\n"))
     );
   });
+
+  const prereqInfo = $derived(getPrereqsFor(course.code.split(".")[0].replace(/\s+/g, "")));
 
   const conflicts = $derived.by(() => {
     const { hours, days } = getCurSemesterData()[courseName];
@@ -138,6 +141,35 @@
       >
         Departments: {course.dept.join(", ")}
       </div>
+    {/if}
+    {#if prereqInfo && (prereqInfo.prereqs.length > 0 || prereqInfo.consent || prereqInfo.gpa)}
+      {#if prereqInfo.prereqs.length > 0}
+        <div
+          class="text-sm {conflicts.length > 0
+            ? 'text-zinc-400 dark:text-zinc-500'
+            : 'text-zinc-500 dark:text-zinc-400'}"
+        >
+          Prerequisite: {prereqInfo.prereqs.join(", ")}
+        </div>
+      {/if}
+      {#if prereqInfo.consent}
+        <div
+          class="text-sm {conflicts.length > 0
+            ? 'text-zinc-400 dark:text-zinc-500'
+            : 'text-zinc-500 dark:text-zinc-400'}"
+        >
+          Instructor consent required
+        </div>
+      {/if}
+      {#if prereqInfo.gpa}
+        <div
+          class="text-sm {conflicts.length > 0
+            ? 'text-zinc-400 dark:text-zinc-500'
+            : 'text-zinc-500 dark:text-zinc-400'}"
+        >
+          Min. GPA: {prereqInfo.gpa}
+        </div>
+      {/if}
     {/if}
   </div>
   <div class="flex flex-col items-end shrink-0">

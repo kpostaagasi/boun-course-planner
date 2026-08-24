@@ -1,0 +1,45 @@
+name: Scrape prerequisites
+
+# Full prerequisite crawl (~2000+ courses, ~20-40 min with throttling).
+# Manual only — the daily course-schedule pipeline does NOT run this.
+# --resume skips courses already present in public/data/prereqs.json,
+# so re-running after an interruption continues where it left off.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape-prereqs
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Crawl prerequisites
+        run: node tools/scrape-prereqs.mjs --resume
+
+      - name: Commit updated prerequisites
+        run: |
+          if [ -z "$(git status --porcelain public/data/prereqs.json)" ]; then
+            echo "No prerequisite changes."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/data/prereqs.json
+            git commit -m "chore(data): update course prerequisites"
+            git push
+          fi

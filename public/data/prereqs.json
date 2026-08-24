@@ -1,0 +1,1391 @@
+{
+  "AS2003": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS2004": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS2005": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS4101": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS4110": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS4201": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "AS4210": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4101": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4102": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4103": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4104": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4201": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4202": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4203": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4204": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "BM4299": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE100": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE101": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE110": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE140": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE142": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE150": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE151": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE152": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE160": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE200": {
+    "prereqs": [
+      "CMPE150"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE210": {
+    "prereqs": [
+      "CMPE150"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE220": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE221": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE222": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE223": {
+    "prereqs": [
+      "CMPE150"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE224": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE230": {
+    "prereqs": [
+      "CMPE160"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE235": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE240": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE244": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE250": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE260": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE300": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE310": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE320": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE321": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE322": {
+    "prereqs": [
+      "CMPE250"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE330": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE335": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE340": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE342": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE343": {
+    "prereqs": [
+      "MATH101"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE344": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE346": {
+    "prereqs": [
+      "CMPE244"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE350": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE352": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE354": {
+    "prereqs": [
+      "CMPE222"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE360": {
+    "prereqs": [
+      "MATH202"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE362": {
+    "prereqs": [
+      "MATH202"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE365": {
+    "prereqs": [
+      "CMPE250",
+      "MATH310"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE400": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE410": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE415": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE416": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE420": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE421": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE422": {
+    "prereqs": [
+      "CMPE321"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE425": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE430": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE434": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE436": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE440": {
+    "prereqs": [
+      "CMPE344"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE441": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE443": {
+    "prereqs": [
+      "CMPE240"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE444": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE446": {
+    "prereqs": [
+      "CMPE322",
+      "CMPE344"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE448": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE449": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE450": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE451": {
+    "prereqs": [
+      "CMPE321",
+      "CMPE352"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE455": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE460": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE461": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE462": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE463": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE464": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE465": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE468": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE470": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE471": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE472": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE473": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE474": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE475": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE476": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE477": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE478": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE480": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE481": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE482": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE483": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE484": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE485": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE486": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE487": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE488": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE489": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE490": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE491": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE492": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE493": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE494": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE495": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE496": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE497": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE498": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE499": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE510": {
+    "prereqs": [
+      "CMPE561"
+    ],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE511": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE513": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE516": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE518": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE520": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE521": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE522": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE523": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE524": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE525": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE526": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE527": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE528": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE529": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE530": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE532": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE535": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE537": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE538": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE540": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE542": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE544": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE545": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE547": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE548": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE549": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE550": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE556": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE557": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE560": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE561": {
+    "prereqs": [
+      "CMPE540"
+    ],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE562": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE565": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE567": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE569": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE579": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE580": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE581": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE582": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE583": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE584": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE585": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE586": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE587": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE588": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE589": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE590": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE591": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE592": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE593": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE594": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE595": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE596": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE597": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE598": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE599": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE601": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE602": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE603": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE604": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE605": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE606": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE610": {
+    "prereqs": [
+      "CMPE511"
+    ],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE621": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE622": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE623": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE625": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE628": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE630": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE636": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE638": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE641": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE642": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE650": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE660": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE679": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE690": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE691": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE692": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE693": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE694": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE695": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE696": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": true,
+    "gpa": null
+  },
+  "CMPE698": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE699": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE700": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "CMPE790": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "EE4106": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "ENG101": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "ENG493": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "ENG495": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "ENGG100": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "IS4001": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "IS4070": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "KA1001": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "MK4001": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "TE1006": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "TE1103": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "TE1105": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "TE1203": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "TE2102": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YB2311": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YB2321": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YC1411": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YC1421": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YD1102": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YD1202": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YD2102": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  },
+  "YD2202": {
+    "prereqs": [],
+    "coreqs": [],
+    "consent": false,
+    "gpa": null
+  }
+}

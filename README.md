@@ -62,6 +62,22 @@ retries failed departments once after a cool-down, then proceeds if at least
 95% of departments succeeded — loudly logging which departments are missing.
 It never applies to the auto-synced current semester.
 
+
+### Prerequisites
+
+Course prerequisites come from the registration system's official
+prerequisite check (`prerequisitecheck.asp`) and power the
+"Prerequisite:" line on each course. The full crawl covers ~2000+ courses
+and is throttled, so it runs manually:
+
+```sh
+node tools/scrape-prereqs.mjs --resume   # continues where it left off
+```
+
+or via the *Scrape prerequisites* workflow (manual dispatch). Output lands
+in `public/data/prereqs.json`; `--resume` skips courses already present.
+The daily schedule pipeline does not touch this file.
+
 ### Manual data
 
 `public/data/semester-dates.json` (semester start/end dates and holidays,

@@ -1,9 +1,16 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import Header from "./lib/Header.svelte";
   import CourseCatalogue from "./lib/CourseCatalogue.svelte";
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
+  import { loadPrereqs } from "./lib/globalState.svelte";
+
+  onMount(() => {
+    // Fire-and-forget: errors handled inside loadPrereqs
+    loadPrereqs();
+  });
 </script>
 
 <main
