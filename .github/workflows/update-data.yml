@@ -53,6 +53,11 @@ jobs:
           fi
           node tools/scrape.mjs $ARGS
 
+      - name: Scrape academic calendar
+        # Best-effort: a calendar site outage must not block the course scrape,
+        # but a real layout change should surface in the run log.
+        run: node tools/scrape-calendar.mjs
+
       - name: Alert about missing semester dates
         if: steps.scrape.outputs.missing_dates != ''
         env:

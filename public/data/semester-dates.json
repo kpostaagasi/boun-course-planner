@@ -30,5 +30,159 @@
                 "name": "Cumhuriyet Bayramı"
             }
         ]
+    },
+    "2025-2026-2": {
+        "start": "2026-02-09",
+        "end": "2026-05-15",
+        "holidays": [
+            {
+                "date": "2026-01-01",
+                "name": "Yılbaşı"
+            },
+            {
+                "date": "2026-03-19",
+                "name": "Arife (Yarım Gün)",
+                "timeType": "after",
+                "time": "13:00"
+            },
+            {
+                "date": "2026-03-20",
+                "name": "Ramazan Bayramı"
+            },
+            {
+                "date": "2026-03-21",
+                "name": "Ramazan Bayramı"
+            },
+            {
+                "date": "2026-03-22",
+                "name": "Ramazan Bayramı"
+            },
+            {
+                "date": "2026-04-23",
+                "name": "Ulusal Egemenlik ve Çocuk Bayramı"
+            },
+            {
+                "date": "2026-05-01",
+                "name": "Emek ve Dayanışma günü"
+            },
+            {
+                "date": "2026-05-19",
+                "name": "Gençlik ve Spor Bayramı"
+            },
+            {
+                "date": "2026-05-26",
+                "name": "Arife (Yarım Gün)",
+                "timeType": "after",
+                "time": "13:00"
+            },
+            {
+                "date": "2026-05-27",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2026-05-28",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2026-05-29",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2026-05-30",
+                "name": "Kurban Bayramı"
+            }
+        ]
+    },
+    "2025-2026-3": {
+        "start": null,
+        "end": null,
+        "holidays": [
+            {
+                "date": "2026-07-15",
+                "name": "Demokrasi ve Millî Birlik Günü"
+            },
+            {
+                "date": "2026-08-30",
+                "name": "Zafer Bayramı"
+            }
+        ]
+    },
+    "2026-2027-2": {
+        "start": "2027-01-18",
+        "end": "2027-04-22",
+        "holidays": [
+            {
+                "date": "2027-01-01",
+                "name": "Yılbaşı"
+            },
+            {
+                "date": "2027-03-08",
+                "name": "Bahar Tatili / Ramazan Bayramı"
+            },
+            {
+                "date": "2027-03-09",
+                "name": "Bahar Tatili / Ramazan Bayramı"
+            },
+            {
+                "date": "2027-03-10",
+                "name": "Bahar Tatili / Ramazan Bayramı"
+            },
+            {
+                "date": "2027-03-11",
+                "name": "Bahar Tatili / Ramazan Bayramı"
+            },
+            {
+                "date": "2027-03-12",
+                "name": "Bahar Tatili / Ramazan Bayramı"
+            },
+            {
+                "date": "2027-04-23",
+                "name": "Ulusal Egemenlik ve Çocuk Bayramı"
+            },
+            {
+                "date": "2027-05-01",
+                "name": "Emek ve Dayanışma günü"
+            },
+            {
+                "date": "2027-05-15",
+                "name": "Arife (Yarım Gün)",
+                "timeType": "after",
+                "time": "13:00"
+            },
+            {
+                "date": "2027-05-16",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2027-05-17",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2027-05-18",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2027-05-19",
+                "name": "Kurban Bayramı"
+            },
+            {
+                "date": "2027-05-19",
+                "name": "Gençlik ve Spor Bayramı"
+            }
+        ]
+    },
+    "2026-2027-3": {
+        "start": null,
+        "end": null,
+        "holidays": [
+            {
+                "date": "2027-07-15",
+                "name": "Demokrasi ve Millî Birlik Günü"
+            },
+            {
+                "date": "2027-08-30",
+                "name": "Zafer Bayramı"
+            }
+        ]
     }
 }
