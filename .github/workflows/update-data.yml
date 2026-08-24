@@ -73,8 +73,9 @@ jobs:
 
           Kaynak: https://akademiktakvim.bogazici.edu.tr"
 
+          gh label create semester-dates --repo ${{ github.repository }} \
+            --description "Missing semester-dates.json entries" --color FBCA04 --force 2>/dev/null || true
           OPEN=$(gh issue list --repo ${{ github.repository }} --label semester-dates --state open --json number --jq '.[0].number')
-          if [ -n "$OPEN" ]; then
             gh issue comment "$OPEN" --repo ${{ github.repository }} --body "$BODY"
           else
             gh issue create --repo ${{ github.repository }} \
@@ -134,6 +135,8 @@ jobs:
           OPEN_ISSUE=$(gh issue list --repo ${{ github.repository }} \
             --label automation-failure --state open --json number --jq '.[0].number')
 
+          gh label create automation-failure --repo ${{ github.repository }} \
+            --description "Automated scrape/deploy failures" --color D73A4A --force 2>/dev/null || true
           if [ -n "$OPEN_ISSUE" ]; then
             gh issue comment "$OPEN_ISSUE" --repo ${{ github.repository }} --body "$BODY"
           else

@@ -47,6 +47,8 @@ jobs:
           workflow file, or a permanently failing scrape. Check:
           https://github.com/${{ github.repository }}/actions/workflows/update-data.yml"
 
+          gh label create pipeline-stale --repo ${{ github.repository }} \
+            --description "Data pipeline silent for too long" --color FBCA04 --force 2>/dev/null || true
           OPEN=$(gh issue list --repo ${{ github.repository }} \
             --label pipeline-stale --state open --json number --jq '.[0].number')
           if [ -n "$OPEN" ]; then
