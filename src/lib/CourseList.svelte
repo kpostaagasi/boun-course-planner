@@ -2,6 +2,7 @@
   import {
     getSelectedCourseNames,
     getCurSemesterData,
+    getCurrentSemester,
     setHoveredCourse,
     delCourse,
     resetHoveredCourse,
@@ -41,6 +42,25 @@
       })
       .reduce((a, b) => a + b, 0);
   });
+
+  let copiedLink = $state(false);
+
+  function copyShareLink() {
+    const url = `${location.origin}${location.pathname}?d=${encodeURIComponent(getCurrentSemester())}&c=${encodeURIComponent(getSelectedCourseNames().join(","))}`;
+    const markCopied = () => {
+      copiedLink = true;
+      setTimeout(() => {
+        copiedLink = false;
+      }, 2000);
+    };
+    navigator.clipboard
+      .writeText(url)
+      .then(markCopied)
+      .catch(() => {
+        window.prompt("Copy this link:", url);
+        markCopied();
+      });
+  }
 </script>
 
 <div
@@ -54,6 +74,15 @@
       class="ml-2 text-xs bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 border border-blue-600/50 dark:border-blue-400/50 rounded-full px-1"
       >{courseCount}</span
     >
+    {#if getSelectedCourseNames().length > 0}
+      <button
+        type="button"
+        class="ml-auto text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
+        onclick={copyShareLink}
+      >
+        {copiedLink ? "Copied!" : "Copy Link"}
+      </button>
+    {/if}
   </div>
   <div
     class="divide-y divide-gray-200 dark:divide-zinc-500"

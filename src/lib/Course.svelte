@@ -17,6 +17,29 @@
     return `https://registration.boun.edu.tr/scripts/schedule/coursedescription.asp?course=${code}&section=${section}&term=${term}`;
   });
 
+  const reportIssueUrl = $derived.by(() => {
+    const bodyLines = [
+      `Dönem: ${currentSemester}`,
+      `Anahtar: ${courseName}`,
+      ...("code" in course ? [`Kod: ${course.code}`] : []),
+      ...("name" in course ? [`Ad: ${course.name}`] : []),
+      `Hoca: ${course.instructor}`,
+      ...("days" in course ? [`Günler: ${course.days.join(", ")}`] : []),
+      ...("hours" in course ? [`Saatler: ${course.hours.join(", ")}`] : []),
+      ...("rooms" in course ? [`Odalar: ${course.rooms.join(", ")}`] : []),
+      ``,
+      `Bu bilgiler yanlış/eksik çünkü: `,
+      ``,
+      `Kaynak sayfa: ${syllabusLink}`,
+    ];
+    return (
+      `https://github.com/kpostaagasi/boun-course-planner/issues/new?title=` +
+      encodeURIComponent(`Veri hatası: ${courseName} (${currentSemester})`) +
+      `&body=` +
+      encodeURIComponent(bodyLines.join("\n"))
+    );
+  });
+
   const conflicts = $derived.by(() => {
     const { hours, days } = getCurSemesterData()[courseName];
     let conflicts = [];
@@ -119,6 +142,15 @@
   </div>
   <div class="flex flex-col items-end shrink-0">
     <div class="flex flex-col-reverse sm:flex-row">
+      <a
+        href={reportIssueUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Report incorrect data"
+        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-zinc-400 hover:text-red-500 dark:text-zinc-500 dark:hover:text-red-500 text-xs"
+      >
+        ⚠
+      </a>
       <a
         href={syllabusLink}
         target="_blank"

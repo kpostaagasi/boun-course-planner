@@ -49,6 +49,32 @@ export function resetHoveredCourse() {
 
 let selectedCourseNamesAll = $state(readSelectedCourseNames()); // selected course names for all semesters
 
+// Read share parameters from the URL query string (?d=<semester>&c=<course,course>)
+export function getShareParams(): { semester: string | null; courses: string[] } {
+  const searchParams = new URLSearchParams(location.search);
+  const semester = searchParams.get("d");
+  const coursesParam = searchParams.get("c");
+  const courses = coursesParam
+    ? coursesParam.split(",").filter((courseName) => courseName.length > 0)
+    : [];
+  return { semester, courses };
+}
+
+// Apply a shared selection from the URL on first load (?d=2026-2027-1&c=CMPE150.01,...)
+const shareParams = getShareParams();
+if (shareParams.courses.length > 0) {
+  const shareSemesterKey = shareParams.semester ?? currentSemester;
+  if (shareSemesterKey) {
+    selectedCourseNamesAll[shareSemesterKey] = [...shareParams.courses];
+    persistSelectedCourseNames();
+  }
+}
+
+// Remove share parameters from the URL after they have been applied
+export function clearShareUrl() {
+  history.replaceState(null, "", location.pathname);
+}
+
 export function getSelectedCourseNamesAll() {
   return selectedCourseNamesAll;
 }

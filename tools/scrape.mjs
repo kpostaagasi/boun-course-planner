@@ -60,6 +60,14 @@ function semesterFileKey(donem) {
   return donem.replace("/", "-");
 }
 
+/** Freshness timestamps ("YYYY-YYYY-T" -> ISO date) for data written this run. */
+function touchMeta(donem) {
+  const file = path.join(DATA_DIR, "meta.json");
+  const meta = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {};
+  meta[semesterFileKey(donem)] = new Date().toISOString();
+  writeFileSync(file, JSON.stringify(meta, null, 4) + "\n");
+}
+
 function readJson(file) {
   return JSON.parse(readFileSync(path.join(DATA_DIR, file), "utf8"));
 }
@@ -223,6 +231,7 @@ async function main() {
     }
     writeFileSync(current, json);
     changed.push(file);
+    touchMeta(donem);
     console.log(`  ${file}: written (${Object.keys(courses).length} sections)`);
   }
 
