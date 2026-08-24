@@ -130,6 +130,42 @@
     }
     return table;
   }
+
+  // Full literal class strings so Tailwind's JIT scanner can see them.
+  // Dynamic class construction (e.g. `bg-${x}-100`) would never be generated.
+  const PALETTE = [
+    { bg: "bg-blue-100", text: "text-blue-800", darkBg: "dark:bg-blue-900", darkText: "dark:text-blue-200" },
+    { bg: "bg-emerald-100", text: "text-emerald-800", darkBg: "dark:bg-emerald-900", darkText: "dark:text-emerald-200" },
+    { bg: "bg-amber-100", text: "text-amber-800", darkBg: "dark:bg-amber-900", darkText: "dark:text-amber-200" },
+    { bg: "bg-violet-100", text: "text-violet-800", darkBg: "dark:bg-violet-900", darkText: "dark:text-violet-200" },
+    { bg: "bg-rose-100", text: "text-rose-800", darkBg: "dark:bg-rose-900", darkText: "dark:text-rose-200" },
+    { bg: "bg-cyan-100", text: "text-cyan-800", darkBg: "dark:bg-cyan-900", darkText: "dark:text-cyan-200" },
+    { bg: "bg-lime-100", text: "text-lime-800", darkBg: "dark:bg-lime-900", darkText: "dark:text-lime-200" },
+    { bg: "bg-orange-100", text: "text-orange-800", darkBg: "dark:bg-orange-900", darkText: "dark:text-orange-200" },
+    { bg: "bg-fuchsia-100", text: "text-fuchsia-800", darkBg: "dark:bg-fuchsia-900", darkText: "dark:text-fuchsia-200" },
+    { bg: "bg-sky-100", text: "text-sky-800", darkBg: "dark:bg-sky-900", darkText: "dark:text-sky-200" },
+  ];
+
+  function courseColor(name: string) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = hash * 31 + name.charCodeAt(i);
+    }
+    return PALETTE[Math.abs(hash) % PALETTE.length];
+  }
+
+  const hoveredCourse = $derived(getHoveredCourse());
+  const selectedCourses = $derived(getSelectedCourseNames());
+
+  const DAYS: Days[] = ["M", "T", "W", "Th", "F", "St"];
+  const DAY_LABELS: Record<Days, string> = {
+    M: "Mon",
+    T: "Tue",
+    W: "Wed",
+    Th: "Thu",
+    F: "Fri",
+    St: "Sat",
+  };
 </script>
 
 <div
@@ -141,77 +177,37 @@
     <thead>
       <tr>
         <th class="w-4 md:w-6"></th>
-        <th class="w-20"> Mon </th>
-        <th class="w-20"> Tue </th>
-        <th class="w-20"> Wed </th>
-        <th class="w-20"> Thu </th>
-        <th class="w-20"> Fri </th>
-        <th class="w-20 {courseOnSaturday ? '' : 'hidden'}"> Sat </th>
+        {#each DAYS as day}
+          <th class="w-20 {day == 'St' && !courseOnSaturday ? 'hidden' : ''}">
+            {DAY_LABELS[day]}
+          </th>
+        {/each}
       </tr>
     </thead>
     <tbody>
-      {#each tableItems as row, i}
-        <tr class={i % 2 == 0 ? "bg-gray-50 dark:bg-gray-700" : ""}>
-          <th class="md:p-1"> {row["hour"]} </th>
-          <td class={row["M"].length > 1 ? "bg-red-100 dark:bg-red-900" : ""}
-            >{#each row["M"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
-                  : ''}"
-              >
-                {course}
-              </div>{/each}</td
-          >
-          <td class={row["T"].length > 1 ? "bg-red-100 dark:bg-red-900" : ""}
-            >{#each row["T"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
-                  : ''}"
-              >
-                {course}
-              </div>{/each}</td
-          >
-          <td class={row["W"].length > 1 ? "bg-red-100 dark:bg-red-900" : ""}
-            >{#each row["W"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
-                  : ''}"
-              >
-                {course}
-              </div>{/each}</td
-          >
-          <td class={row["Th"].length > 1 ? "bg-red-100 dark:bg-red-900" : ""}
-            >{#each row["Th"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
-                  : ''}"
-              >
-                {course}
-              </div>{/each}</td
-          >
-          <td class={row["F"].length > 1 ? "bg-red-100 dark:bg-red-900" : ""}
-            >{#each row["F"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
-                  : ''}"
-              >
-                {course}
-              </div>{/each}</td
-          >
+    {#each tableItems as row, i}
+      <tr class={i % 2 == 0 ? "bg-gray-50 dark:bg-gray-700" : ""}>
+        <th class="md:p-1"> {row["hour"]} </th>
+        {#each DAYS as day}
           <td
-            class="{courseOnSaturday ? '' : 'hidden'} {row['St'].length > 1
+            class="{day == 'St' && !courseOnSaturday ? 'hidden' : ''} {row[day].length > 1
               ? 'bg-red-100 dark:bg-red-900'
               : ''}"
-            >{#each row["St"] as course}<div
-                class="leading-tight p-px {course == getHoveredCourse()
-                  ? 'bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 rounded'
+            >{#each row[day] as course}{@const color = courseColor(course)}<div
+                class="leading-tight p-px rounded {color.bg} {color.text} {color.darkBg}
+                  {color.darkText}
+                  {course == hoveredCourse && !selectedCourses.includes(course)
+                  ? 'ring-2 ring-green-500 opacity-75'
+                  : course == hoveredCourse
+                  ? 'ring-2 ring-green-500'
                   : ''}"
               >
                 {course}
               </div>{/each}</td
           >
-        </tr>
-      {/each}
+        {/each}
+      </tr>
+    {/each}
     </tbody>
   </table>
 </div>
