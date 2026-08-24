@@ -39,6 +39,10 @@ test("parses the current layout (with Quota column)", () => {
   assert.equal(lab.name, "INTRODUCTION TO COMPUTING LAB");
   assert.equal(lab.code, "CMPE150.01");
   assert.ok(!("credits" in lab));
+
+  // "Required for Dept.(*)" column parses into a code list.
+  assert.deepEqual(sections.get("CMPE150.03").entry.requiredForDept, ["CE", "ME"]);
+  assert.ok(!("requiredForDept" in sections.get("CMPE101.01").entry));
 });
 
 test("parses the archived layout (without Quota column)", () => {

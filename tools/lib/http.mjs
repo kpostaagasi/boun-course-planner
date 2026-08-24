@@ -10,6 +10,7 @@ const BASE_URL = "https://registration.boun.edu.tr";
 const MAX_RETRIES = 4;
 const TIMEOUT_MS = 20_000;
 const RETRY_DELAY_MS = 1_500;
+const RATE_LIMIT_DELAY_MS = 30_000;
 
 const DECODER = new TextDecoder("iso-8859-9");
 
@@ -39,11 +40,18 @@ export async function fetchPage(path, params = {}) {
         throw new Error(`HTTP ${response.status} for ${url}`);
       }
       const buffer = Buffer.from(await response.arrayBuffer());
-      return DECODER.decode(buffer);
+      const text = DECODER.decode(buffer);
+      // The server answers abuse/rate-limits with a redirect to an "Alert"
+      // page. Treat it as retryable rather than valid (empty) content.
+      if (/<title>\s*Alert\s*<\/title>/i.test(text)) {
+        throw new Error(`rate-limited (Alert page) for ${url}`);
+      }
+      return text;
     } catch (error) {
       lastError = error;
       if (attempt < MAX_RETRIES) {
-        await sleep(RETRY_DELAY_MS * attempt);
+        const isRateLimit = /rate-limited/.test(lastError.message);
+        await sleep(isRateLimit ? RATE_LIMIT_DELAY_MS : RETRY_DELAY_MS * attempt);
       }
     }
   }

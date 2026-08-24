@@ -115,6 +115,7 @@ const COLUMN_ALIASES = {
   days: ["Days"],
   slots: ["Hours"],
   rooms: ["Rooms"],
+  requiredForDept: ["Required for Dept.(*)", "Required for Dept."],
 };
 
 function findColumnMap($) {
@@ -164,6 +165,10 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
       if (!isLabRow) {
         const rawCode = cells[columns.code];
         if (!rawCode) continue;
+        const requiredFor = cells[columns.requiredForDept]
+          ?.split(",")
+          .map((c) => c.trim())
+          .filter(Boolean);
         const entry = {
           code: rawCode,
           credits: Number(cells[columns.credits]) || 0,
@@ -173,8 +178,12 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
           hours: [],
           instructor: cells[columns.instructor],
           name: cells[columns.name],
-          rooms: [],
         };
+        if (requiredFor?.length) {
+          // Keys stay alphabetical to match the historical data files.
+          entry.requiredForDept = requiredFor;
+        }
+        entry.rooms = [];
         appendMeetings(entry, cells[columns.days], cells[columns.slots], cells[columns.rooms]);
         current = { key: rawCode.replace(/\s+/g, ""), entry };
         if (!sections.has(current.key)) sections.set(current.key, current);

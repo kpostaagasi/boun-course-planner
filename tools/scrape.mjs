@@ -27,6 +27,8 @@ const DATA_DIR = path.join(ROOT, "public", "data");
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+/** Only usable with --semester: tolerate server-broken departments on archived terms. */
+const ALLOW_PARTIAL = args.includes("--allow-partial");
 function optionValues(flag) {
   const values = [];
   for (let i = 0; i < args.length; i++) {
@@ -35,13 +37,23 @@ function optionValues(flag) {
   return values;
 }
 const forcedSemesters = optionValues("--semester").filter(Boolean);
-
+if (ALLOW_PARTIAL && forcedSemesters.length === 0) {
+  console.error("--allow-partial requires an explicit --semester (never applies to auto-synced terms)");
+  process.exit(1);
+}
 /** Absolute floor of parsed sections for a semester to be considered real. */
 const MIN_SECTIONS = 50;
 /** A refresh that loses more than this fraction of sections is treated as an outage. */
 const MAX_SHRINK_RATIO = 0.5;
 /** Parse warnings tolerated before a scrape is rejected. */
 const MAX_WARNINGS = 20;
+
+/** Politeness delay between department requests to avoid tripping the site's rate limiter. */
+const DEPT_DELAY_MS = 1_000;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function semesterFileKey(donem) {
   // "2025/2026-1" -> "2025-2026-1"
@@ -67,24 +79,60 @@ async function scrapeSemester(donem, departments) {
   console.log(`Scraping ${donem} across ${departments.length} departments…`);
   const merged = new Map();
   const warnings = [];
+  // In --allow-partial mode, departments that fail get one more pass after a
+  // cool-down: transient rate-limits recover, server-broken pages do not.
+  let queue = [...departments];
+  const maxPasses = ALLOW_PARTIAL ? 2 : 1;
+  const broken = [];
 
-  for (const dept of departments) {
-    const html = await fetchSchedule(donem, dept.kisaadi, dept.bolum);
-    const { sections, warnings: rowWarnings } = parseSchedulePage(html, dept);
-    warnings.push(...rowWarnings.map((w) => `${dept.kisaadi}: ${w}`));
+  for (let pass = 0; pass < maxPasses && queue.length > 0; pass++) {
+    if (pass > 0) {
+      console.warn(
+        `  PARTIAL: retrying ${queue.map((d) => d.kisaadi).join(", ")} after cooldown…`,
+      );
+      await sleep(60_000);
+    }
 
-    for (const [key, { entry }] of sections) {
-      const prior = merged.get(key);
-      if (!prior) {
-        merged.set(key, entry);
-      } else if (Array.isArray(prior.dept)) {
-        // Cross-listed section seen from another department page: keep the
-        // first schedule, accumulate department codes.
-        for (const d of entry.dept ?? []) {
-          if (!prior.dept.includes(d)) prior.dept.push(d);
+    const stillBroken = [];
+    for (const dept of queue) {
+      await sleep(DEPT_DELAY_MS);
+      let html;
+      try {
+        html = await fetchSchedule(donem, dept.kisaadi, dept.bolum);
+      } catch (error) {
+        if (!ALLOW_PARTIAL) throw error;
+        stillBroken.push(dept);
+        console.warn(`  PARTIAL: ${dept.kisaadi} failed (${error.message})`);
+        continue;
+      }
+      const { sections, warnings: rowWarnings } = parseSchedulePage(html, dept);
+      warnings.push(...rowWarnings.map((w) => `${dept.kisaadi}: ${w}`));
+
+      for (const [key, { entry }] of sections) {
+        const prior = merged.get(key);
+        if (!prior) {
+          merged.set(key, entry);
+        } else if (Array.isArray(prior.dept)) {
+          // Cross-listed section seen from another department page: keep the
+          // first schedule, accumulate department codes.
+          for (const d of entry.dept ?? []) {
+            if (!prior.dept.includes(d)) prior.dept.push(d);
+          }
         }
       }
     }
+    broken.push(...stillBroken.filter((d) => !broken.includes(d)).map((d) => d.kisaadi));
+    queue = stillBroken;
+  }
+
+  if (ALLOW_PARTIAL && broken.length > 0) {
+    const coverage = 1 - broken.length / departments.length;
+    if (coverage < 0.95) {
+      throw new Error(
+        `${donem}: only ${(coverage * 100).toFixed(1)}% of departments succeeded (< 95%)`,
+      );
+    }
+    console.warn(`  PARTIAL: ${donem} will be written without ${broken.join(", ")}`);
   }
 
   if (warnings.length > MAX_WARNINGS) {

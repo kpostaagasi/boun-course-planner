@@ -53,7 +53,14 @@ npm install
 npm run scrape                # auto-detect the current semester
 npm run scrape -- --dry-run   # validate without writing
 npm run scrape -- --semester 2026/2027-1
+npm run scrape -- --allow-partial --semester 2025/2026-2
 ```
+
+`--allow-partial` (only valid together with `--semester`) is for recovering
+archived terms whose pages are partially broken on the server side: it
+retries failed departments once after a cool-down, then proceeds if at least
+95% of departments succeeded — loudly logging which departments are missing.
+It never applies to the auto-synced current semester.
 
 ### Manual data
 
