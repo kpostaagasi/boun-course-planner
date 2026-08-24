@@ -6,7 +6,9 @@
     setHoveredCourse,
     delCourse,
     resetHoveredCourse,
+    setCourseList,
   } from "./globalState.svelte";
+  import { solveConflictFree } from "./solver";
   import IconX from "./icons/IconX.svelte";
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
@@ -60,6 +62,29 @@
         window.prompt("Copy this link:", url);
         markCopied();
       });
+  }
+  let prevSchedule = $state<string[] | null>(null);
+  let solverMessage = $state("");
+
+  function findConflictFree() {
+    const current = getSelectedCourseNames();
+    const result = solveConflictFree(current, getCurSemesterData());
+    if (result.ok) {
+      prevSchedule = [...current];
+      setCourseList(result.schedule);
+      solverMessage = "Applied conflict-free schedule";
+    } else {
+      solverMessage = `No conflict-free combination exists (blocked by: ${result.blockedOn})`;
+    }
+  }
+
+  function undoConflictFree() {
+    if (!prevSchedule) {
+      return;
+    }
+    setCourseList(prevSchedule);
+    prevSchedule = null;
+    solverMessage = "";
   }
 </script>
 
@@ -126,6 +151,28 @@
     class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 text-green-700 dark:text-green-300 font-medium"
   >
     Total Credits: {totalCredit}
+  </div>
+  <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center gap-2 flex-wrap">
+    <button
+      type="button"
+      class="text-xs px-2 py-1 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      disabled={getSelectedCourseNames().length < 2}
+      onclick={findConflictFree}
+    >
+      Find conflict-free sections
+    </button>
+    {#if solverMessage}
+      <span class="text-xs text-zinc-600 dark:text-zinc-300">{solverMessage}</span>
+    {/if}
+    {#if prevSchedule}
+      <button
+        type="button"
+        class="text-xs px-2 py-1 rounded border border-zinc-400/50 dark:border-zinc-500/50 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 cursor-pointer"
+        onclick={undoConflictFree}
+      >
+        Undo
+      </button>
+    {/if}
   </div>
   <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700">
     <CalendarExport />
