@@ -131,25 +131,30 @@
     return table;
   }
 
+  // Translucent tinted fill + same-hue bright text + saturated left accent:
+  // reads crisply on dark rows instead of turning into muddy -900 slabs.
   // Full literal class strings so Tailwind's JIT scanner can see them.
-  // Dynamic class construction (e.g. `bg-${x}-100`) would never be generated.
   const PALETTE = [
-    { bg: "bg-blue-100", text: "text-blue-800", darkBg: "dark:bg-blue-900", darkText: "dark:text-blue-200" },
-    { bg: "bg-emerald-100", text: "text-emerald-800", darkBg: "dark:bg-emerald-900", darkText: "dark:text-emerald-200" },
-    { bg: "bg-amber-100", text: "text-amber-800", darkBg: "dark:bg-amber-900", darkText: "dark:text-amber-200" },
-    { bg: "bg-violet-100", text: "text-violet-800", darkBg: "dark:bg-violet-900", darkText: "dark:text-violet-200" },
-    { bg: "bg-rose-100", text: "text-rose-800", darkBg: "dark:bg-rose-900", darkText: "dark:text-rose-200" },
-    { bg: "bg-cyan-100", text: "text-cyan-800", darkBg: "dark:bg-cyan-900", darkText: "dark:text-cyan-200" },
-    { bg: "bg-lime-100", text: "text-lime-800", darkBg: "dark:bg-lime-900", darkText: "dark:text-lime-200" },
-    { bg: "bg-orange-100", text: "text-orange-800", darkBg: "dark:bg-orange-900", darkText: "dark:text-orange-200" },
-    { bg: "bg-fuchsia-100", text: "text-fuchsia-800", darkBg: "dark:bg-fuchsia-900", darkText: "dark:text-fuchsia-200" },
-    { bg: "bg-sky-100", text: "text-sky-800", darkBg: "dark:bg-sky-900", darkText: "dark:text-sky-200" },
+    { bg: "bg-red-50 dark:bg-red-500/20", text: "text-red-800 dark:text-red-200", border: "border-red-400 dark:border-red-400/80" },
+    { bg: "bg-orange-50 dark:bg-orange-500/20", text: "text-orange-800 dark:text-orange-200", border: "border-orange-400 dark:border-orange-400/80" },
+    { bg: "bg-amber-50 dark:bg-amber-500/20", text: "text-amber-800 dark:text-amber-200", border: "border-amber-400 dark:border-amber-400/80" },
+    { bg: "bg-yellow-50 dark:bg-yellow-500/20", text: "text-yellow-800 dark:text-yellow-200", border: "border-yellow-400 dark:border-yellow-400/80" },
+    { bg: "bg-lime-50 dark:bg-lime-500/20", text: "text-lime-800 dark:text-lime-200", border: "border-lime-400 dark:border-lime-400/80" },
+    { bg: "bg-emerald-50 dark:bg-emerald-500/20", text: "text-emerald-800 dark:text-emerald-200", border: "border-emerald-400 dark:border-emerald-400/80" },
+    { bg: "bg-teal-50 dark:bg-teal-500/20", text: "text-teal-800 dark:text-teal-200", border: "border-teal-400 dark:border-teal-400/80" },
+    { bg: "bg-sky-50 dark:bg-sky-500/20", text: "text-sky-800 dark:text-sky-200", border: "border-sky-400 dark:border-sky-400/80" },
+    { bg: "bg-blue-50 dark:bg-blue-500/20", text: "text-blue-800 dark:text-blue-200", border: "border-blue-400 dark:border-blue-400/80" },
+    { bg: "bg-indigo-50 dark:bg-indigo-500/20", text: "text-indigo-800 dark:text-indigo-200", border: "border-indigo-400 dark:border-indigo-400/80" },
+    { bg: "bg-fuchsia-50 dark:bg-fuchsia-500/20", text: "text-fuchsia-800 dark:text-fuchsia-200", border: "border-fuchsia-400 dark:border-fuchsia-400/80" },
+    { bg: "bg-pink-50 dark:bg-pink-500/20", text: "text-pink-800 dark:text-pink-200", border: "border-pink-400 dark:border-pink-400/80" },
   ];
 
+  // FNV-1a: spreads course names across the 12 hues better than a 31-multi hash.
   function courseColor(name: string) {
-    let hash = 0;
+    let hash = 2166136261;
     for (let i = 0; i < name.length; i++) {
-      hash = hash * 31 + name.charCodeAt(i);
+      hash ^= name.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
     }
     return PALETTE[Math.abs(hash) % PALETTE.length];
   }
@@ -194,12 +199,11 @@
               ? 'bg-red-100 dark:bg-red-900'
               : ''}"
             >{#each row[day] as course}{@const color = courseColor(course)}<div
-                class="leading-tight p-px rounded {color.bg} {color.text} {color.darkBg}
-                  {color.darkText}
+                class="leading-tight px-1 py-px rounded-r border-l-2 {color.bg} {color.text} {color.border}
                   {course == hoveredCourse && !selectedCourses.includes(course)
-                  ? 'ring-2 ring-green-500 opacity-75'
+                  ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
                   : course == hoveredCourse
-                  ? 'ring-2 ring-green-500'
+                  ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
                   : ''}"
               >
                 {course}
