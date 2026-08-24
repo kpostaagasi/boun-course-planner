@@ -52,6 +52,35 @@ jobs:
           fi
           node tools/scrape.mjs $ARGS
 
+      - name: Alert about missing semester dates
+        if: steps.scrape.outputs.missing_dates != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEYS: ${{ steps.scrape.outputs.missing_dates }}
+        run: |
+          TITLE="semester-dates.json eksik: $KEYS"
+          BODY="Bu dönem(ler) için \`public/data/semester-dates.json\` girişi yok; takvim dışa aktarımı kapalı kalıyor.
+
+          Eklenmesi gereken format (örnek):
+
+          \`\`\`json
+          \"$KEYS\": {
+            \"start\": \"YYYY-MM-DD\",
+            \"end\": \"YYYY-MM-DD\",
+            \"holidays\": [{\"date\": \"YYYY-MM-DD\", \"name\": \"Resmi Tatil\"}]
+          }
+          \`\`\`
+
+          Kaynak: https://akademiktakvim.bogazici.edu.tr"
+
+          OPEN=$(gh issue list --repo ${{ github.repository }} --label semester-dates --state open --json number --jq '.[0].number')
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --repo ${{ github.repository }} --body "$BODY"
+          else
+            gh issue create --repo ${{ github.repository }} \
+              --title "$TITLE" --body "$BODY" --label semester-dates
+          fi
+
       - name: Commit new data
         id: commit
         run: |

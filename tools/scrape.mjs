@@ -14,7 +14,7 @@
  */
 
 
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -237,12 +237,15 @@ async function main() {
     console.log(`  ${listFile}: updated -> ${allCodes.join(", ")}`);
   }
 
-  // Academic-calendar dates are not scrapeable reliably; warn so humans can add them.
+  // Academic-calendar dates are not scrapeable reliably; surface missing
+  // entries so CI can open an issue and a human can add them.
   const datesFile = "semester-dates.json";
+  const missingDates = [];
   if (existingFiles.has(datesFile)) {
     const dates = readJson(datesFile);
     for (const donem of semesters) {
       if (!(semesterFileKey(donem) in dates)) {
+        missingDates.push(semesterFileKey(donem));
         console.warn(
           `NOTE: ${datesFile} has no entry for ${semesterFileKey(donem)} ` +
             "(calendar export disabled until added manually)",
@@ -251,9 +254,16 @@ async function main() {
     }
   }
 
-  if (changed.length === 0) {
+  if (missingDates.length > 0 && process.env.GITHUB_OUTPUT) {
+    appendFileSync(
+      process.env.GITHUB_OUTPUT,
+      `missing_dates=${missingDates.join(",")}\n`,
+    );
+  }
+
+  if (changed.length === 0 && missingDates.length === 0) {
     console.log("Everything already up to date.");
-  } else {
+  } else if (changed.length > 0) {
     console.log(`Changed files: ${changed.join(", ")}`);
   }
 }

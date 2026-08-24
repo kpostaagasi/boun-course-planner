@@ -35,7 +35,7 @@
         `${import.meta.env.BASE_URL}data/semester-dates.json`
       );
       if (res.ok) {
-        const data = await res.json();
+        const data: Record<string, SemesterData> = await res.json();
         semesterDates = data;
 
         // Extract holidays from semester data

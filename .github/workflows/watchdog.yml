@@ -1,0 +1,57 @@
+name: Pipeline watchdog
+
+# Dead man's switch: if the daily update-data workflow has had no successful
+# run for over a week (cron broken, runner quota exhausted, repo misconfigured),
+# open an issue — silence must not be mistaken for health.
+
+on:
+  schedule:
+    - cron: "30 6 * * 1" # Mondays 06:30 UTC, after scrape windows
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  actions: read
+
+jobs:
+  stale-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check last successful data update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LAST=$(gh run list --repo ${{ github.repository }} \
+            --workflow update-data.yml --status success --limit 1 \
+            --json createdAt --jq '.[0].createdAt')
+
+          if [ -z "$LAST" ]; then
+            DAYS=9999
+          else
+            DAYS=$(( ($(date +%s) - $(date -d "$LAST" +%s)) / 86400 ))
+          fi
+          echo "Last successful run: ${LAST:-never} ($DAYS days ago)"
+
+          if [ "$DAYS" -lt 8 ]; then
+            echo "Pipeline healthy."
+            exit 0
+          fi
+
+          TITLE="Course data pipeline has been silent for $DAYS days"
+          BODY="The \`update-data\` workflow has had no successful run in $DAYS days.
+          The site is still serving its last scraped data, but it may be stale.
+
+          Last success: ${LAST:-never}
+
+          Possible causes: disabled Actions, exhausted billing quota, renamed
+          workflow file, or a permanently failing scrape. Check:
+          https://github.com/${{ github.repository }}/actions/workflows/update-data.yml"
+
+          OPEN=$(gh issue list --repo ${{ github.repository }} \
+            --label pipeline-stale --state open --json number --jq '.[0].number')
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --repo ${{ github.repository }} --body "$BODY"
+          else
+            gh issue create --repo ${{ github.repository }} \
+              --title "$TITLE" --body "$BODY" --label pipeline-stale
+          fi
