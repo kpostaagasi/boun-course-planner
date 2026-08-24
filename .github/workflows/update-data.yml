@@ -115,6 +115,38 @@ jobs:
         uses: actions/deploy-pages@v4
         if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
 
+      - name: Smoke test deployment
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          BASE="${{ steps.deployment.outputs.page_url }}"
+          FAIL=0
+
+          check() {
+            local path="$1"
+            for attempt in 1 2 3 4 5; do
+              CODE=$(curl -s -o /tmp/smoke-body -w '%{http_code}' "$BASE$path")
+              if [ "$CODE" = "200" ]; then
+                echo "OK  $path"
+                return 0
+              fi
+              echo "attempt $attempt: $path -> $CODE, retrying in 10s…"
+              sleep 10
+            done
+            echo "FAIL $path (last code $CODE)"
+            FAIL=1
+          }
+
+          check ""
+          for f in public/data/*.json; do
+            check "data/$(basename "$f")"
+            if [ "$FAIL" = "0" ]; then
+              node -e "JSON.parse(require('fs').readFileSync('/tmp/smoke-body','utf8'))" \
+                || { echo "FAIL invalid JSON: $f"; FAIL=1; }
+            fi
+          done
+
+          exit $FAIL
+
   notify-failure:
     needs: scrape-and-deploy
     if: failure()
