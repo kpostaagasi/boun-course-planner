@@ -138,7 +138,15 @@ async function main() {
     process.exitCode = 1;
     return;
   }
-  const semesters = forcedSemesters.length > 0 ? published : semestersToSync(published);
+  const semesters =
+    forcedSemesters.length > 0
+      ? forcedSemesters.filter((donem) => published.includes(donem))
+      : semestersToSync(published);
+  if (semesters.length === 0) {
+    console.error(`None of the forced semesters are published: ${forcedSemesters.join(", ")}`);
+    process.exitCode = 1;
+    return;
+  }
   console.log(`Published: ${published.join(", ")}`);
   console.log(`Syncing: ${semesters.join(", ")}`);
 

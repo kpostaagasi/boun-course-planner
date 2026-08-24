@@ -154,6 +154,7 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
   const sections = new Map();
   const warnings = [];
   let current = null;
+  const labCounts = new Map(); // per section+type numbering: "LAB 1", "P.S. 2"
 
   for (const row of rows) {
     const cells = $(row).find("td").toArray().map((td) => cellText($, td));
@@ -176,9 +177,31 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
         };
         appendMeetings(entry, cells[columns.days], cells[columns.slots], cells[columns.rooms]);
         current = { key: rawCode.replace(/\s+/g, ""), entry };
-        sections.set(current.key, current);
-      } else if (current) {
-        appendMeetings(current.entry, cells[columns.days], cells[columns.slots], cells[columns.rooms]);
+        if (!sections.has(current.key)) sections.set(current.key, current);
+      } else if (current && cells.some(Boolean)) {
+        // LAB / P.S. rows are separate selectable entries, matching the
+        // historical data format: "<key> LAB 1", "<key> P.S. 2", ...
+        const type = cells[columns.name] || "LAB";
+        const n = (labCounts.get(current.key + "|" + type) ?? 0) + 1;
+        labCounts.set(current.key + "|" + type, n);
+
+        const meetings = extractMeetings(
+          cells[columns.days],
+          cells[columns.slots],
+          cells[columns.rooms],
+        );
+        const lab = { code: current.entry.code };
+        if (meetings) {
+          lab.days = meetings.days;
+          lab.hours = meetings.hours;
+        }
+        lab.instructor = cells[columns.instructor];
+        lab.name = `${current.entry.name} ${type}`;
+        if (meetings) {
+          lab.rooms = meetings.rooms;
+        }
+        const key = `${current.key} ${type} ${n}`;
+        sections.set(key, { key, entry: lab });
       }
     } catch (error) {
       warnings.push(`${current?.key ?? "?"}: ${error.message}`);
@@ -188,17 +211,21 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
   return { sections, warnings };
 }
 
-function appendMeetings(entry, daysCell, slotsCell, roomsCell) {
-  if (!daysCell && !slotsCell) return;
+function extractMeetings(daysCell, slotsCell, roomsCell) {
+  if (!daysCell && !slotsCell) return null;
   const days = daysCell ? splitDays(daysCell) : [];
   const hours = slotsCell ? splitSlots(slotsCell, Math.max(days.length, 1)) : [];
   const rooms = splitRooms(roomsCell, Math.max(days.length, hours.length));
-
-  entry.days.push(...days);
-  entry.hours.push(...hours);
-  entry.rooms.push(...rooms);
+  return { days, hours, rooms };
 }
 
+function appendMeetings(entry, daysCell, slotsCell, roomsCell) {
+  const meetings = extractMeetings(daysCell, slotsCell, roomsCell);
+  if (!meetings) return;
+  (entry.days ??= []).push(...meetings.days);
+  (entry.hours ??= []).push(...meetings.hours);
+  (entry.rooms ??= []).push(...meetings.rooms);
+}
 /**
  * Parse the department list page into {kisaadi, bolum} pairs.
  * @returns {Array<{kisaadi: string, bolum: string}>}
