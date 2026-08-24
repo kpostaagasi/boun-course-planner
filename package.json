@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "scrape": "node tools/scrape.mjs"
+    "scrape": "node tools/scrape.mjs",
+    "test": "node --test tools/lib/test/*.test.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.1",

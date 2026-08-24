@@ -40,6 +40,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Run parser tests
+        run: npm test
+
       - name: Scrape course schedules
         id: scrape
         run: |
