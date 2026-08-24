@@ -14,5 +14,21 @@
                 "name": "Cumhuriyet Bayramı"
             }
         ]
+    },
+    "2026-2027-1": {
+        "start": "2026-09-21",
+        "end": "2026-12-11",
+        "holidays": [
+            {
+                "date": "2026-10-28",
+                "name": "Cumhuriyet Bayramı (Yarım Gün)",
+                "timeType": "after",
+                "time": "13:00"
+            },
+            {
+                "date": "2026-10-29",
+                "name": "Cumhuriyet Bayramı"
+            }
+        ]
     }
 }

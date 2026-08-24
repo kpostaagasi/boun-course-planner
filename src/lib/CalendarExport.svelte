@@ -285,7 +285,7 @@
       alert(
         "Semester dates not available for " +
           currentSemester +
-          ". Please try again in a moment."
+          ". Calendar export needs the official term dates, which are added manually from the academic calendar."
       );
       return "";
     }
@@ -386,6 +386,16 @@
   );
 
   const canExportCalendar = $derived(hasSelectedCourses && isFutureSemester);
+
+  const calendarTooltip = $derived(
+    canExportCalendar
+      ? "Download calendar file (.ics)"
+      : !hasSelectedCourses
+        ? "Select courses to enable calendar export"
+        : !isFutureSemester
+          ? "Bu dönem için takvim tarihleri henüz eklenmedi"
+          : "Select courses to enable calendar export",
+  );
 </script>
 
 <div class="flex flex-col gap-2">
@@ -395,11 +405,7 @@
       class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       onclick={downloadCalendar}
       disabled={!canExportCalendar}
-      title={canExportCalendar
-        ? "Download calendar file (.ics)"
-        : !hasSelectedCourses
-          ? "Select courses to enable calendar export"
-          : "Calendar export is only available for future semesters"}
+      title={calendarTooltip}
     >
       <IconDocument />
       Add to Calendar
