@@ -9,6 +9,7 @@
     delCourse,
     addCourse,
     getPrereqsFor,
+    getDescriptionFor,
   } from "./globalState.svelte";
 
   let { course, courseName, striped, currentSemester, selected } = $props();
@@ -42,6 +43,9 @@
   });
 
   const prereqInfo = $derived(getPrereqsFor(course.code.split(".")[0].replace(/\s+/g, "")));
+
+  const descriptionInfo = $derived(getDescriptionFor(course.code.split(".")[0].replace(/\s+/g, "")));
+  let descriptionExpanded = $state(false);
 
   const conflicts = $derived.by(() => {
     const { hours, days } = getCurSemesterData()[courseName];
@@ -170,6 +174,29 @@
           Min. GPA: {prereqInfo.gpa}
         </div>
       {/if}
+    {/if}
+    {#if descriptionInfo?.description}
+      {#if descriptionExpanded}
+        <div
+          class="mt-1 text-sm whitespace-pre-line {conflicts.length > 0
+            ? 'text-zinc-400 dark:text-zinc-500'
+            : 'text-zinc-500 dark:text-zinc-400'}"
+        >
+          {descriptionInfo.description}
+          {#if descriptionInfo.prerequisite}
+            <div class="mt-1">Catalog prerequisite: {descriptionInfo.prerequisite}</div>
+          {/if}
+        </div>
+      {/if}
+      <button
+        type="button"
+        class="text-xs cursor-pointer {conflicts.length > 0
+          ? 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
+        onclick={() => (descriptionExpanded = !descriptionExpanded)}
+      >
+        {descriptionExpanded ? "Hide description ▲" : "Show description ▼"}
+      </button>
     {/if}
   </div>
   <div class="flex flex-col items-end shrink-0">

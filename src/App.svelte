@@ -5,11 +5,13 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
-  import { loadPrereqs } from "./lib/globalState.svelte";
+  import { loadPrereqs, loadDescriptions } from "./lib/globalState.svelte";
 
   onMount(() => {
     // Fire-and-forget: errors handled inside loadPrereqs
     loadPrereqs();
+    // Fire-and-forget: errors handled inside loadDescriptions
+    loadDescriptions();
   });
 </script>
 

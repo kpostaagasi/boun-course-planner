@@ -304,3 +304,32 @@ export async function loadPrereqs(): Promise<void> {
 export function getPrereqsFor(code: string): PrereqInfo | null {
   return prereqData ? (prereqData[code] ?? null) : null;
 }
+
+export type DescriptionInfo = {
+  title: string;
+  credits: string;
+  ects: string;
+  description: string;
+  prerequisite: string | null;
+};
+
+let descriptionData = $state<Record<string, DescriptionInfo> | null>(null); // Catalog descriptions keyed by course code ("CMPE150")
+let descriptionLoadStarted = false;
+
+// Fetch catalog course descriptions once; missing/404/error leaves descriptionData null
+export async function loadDescriptions(): Promise<void> {
+  if (descriptionLoadStarted) return;
+  descriptionLoadStarted = true;
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/descriptions.json`);
+    if (res.ok) {
+      descriptionData = (await res.json()) as Record<string, DescriptionInfo>;
+    }
+  } catch {
+    // Data unavailable; app works without descriptions
+  }
+}
+
+export function getDescriptionFor(code: string): DescriptionInfo | null {
+  return descriptionData ? (descriptionData[code] ?? null) : null;
+}
