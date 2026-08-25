@@ -12,6 +12,7 @@
  * @param {Record<string, { prereqs: string[] }>} prereqs
  */
 export function checkRoadmapPrereqs(roadmap, orderedTerms, completed, prereqs) {
+  /** @type {Record<string, Record<string, { ok: boolean, missing: string[] }>>} */
   const result = {};
   const seen = new Set(completed);
   // Courses known to exist: prereqs-map entries plus everything scheduled in
@@ -45,6 +46,7 @@ export function checkRoadmapPrereqs(roadmap, orderedTerms, completed, prereqs) {
  * @param {Record<string, any>} termData semester course map keyed by section name
  */
 export function termCredits(semesterKey, roadmap, termData) {
+  /** @type {Record<string, number>} */
   const codeToCredits = {};
   for (const [sectionName, info] of Object.entries(termData)) {
     const base = sectionName.split(".")[0];
@@ -59,6 +61,10 @@ export function termCredits(semesterKey, roadmap, termData) {
   return total;
 }
 
+/**
+ * @param {string[]} terms
+ * @returns {string[]}
+ */
 export function sortTermsNewestFirst(terms) {
   return [...terms].sort((a, b) => b.localeCompare(a));
 }
