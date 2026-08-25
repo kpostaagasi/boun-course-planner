@@ -1,4 +1,3 @@
-// @ts-expect-error re-export of plain-JS pure logic (tested via node:test)
 export { getEligibility } from "./eligibility.mjs";
 
 export type EligibilityStatus =
