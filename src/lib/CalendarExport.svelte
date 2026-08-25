@@ -601,39 +601,36 @@
 
 <div class="flex flex-col gap-2">
   <div class="flex items-center gap-3">
-    <button
-      type="button"
-      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-      onclick={downloadCalendar}
-      disabled={!canExportCalendar}
-      title={calendarTooltip}
-    >
-      <IconDocument />
-      {t("calendar.addToCalendar")}
-    </button>
-    <button
-      type="button"
-      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-      onclick={openInGoogleCalendar}
-      disabled={!canUseGoogleCalendar}
-      title={googleCalendarTooltip}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        style="height: 1.5rem; width: 1.5rem;"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    {#if canUseGoogleCalendar}
+      <button
+        type="button"
+        class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 rounded-lg transition-colors duration-200"
+        onclick={openInGoogleCalendar}
+        title={googleCalendarTooltip}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-      {t("calendar.addToGcal")}
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          style="height: 1.5rem; width: 1.5rem;"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        {t("calendar.addToGcal")}
+      </button>
+    {:else if canExportCalendar}
+      <!-- >6 courses: hidden entirely; the .ics button tooltip explains why -->
+    {/if}
+
+    {#if !canExportCalendar}
+      <span class="text-xs text-zinc-500 dark:text-zinc-400">{calendarTooltip}</span>
+    {/if}
 
     <button
       type="button"
