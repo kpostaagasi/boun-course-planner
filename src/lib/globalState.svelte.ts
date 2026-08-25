@@ -387,3 +387,60 @@ export function isCompleted(code: string): boolean {
 export function getCompletedCourses(): string[] {
   return [...completedCourses];
 }
+
+
+// ---- Roadmap (multi-semester planning) ----
+const roadmapState = $state<Record<string, string[]>>({});
+let roadmapLoaded = false;
+
+function persistRoadmap(): void {
+  try {
+    localStorage.setItem("roadmap", JSON.stringify(roadmapState));
+  } catch {
+    // ignore
+  }
+}
+
+export function loadRoadmap(): void {
+  if (roadmapLoaded) return;
+  roadmapLoaded = true;
+  try {
+    const raw = localStorage.getItem("roadmap");
+    if (raw) {
+      const parsed: Record<string, string[]> = JSON.parse(raw);
+      for (const [term, codes] of Object.entries(parsed)) {
+        roadmapState[term] = codes;
+      }
+    }
+  } catch {
+    // corrupt data: start empty
+  }
+}
+
+export function getRoadmap(): Record<string, string[]> {
+  return roadmapState;
+}
+
+export function addToRoadmap(semester: string, code: string): void {
+  if (!roadmapState[semester]) roadmapState[semester] = [];
+  if (!roadmapState[semester].includes(code)) {
+    roadmapState[semester].push(code);
+    persistRoadmap();
+  }
+}
+
+export function removeFromRoadmap(semester: string, code: string): void {
+  const list = roadmapState[semester];
+  if (list) {
+    const idx = list.indexOf(code);
+    if (idx !== -1) {
+      list.splice(idx, 1);
+      persistRoadmap();
+    }
+  }
+}
+
+export function clearRoadmap(): void {
+  for (const k of Object.keys(roadmapState)) delete roadmapState[k];
+  persistRoadmap();
+}

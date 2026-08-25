@@ -5,7 +5,7 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
-  import { loadPrereqs, loadDescriptions, loadCompleted } from "./lib/globalState.svelte";
+  import { loadPrereqs, loadDescriptions, loadCompleted, loadRoadmap } from "./lib/globalState.svelte";
   import { initLang } from "./lib/i18n.svelte";
 
   onMount(() => {
@@ -16,6 +16,8 @@
     loadDescriptions();
     // Fire-and-forget: localStorage restore, errors handled inside loadCompleted
     loadCompleted();
+    // Fire-and-forget: localStorage restore, errors handled inside loadRoadmap
+    loadRoadmap();
   });
 </script>
 
