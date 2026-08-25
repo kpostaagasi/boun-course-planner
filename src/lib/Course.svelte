@@ -9,9 +9,12 @@
     delCourse,
     addCourse,
     getPrereqsFor,
+    getPrereqsAll,
     getDescriptionFor,
   } from "./globalState.svelte";
   import { t } from "./i18n.svelte";
+  import { getEligibility } from "./eligibility";
+  import { toggleCompleted, isCompleted, getCompletedCourses } from "./globalState.svelte";
 
   let { course, courseName, striped, currentSemester, selected } = $props();
   const syllabusLink = $derived.by(() => {
@@ -43,6 +46,11 @@
     );
   });
 
+  const completedSet = $derived(new Set(getCompletedCourses()));
+  const prereqMap = $derived(getPrereqsAll());
+  const eligibility = $derived(
+    getEligibility(course.code.split(".")[0].replace(/\s+/g, ""), completedSet, prereqMap),
+  );
   const prereqInfo = $derived(getPrereqsFor(course.code.split(".")[0].replace(/\s+/g, "")));
 
   const descriptionInfo = $derived(getDescriptionFor(course.code.split(".")[0].replace(/\s+/g, "")));
@@ -113,6 +121,15 @@
           {/if}
         </span>
       </span>
+      {#if eligibility.status === "taken"}
+        <span class="text-xs font-medium text-green-600 dark:text-green-400 mr-2">✓ {t("course.taken")}</span>
+      {:else if eligibility.status === "eligible"}
+        <span class="text-xs text-zinc-400 dark:text-zinc-500 mr-2">{t("course.eligible")}</span>
+      {:else if eligibility.status === "missing-prereq"}
+        <span class="text-xs text-amber-600 dark:text-amber-400 mr-2" title={eligibility.missing.join(", ")}>
+          {t("course.needs")} {eligibility.missing.join(", ")}{eligibility.moreMissing ? "…" : ""}
+        </span>
+      {/if}
     </div>
     <div>
       <span class="mr-2">{course.instructor}</span>
@@ -202,6 +219,20 @@
   </div>
   <div class="flex flex-col items-end shrink-0">
     <div class="flex flex-col-reverse sm:flex-row">
+      <button
+        type="button"
+        title={isCompleted(course.code.split(".")[0].replace(/\s+/g, ""))
+          ? t("course.markNotTaken")
+          : t("course.markTaken")}
+        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-xs cursor-pointer {isCompleted(
+          course.code.split(".")[0].replace(/\s+/g, ""),
+        )
+          ? 'text-green-600 dark:text-green-400'
+          : 'text-zinc-400 hover:text-green-600 dark:text-zinc-500 dark:hover:text-green-400'}"
+        onclick={() => toggleCompleted(course.code.split(".")[0].replace(/\s+/g, ""))}
+      >
+        ✓
+      </button>
       <a
         href={reportIssueUrl}
         target="_blank"

@@ -1,3 +1,5 @@
+import { SvelteSet } from "svelte/reactivity";
+
 let currentSemester = $state(""); // Currently selected semester
 
 export function getCurrentSemester() {
@@ -314,6 +316,10 @@ export function getPrereqsFor(code: string): PrereqInfo | null {
   return prereqData ? (prereqData[code] ?? null) : null;
 }
 
+export function getPrereqsAll(): Record<string, PrereqInfo> | null {
+  return prereqData;
+}
+
 export type DescriptionInfo = {
   title: string;
   credits: string;
@@ -344,7 +350,7 @@ export function getDescriptionFor(code: string): DescriptionInfo | null {
 }
 
 // ---- Completed courses (eligibility feature) ----
-const completedCourses = $state<Set<string>>(new Set());
+const completedCourses = new SvelteSet<string>();
 let completedLoaded = false;
 
 export function loadCompleted(): void {
