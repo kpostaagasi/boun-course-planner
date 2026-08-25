@@ -11,6 +11,7 @@
     getPrereqsFor,
     getDescriptionFor,
   } from "./globalState.svelte";
+  import { t } from "./i18n.svelte";
 
   let { course, courseName, striped, currentSemester, selected } = $props();
   const syllabusLink = $derived.by(() => {
@@ -97,7 +98,7 @@
       <span class="text-sm break-all">{course.name}</span>
       <span class="ml-auto mr-2">
         {#if conflicts.length > 0}
-          <span class="text-red-500 text-xs font-medium p-1">Conflict</span>
+          <span class="text-red-500 text-xs font-medium p-1">{t("course.conflict")}</span>
         {/if}
         <span
           class="text-xs {conflicts.length > 0
@@ -134,7 +135,7 @@
           ? 'text-zinc-400 dark:text-zinc-500'
           : 'text-zinc-500'}"
       >
-        Required for department: {course.requiredForDept.join(", ")}
+        {t("course.requiredFor")} {course.requiredForDept.join(", ")}
       </div>
     {/if}
     {#if "dept" in course}
@@ -143,7 +144,7 @@
           ? 'text-zinc-400 dark:text-zinc-500'
           : 'text-zinc-500'}"
       >
-        Departments: {course.dept.join(", ")}
+        {t("course.departments")} {course.dept.join(", ")}
       </div>
     {/if}
     {#if prereqInfo && (prereqInfo.prereqs.length > 0 || prereqInfo.consent || prereqInfo.gpa)}
@@ -153,7 +154,7 @@
             ? 'text-zinc-400 dark:text-zinc-500'
             : 'text-zinc-500 dark:text-zinc-400'}"
         >
-          Prerequisite: {prereqInfo.prereqs.join(", ")}
+          {t("course.prerequisite")} {prereqInfo.prereqs.join(", ")}
         </div>
       {/if}
       {#if prereqInfo.consent}
@@ -162,7 +163,7 @@
             ? 'text-zinc-400 dark:text-zinc-500'
             : 'text-zinc-500 dark:text-zinc-400'}"
         >
-          Instructor consent required
+          {t("course.consentRequired")}
         </div>
       {/if}
       {#if prereqInfo.gpa}
@@ -171,7 +172,7 @@
             ? 'text-zinc-400 dark:text-zinc-500'
             : 'text-zinc-500 dark:text-zinc-400'}"
         >
-          Min. GPA: {prereqInfo.gpa}
+          {t("course.minGpa")} {prereqInfo.gpa}
         </div>
       {/if}
     {/if}
@@ -184,7 +185,7 @@
         >
           {descriptionInfo.description}
           {#if descriptionInfo.prerequisite}
-            <div class="mt-1">Catalog prerequisite: {descriptionInfo.prerequisite}</div>
+            <div class="mt-1">{t("course.catalogPrerequisite")} {descriptionInfo.prerequisite}</div>
           {/if}
         </div>
       {/if}
@@ -195,7 +196,7 @@
           : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
         onclick={() => (descriptionExpanded = !descriptionExpanded)}
       >
-        {descriptionExpanded ? "Hide description ▲" : "Show description ▼"}
+        {descriptionExpanded ? t("course.hideDescription") : t("course.showDescription")}
       </button>
     {/if}
   </div>

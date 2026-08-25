@@ -5,6 +5,7 @@
     getCurrentSemester,
   } from "./globalState.svelte";
   import IconDocument from "./icons/IconDocument.svelte";
+  import { t as i18nT } from "./i18n.svelte";
   import { onMount } from "svelte";
 
   // Semester data with dates and holidays loaded from JSON
@@ -373,6 +374,191 @@
       URL.revokeObjectURL(url);
     }, 100);
   }
+  // Check if a class hour range conflicts with a holiday's time specification
+  function conflictsWithHoliday(
+    holiday: Holiday,
+    classStartHour: number,
+    classEndHour: number,
+  ): boolean {
+    if (!holiday.timeType) {
+      return true; // Full day holiday
+    }
+    if (!holiday.time) {
+      return false;
+    }
+    const [holidayHour, holidayMinute] = holiday.time.split(":").map(Number);
+    const holidayTimeInHours = holidayHour + holidayMinute / 60;
+
+    const classStartTime = 8 + classStartHour;
+    const classEndTime = 8 + classEndHour;
+
+    if (holiday.timeType === "before") {
+      return classStartTime < holidayTimeInHours;
+    }
+    if (holiday.timeType === "after") {
+      return classEndTime > holidayTimeInHours;
+    }
+    if (holiday.timeType === "between" && holiday.endTime) {
+      const [endHour, endMinute] = holiday.endTime.split(":").map(Number);
+      const holidayEndTime = endHour + endMinute / 60;
+      return !(
+        classEndTime <= holidayTimeInHours ||
+        classStartTime >= holidayEndTime
+      );
+    }
+    return false;
+  }
+
+  // Build Google Calendar TEMPLATE links for each consecutive-hour group of a course
+  function buildGoogleCalendarUrls(
+    courseName: string,
+    courseInfo: any,
+    startDate: Date,
+    endDate: Date,
+  ): string[] {
+    if (!courseInfo.days || !courseInfo.hours) {
+      return [];
+    }
+
+    const semesterHolidays =
+      holidaysData[getCurrentSemester()] || [];
+
+    // Group consecutive hours by day (same as createCalendarEvent)
+    const dayGroups: Record<string, number[]> = {};
+    for (let i = 0; i < courseInfo.days.length; i++) {
+      const day = courseInfo.days[i];
+      dayGroups[day] = dayGroups[day] || [];
+      dayGroups[day].push(courseInfo.hours[i]);
+    }
+
+    const urls: string[] = [];
+
+    Object.entries(dayGroups).forEach(([day, hours]) => {
+      hours.sort((a, b) => a - b);
+      const consecutiveGroups: number[][] = [];
+      let currentGroup = [hours[0]];
+
+      for (let i = 1; i < hours.length; i++) {
+        if (hours[i] === hours[i - 1] + 1) {
+          currentGroup.push(hours[i]);
+        } else {
+          consecutiveGroups.push(currentGroup);
+          currentGroup = [hours[i]];
+        }
+      }
+      consecutiveGroups.push(currentGroup);
+
+      consecutiveGroups.forEach((group) => {
+        const startHour = group[0];
+        const endHour = group[group.length - 1] + 1;
+
+        const firstOccurrence = getFirstDayOfWeek(startDate, day);
+
+        const eventStart = new Date(firstOccurrence);
+        eventStart.setHours(8 + startHour, 0, 0, 0);
+
+        const eventEnd = new Date(firstOccurrence);
+        eventEnd.setHours(8 + endHour, 0, 0, 0);
+
+        let location = "Boğaziçi University";
+        if (courseInfo.rooms && courseInfo.rooms.length > 0) {
+          if (courseInfo.rooms[0] === "Online") {
+            location = "Online";
+          } else {
+            location = `${courseInfo.rooms.join(", ")}, Boğaziçi University`;
+          }
+        }
+
+        const detailsParts = [
+          `Course: ${courseInfo.name || courseName}`,
+          `Instructor: ${courseInfo.instructor || "N/A"}`,
+          `Credits: ${courseInfo.credits || "N/A"}`,
+        ];
+
+        // TEMPLATE links don't support EXDATE; list excluded holidays in the details instead
+        const excludedHolidayDates: string[] = [];
+        let currentDate = new Date(firstOccurrence);
+        while (currentDate <= endDate) {
+          const dateString = currentDate.toISOString().split("T")[0];
+          const holiday = semesterHolidays.find((h) => h.date === dateString);
+          if (
+            holiday &&
+            conflictsWithHoliday(holiday, startHour, endHour)
+          ) {
+            excludedHolidayDates.push(dateString);
+          }
+          currentDate.setDate(currentDate.getDate() + 7);
+        }
+        if (excludedHolidayDates.length > 0) {
+          detailsParts.push(
+            `Excluded holidays: ${excludedHolidayDates.join(", ")}`,
+          );
+        }
+
+        // Floating local times + ctz param; UNTIL keeps the Z-suffixed formatDate format
+        const pad = (n: number) => String(n).padStart(2, "0");
+        const formatLocalDateTime = (d: Date) =>
+          `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        const rruleUntil = `${formatLocalDateTime(endDate)}Z`;
+
+        const params = [
+          "action=TEMPLATE",
+          `text=${encodeURIComponent(courseName)}`,
+          `dates=${formatLocalDateTime(eventStart)}/${formatLocalDateTime(eventEnd)}`,
+          `recur=${encodeURIComponent(`RRULE:FREQ=WEEKLY;UNTIL=${rruleUntil}`)}`,
+          `location=${encodeURIComponent(location)}`,
+          `details=${encodeURIComponent(detailsParts.join("\n"))}`,
+          "ctz=Europe/Istanbul",
+        ];
+
+        urls.push(
+          `https://calendar.google.com/calendar/render?${params.join("&")}`,
+        );
+      });
+    });
+
+    return urls;
+  }
+
+  const t = i18nT;
+  function openInGoogleCalendar() {
+    const currentSemester = getCurrentSemester();
+    const selectedCourses = getSelectedCourseNames();
+    const semesterData = getCurSemesterData();
+
+    if (!currentSemester || !semesterData || selectedCourses.length === 0) {
+      alert("No courses selected or semester data not available.");
+      return;
+    }
+
+    const semesterDateRange = semesterDates[currentSemester];
+    if (!semesterDateRange) {
+      alert(
+        "Semester dates not available for " +
+          currentSemester +
+          ". Calendar export needs the official term dates, which are added manually from the academic calendar.",
+      );
+      return;
+    }
+
+    const startDate = new Date(semesterDateRange.start);
+    const endDate = new Date(semesterDateRange.end);
+
+    // window.open calls stay synchronous inside this user gesture so popups aren't blocked
+    selectedCourses.forEach((courseName) => {
+      if (!semesterData[courseName]) {
+        return;
+      }
+      buildGoogleCalendarUrls(
+        courseName,
+        semesterData[courseName],
+        startDate,
+        endDate,
+      ).forEach((url) => {
+        window.open(url, "_blank");
+      });
+    });
+  }
 
   const hasSelectedCourses = $derived(
     getSelectedCourseNames().length > 0 &&
@@ -387,14 +573,29 @@
 
   const canExportCalendar = $derived(hasSelectedCourses && isFutureSemester);
 
+  // Google Calendar TEMPLATE links are per-event; cap how many tabs we open
+  const canUseGoogleCalendar = $derived(
+    canExportCalendar && getSelectedCourseNames().length <= 6,
+  );
+
   const calendarTooltip = $derived(
-    canExportCalendar
-      ? "Download calendar file (.ics)"
-      : !hasSelectedCourses
-        ? "Select courses to enable calendar export"
-        : !isFutureSemester
-          ? "Bu dönem için takvim tarihleri henüz eklenmedi"
-          : "Select courses to enable calendar export",
+    !canExportCalendar
+      ? !hasSelectedCourses
+        ? t("calendar.tooltipSelectCourses")
+        : t("calendar.tooltipNoDates")
+      : getSelectedCourseNames().length > 6
+        ? t("calendar.gcalTooMany")
+        : t("calendar.tooltipIcs"),
+  );
+
+  const googleCalendarTooltip = $derived(
+    !canExportCalendar
+      ? !hasSelectedCourses
+        ? t("calendar.tooltipSelectCourses")
+        : t("calendar.tooltipNoDates")
+      : getSelectedCourseNames().length > 6
+        ? t("calendar.gcalTooMany")
+        : t("calendar.addToGcal"),
   );
 </script>
 
@@ -408,7 +609,30 @@
       title={calendarTooltip}
     >
       <IconDocument />
-      Add to Calendar
+      {t("calendar.addToCalendar")}
+    </button>
+    <button
+      type="button"
+      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      onclick={openInGoogleCalendar}
+      disabled={!canUseGoogleCalendar}
+      title={googleCalendarTooltip}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style="height: 1.5rem; width: 1.5rem;"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+      {t("calendar.addToGcal")}
     </button>
 
     <button
@@ -416,7 +640,7 @@
       class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline cursor-pointer"
       onclick={() => (showInstructions = !showInstructions)}
     >
-      How to import?
+      {t("calendar.howToImport")}
     </button>
   </div>
 
@@ -426,7 +650,7 @@
     >
       <div class="flex justify-between items-start mb-2">
         <h4 class="font-medium text-gray-900 dark:text-gray-100">
-          Import Calendar Instructions:
+          {t("calendar.instructionsTitle")}
         </h4>
         <button
           type="button"
@@ -438,17 +662,16 @@
       </div>
       <ul class="space-y-1 text-gray-700 dark:text-gray-300">
         <li>
-          <strong>macOS:</strong> Double-click the .ics file to open in Calendar
-          app
+          <strong>macOS:</strong> {t("instructions.macos")}
         </li>
         <li>
-          <strong>Windows:</strong> Double-click to open in Outlook or Calendar app
+          <strong>Windows:</strong> {t("instructions.windows")}
         </li>
         <li>
-          <strong>Google Calendar:</strong> Go to Settings → Import & Export → Import
+          <strong>Google Calendar:</strong> {t("instructions.gcal")}
         </li>
         <li>
-          <strong>Outlook Web:</strong> Click 'Add calendar' → 'Upload from file'
+          <strong>Outlook Web:</strong> {t("instructions.outlook")}
         </li>
       </ul>
     </div>

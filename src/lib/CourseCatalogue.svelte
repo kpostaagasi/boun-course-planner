@@ -14,6 +14,7 @@
   import { setHoveredCourse, setSearchQuery } from "./globalState.svelte";
   import { onMount } from "svelte";
   import CourseFilters from "./CourseFilters.svelte";
+  import { t } from "./i18n.svelte";
 
   let input: HTMLInputElement;
   let courseCatalogue: HTMLDivElement | null = $state(null);
@@ -119,7 +120,7 @@
           setSearchQuery((e.currentTarget as HTMLInputElement).value ?? "");
           page = 1;
         }}
-        placeholder="Search courses"
+        placeholder={t("search.placeholder")}
         autocomplete="off"
         autocorrect="off"
         autocapitalize="none"

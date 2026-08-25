@@ -199,12 +199,21 @@ const searchedCourseNames: string[] = $derived.by(() => {
       regex.test(courseName)
     );
 
-    // If no results, fall back to searching the full name and instructor
+    // If no results, fall back to full name, instructor and catalog description
     if (searchedCourses.length === 0) {
       searchedCourses = allCourseEntries.filter(
         ([_, courseInfo]: [string, any]) =>
           regex.test(courseInfo.name) || regex.test(courseInfo.instructor)
       );
+      // Last resort: search the catalog description text ("CMPE150" -> "CMPE" + section-less code)
+      const descriptions = descriptionData;
+      if (searchedCourses.length === 0 && descriptions) {
+        searchedCourses = allCourseEntries.filter(([courseName, _]: [string, any]) => {
+          const baseCode = courseName.split(".")[0].replace(/\s+/g, "");
+          const desc = descriptions[baseCode];
+          return desc ? regex.test(desc.description) || regex.test(desc.title) : false;
+        });
+      }
     }
   } else {
     // If no search query, all courses are included

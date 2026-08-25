@@ -6,8 +6,10 @@
   import CourseList from "./lib/CourseList.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { loadPrereqs, loadDescriptions } from "./lib/globalState.svelte";
+  import { initLang } from "./lib/i18n.svelte";
 
   onMount(() => {
+    initLang();
     // Fire-and-forget: errors handled inside loadPrereqs
     loadPrereqs();
     // Fire-and-forget: errors handled inside loadDescriptions

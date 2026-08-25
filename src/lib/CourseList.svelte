@@ -12,6 +12,7 @@
   import IconX from "./icons/IconX.svelte";
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
+  import { t } from "./i18n.svelte";
 
   const courseCount = $derived(
     getSelectedCourseNames().filter(
@@ -94,7 +95,7 @@
   role="region"
 >
   <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center">
-    <span class="font-medium">Courses</span>
+    <span class="font-medium">{t("list.courses")}</span>
     <span
       class="ml-2 text-xs bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 border border-blue-600/50 dark:border-blue-400/50 rounded-full px-1"
       >{courseCount}</span
@@ -105,7 +106,7 @@
         class="ml-auto text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
         onclick={copyShareLink}
       >
-        {copiedLink ? "Copied!" : "Copy Link"}
+        {copiedLink ? t("list.copied") : t("list.copyLink")}
       </button>
     {/if}
   </div>

@@ -3,12 +3,13 @@
     setSelectedDayHourFilter,
     setShowCoursesWithoutSchedule,
   } from "./globalState.svelte";
+  import { t } from "./i18n.svelte";
   import IconFilter from "./icons/IconFilter.svelte";
   import IconX from "./icons/IconX.svelte";
 
   let dialog: HTMLDialogElement;
 
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // keys for i18n
   const hours = Array.from({ length: 14 }, (_, i) => i + 9); // 9..22 inclusive
 
   let selectedDayHourFilter: boolean[][] = $state(initSelectedDayHourFilter());
@@ -63,7 +64,7 @@
 <div class="shrink-0">
   <button
     type="button"
-    aria-label="Filter Courses"
+    aria-label={t("filters.open")}
     onclick={() => dialog.showModal()}
     class="ml-2 p-2 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-zinc-800 cursor-pointer rounded-lg shadow"
   >
@@ -96,7 +97,7 @@
             }}
             class="cursor-pointer"
           />
-          Show courses without schedule
+          {t("filters.showWithoutSchedule")}
         </label>
 
         <label for="chk-all" class="mr-3">
@@ -111,7 +112,7 @@
             }}
             class="cursor-pointer"
           />
-          Select all
+          {t("filters.selectAll")}
         </label>
 
         <label for="chk-none">
@@ -126,7 +127,7 @@
             }}
             class="cursor-pointer"
           />
-          Unselect all
+          {t("filters.unselectAll")}
         </label>
       </div>
 
@@ -139,7 +140,7 @@
             {#each days as day, dIdx}
               <th
                 class="p-1 text-center select-none cursor-pointer"
-                onclick={() => toggleDaySelectedDayHourFilter(dIdx)}>{day}</th
+                onclick={() => toggleDaySelectedDayHourFilter(dIdx)}>{t(`day.${day}`)}</th
               >
             {/each}
           </tr>

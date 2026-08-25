@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { getCurrentSemester } from "./globalState.svelte";
-
+  import { t } from "./i18n.svelte";
   let meta: Record<string, string> | null = $state(null);
 
   const updatedAt = $derived.by(() => {
@@ -24,18 +24,19 @@
 </script>
 
 <div class="text-center text-zinc-500 py-3">
-  <p class="text-sm">Good luck in the new semester!</p>
+  <p class="text-sm">{t("footer.goodLuck")}</p>
   <small class="text-xs">
     This website has no affiliation with Boğaziçi University. Please check
     <a
       class="underline hover:text-blue-500"
       href="https://registration.boun.edu.tr"
       target="_blank"
-      rel="noopener noreferrer">BOUN registration</a
+      rel="noopener noreferrer"
+      >{t("footer.registration")}</a
     > for most up-to-date schedule. The schedule information presented in this page
     may sometimes lag behind the registration website.
   </small>
   {#if updatedAt}
-    <small class="block text-xs">Schedule data updated: {new Date(updatedAt).toLocaleString()}</small>
+    <small class="block text-xs">{t("footer.dataUpdated")} {new Date(updatedAt).toLocaleString()}</small>
   {/if}
 </div>
