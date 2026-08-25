@@ -573,19 +573,15 @@
 
   const canExportCalendar = $derived(hasSelectedCourses && isFutureSemester);
 
-  // Google Calendar TEMPLATE links are per-event; cap how many tabs we open
-  const canUseGoogleCalendar = $derived(
-    canExportCalendar && getSelectedCourseNames().length <= 6,
-  );
+  // Google Calendar TEMPLATE links are per-event; usable whenever export is.
+  const canUseGoogleCalendar = $derived(canExportCalendar);
 
   const calendarTooltip = $derived(
     !canExportCalendar
       ? !hasSelectedCourses
         ? t("calendar.tooltipSelectCourses")
         : t("calendar.tooltipNoDates")
-      : getSelectedCourseNames().length > 6
-        ? t("calendar.gcalTooMany")
-        : t("calendar.tooltipIcs"),
+      : t("calendar.tooltipIcs"),
   );
 
   const googleCalendarTooltip = $derived(
@@ -593,14 +589,22 @@
       ? !hasSelectedCourses
         ? t("calendar.tooltipSelectCourses")
         : t("calendar.tooltipNoDates")
-      : getSelectedCourseNames().length > 6
-        ? t("calendar.gcalTooMany")
-        : t("calendar.addToGcal"),
+      : t("calendar.addToGcal"),
   );
 </script>
 
 <div class="flex flex-col gap-2">
   <div class="flex items-center gap-3">
+    <button
+      type="button"
+      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      onclick={downloadCalendar}
+      disabled={!canExportCalendar}
+      title={calendarTooltip}
+    >
+      <IconDocument />
+      {t("calendar.addToCalendar")}
+    </button>
     {#if canUseGoogleCalendar}
       <button
         type="button"
