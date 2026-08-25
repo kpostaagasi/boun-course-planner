@@ -342,3 +342,42 @@ export async function loadDescriptions(): Promise<void> {
 export function getDescriptionFor(code: string): DescriptionInfo | null {
   return descriptionData ? (descriptionData[code] ?? null) : null;
 }
+
+// ---- Completed courses (eligibility feature) ----
+const completedCourses = $state<Set<string>>(new Set());
+let completedLoaded = false;
+
+export function loadCompleted(): void {
+  if (completedLoaded) return;
+  completedLoaded = true;
+  try {
+    const raw = localStorage.getItem("completedCourses");
+    if (raw) {
+      const arr: string[] = JSON.parse(raw);
+      for (const code of arr) completedCourses.add(code);
+    }
+  } catch {
+    // private mode / corrupt data: start empty
+  }
+}
+
+export function toggleCompleted(code: string): void {
+  if (completedCourses.has(code)) {
+    completedCourses.delete(code);
+  } else {
+    completedCourses.add(code);
+  }
+  try {
+    localStorage.setItem("completedCourses", JSON.stringify([...completedCourses]));
+  } catch {
+    // ignore persistence failures
+  }
+}
+
+export function isCompleted(code: string): boolean {
+  return completedCourses.has(code);
+}
+
+export function getCompletedCourses(): string[] {
+  return [...completedCourses];
+}
