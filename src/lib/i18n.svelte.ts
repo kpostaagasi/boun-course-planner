@@ -98,6 +98,17 @@ const dict: Record<string, { en: string; tr: string }> = {
   "roadmap.empty": { en: "Add courses to plan this term", tr: "Bu dönem için ders ekleyin" },
   "roadmap.fromTerm": { en: "Picking from", tr: "Kaynak dönem" },
   "roadmap.clear": { en: "Clear roadmap", tr: "Planı temizle" },
+  "palette.title": { en: "Course palette", tr: "Ders paleti" },
+  "palette.placeholder": { en: "Search by code, name, instructor…", tr: "Kod, ad, hoca ara…" },
+  "palette.noResults": { en: "No matching courses", tr: "Eşleşen ders yok" },
+  "palette.navigate": { en: "navigate", tr: "gez" },
+  "palette.add": { en: "add", tr: "ekle" },
+  "palette.close": { en: "close", tr: "kapat" },
+  "palette.openTitle": { en: "Open course palette (Ctrl/Cmd+K)", tr: "Ders paletini aç (Ctrl/Cmd+K)" },
+  "course.prereqTree": { en: "Prerequisite tree", tr: "Ön koşul ağacı" },
+  "course.showTree": { en: "Show prereq tree", tr: "Ön koşul ağacını göster" },
+  "course.hideTree": { en: "Hide prereq tree", tr: "Ön koşul ağacını gizle" },
+
 };
 let lang = $state<Lang>("en");
 

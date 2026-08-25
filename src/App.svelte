@@ -4,8 +4,9 @@
   import CourseCatalogue from "./lib/CourseCatalogue.svelte";
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
-  import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
+  import CommandPalette from "./lib/CommandPalette.svelte";
   import { loadPrereqs, loadDescriptions, loadCompleted, loadRoadmap } from "./lib/globalState.svelte";
+  import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
 
   onMount(() => {
@@ -38,5 +39,5 @@
     </div>
   </div>
 </main>
-
+<CommandPalette />
 <GoogleAnalytics />

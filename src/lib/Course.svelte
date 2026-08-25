@@ -1,7 +1,8 @@
 <script lang="ts">
-  import IconPlus from "./icons/IconPlus.svelte";
   import IconMinus from "./icons/IconMinus.svelte";
+  import PrereqTree from "./PrereqTree.svelte";
   import IconDocument from "./icons/IconDocument.svelte";
+  import IconPlus from "./icons/IconPlus.svelte";
   import {
     getSelectedCourseNames,
     getCurSemesterData,
@@ -55,6 +56,7 @@
 
   const descriptionInfo = $derived(getDescriptionFor(course.code.split(".")[0].replace(/\s+/g, "")));
   let descriptionExpanded = $state(false);
+  let treeExpanded = $state(false);
 
   const conflicts = $derived.by(() => {
     const { hours, days } = getCurSemesterData()[courseName];
@@ -191,6 +193,25 @@
         >
           {t("course.minGpa")} {prereqInfo.gpa}
         </div>
+      {/if}
+    {/if}
+    {#if prereqInfo && prereqInfo.prereqs.length > 0}
+      <button
+        type="button"
+        class="text-xs cursor-pointer {conflicts.length > 0
+          ? 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
+        onclick={() => (treeExpanded = !treeExpanded)}
+      >
+        {treeExpanded ? t("course.hideTree") : t("course.showTree")} {treeExpanded ? "▲" : "▼"}
+      </button>
+      {#if treeExpanded}
+        <PrereqTree
+          code={course.code.split(".")[0].replace(/\s+/g, "")}
+          prereqMap={prereqMap}
+          isCompleted={(c) => completedSet.has(c)}
+          onclose={() => (treeExpanded = false)}
+        />
       {/if}
     {/if}
     {#if descriptionInfo?.description}
