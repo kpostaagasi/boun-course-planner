@@ -388,7 +388,6 @@ export function getCompletedCourses(): string[] {
   return [...completedCourses];
 }
 
-
 // ---- Roadmap (multi-semester planning) ----
 const roadmapState = $state<Record<string, string[]>>({});
 let roadmapLoaded = false;

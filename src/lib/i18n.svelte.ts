@@ -90,6 +90,14 @@ const dict: Record<string, { en: string; tr: string }> = {
     tr: "Yeni dönemde başarılar!",
   },
   "footer.registration": { en: "BOUN registration", tr: "BOUN kayıt" },
+  "roadmap.title": { en: "Roadmap", tr: "Yol Haritası" },
+  "roadmap.addCourse": { en: "Add course…", tr: "Ders ekle…" },
+  "roadmap.prereqUnmet": { en: "Prereq not met before this term", tr: "Ön koşul bu döneme kadar tamamlanmamış" },
+  "roadmap.prereqOk": { en: "Prerequisites met", tr: "Ön koşullar tamam" },
+  "roadmap.credits": { en: "credits", tr: "kredi" },
+  "roadmap.empty": { en: "Add courses to plan this term", tr: "Bu dönem için ders ekleyin" },
+  "roadmap.fromTerm": { en: "Picking from", tr: "Kaynak dönem" },
+  "roadmap.clear": { en: "Clear roadmap", tr: "Planı temizle" },
 };
 let lang = $state<Lang>("en");
 

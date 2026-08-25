@@ -13,6 +13,7 @@
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
   import { t } from "./i18n.svelte";
+  import Roadmap from "./Roadmap.svelte";
 
   const courseCount = $derived(
     getSelectedCourseNames().filter(
@@ -47,6 +48,7 @@
   });
 
   let copiedLink = $state(false);
+  let showRoadmap = $state(false);
 
   function copyShareLink() {
     const url = `${location.origin}${location.pathname}?d=${encodeURIComponent(getCurrentSemester())}&c=${encodeURIComponent(getSelectedCourseNames().join(","))}`;
@@ -109,7 +111,17 @@
         {copiedLink ? t("list.copied") : t("list.copyLink")}
       </button>
     {/if}
+    <button
+      type="button"
+      class="ml-2 text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
+      onclick={() => (showRoadmap = !showRoadmap)}
+    >
+      {t("roadmap.title")}
+    </button>
   </div>
+  {#if showRoadmap}
+    <Roadmap />
+  {:else}
   <div
     class="divide-y divide-gray-200 dark:divide-zinc-500"
     onmouseleave={() => setHoveredCourse("")}
@@ -148,6 +160,7 @@
       </div>
     {/if}
   </div>
+  {/if}
   <div
     class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 text-green-700 dark:text-green-300 font-medium"
   >
