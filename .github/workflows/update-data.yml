@@ -7,6 +7,8 @@ name: Update course data
 # One-time setup: Repository -> Settings -> Pages -> Source: "GitHub Actions".
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "0 5 * * *" # daily at 05:00 UTC (08:00 Istanbul)
   workflow_dispatch:
@@ -105,23 +107,23 @@ jobs:
           fi
 
       - name: Build site
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: npm run build
 
       - uses: actions/configure-pages@v5
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
 
       - uses: actions/upload-pages-artifact@v3
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         with:
           path: dist
 
       - id: deployment
         uses: actions/deploy-pages@v4
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
 
       - name: Smoke test deployment
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
           BASE="${{ steps.deployment.outputs.page_url }}"
           FAIL=0
