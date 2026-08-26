@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import {
     getCurSemesterData,
     addCourse,
@@ -77,10 +76,6 @@
     }
   });
 
-  onMount(() => {
-    document.addEventListener("keydown", onKeydown);
-    return () => document.removeEventListener("keydown", onKeydown);
-  });
 </script>
 
 <svelte:window on:keydown={onKeydown} />
