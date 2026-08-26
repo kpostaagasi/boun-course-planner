@@ -1,6 +1,7 @@
 export {
   checkRoadmapPrereqs,
   termCredits,
+  termEcts,
   sortTermsNewestFirst,
 } from "./roadmapLogic.mjs";
 

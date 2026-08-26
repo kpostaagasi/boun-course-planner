@@ -98,6 +98,10 @@ const dict: Record<string, { en: string; tr: string }> = {
   "roadmap.empty": { en: "Add courses to plan this term", tr: "Bu dönem için ders ekleyin" },
   "roadmap.fromTerm": { en: "Picking from", tr: "Kaynak dönem" },
   "roadmap.clear": { en: "Clear roadmap", tr: "Planı temizle" },
+  "roadmap.overload": {
+    en: "Heavy load — BOUN norm is ~30 ECTS/term",
+    tr: "Ağır yük — BOÜZ normu dönemde ~30 ECTS",
+  },
   "palette.title": { en: "Course palette", tr: "Ders paleti" },
   "palette.placeholder": { en: "Search by code, name, instructor…", tr: "Kod, ad, hoca ara…" },
   "palette.noResults": { en: "No matching courses", tr: "Eşleşen ders yok" },
@@ -108,6 +112,20 @@ const dict: Record<string, { en: string; tr: string }> = {
   "course.prereqTree": { en: "Prerequisite tree", tr: "Ön koşul ağacı" },
   "course.showTree": { en: "Show prereq tree", tr: "Ön koşul ağacını göster" },
   "course.hideTree": { en: "Hide prereq tree", tr: "Ön koşul ağacını gizle" },
+  "timetable.semesterStart": { en: "Start", tr: "Başlangıç" },
+  "timetable.semesterEnd": { en: "End", tr: "Bitiş" },
+  "course.offeredTerms": {
+    en: "Offered in {n} terms since 2017",
+    tr: "2017'den beri {n} dönemde açıldı",
+  },
+  "newly.title": { en: "Newly eligible", tr: "Yeni uygun hale gelenler" },
+  "newly.completedAsOf": { en: "Completed as of", tr: "Tamamlanmış kabul dönemi" },
+  "newly.now": { en: "Now", tr: "Şimdi" },
+  "newly.missingPrereqs": { en: "{n} missing prereqs", tr: "{n} eksik ön koşul" },
+  "newly.empty": {
+    en: "No courses would become newly eligible.",
+    tr: "Yeni uygun hale gelecek ders yok.",
+  },
 
 };
 let lang = $state<Lang>("en");

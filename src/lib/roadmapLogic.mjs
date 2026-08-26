@@ -62,6 +62,27 @@ export function termCredits(semesterKey, roadmap, termData) {
 }
 
 /**
+ * @param {string} semesterKey
+ * @param {Record<string, string[]>} roadmap
+ * @param {Record<string, any>} termData semester course map keyed by section name
+ */
+export function termEcts(semesterKey, roadmap, termData) {
+  /** @type {Record<string, number>} */
+  const codeToEcts = {};
+  for (const [sectionName, info] of Object.entries(termData)) {
+    const base = sectionName.split(".")[0];
+    if (info && typeof info.ects !== "undefined" && !(base in codeToEcts)) {
+      codeToEcts[base] = Number(info.ects) || 0;
+    }
+  }
+  let total = 0;
+  for (const code of roadmap[semesterKey] || []) {
+    total += codeToEcts[code] || 0;
+  }
+  return total;
+}
+
+/**
  * @param {string[]} terms
  * @returns {string[]}
  */

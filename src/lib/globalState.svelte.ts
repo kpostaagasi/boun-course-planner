@@ -320,6 +320,27 @@ export function getPrereqsAll(): Record<string, PrereqInfo> | null {
   return prereqData;
 }
 
+let offeringsData = $state<Record<string, string[]> | null>(null); // Offering terms keyed by base course code ("CMPE210")
+let offeringsLoadStarted = false;
+
+// Fetch offering history data once; missing/404/error leaves offeringsData null
+export async function loadOfferings(): Promise<void> {
+  if (offeringsLoadStarted) return;
+  offeringsLoadStarted = true;
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/offerings.json`);
+    if (res.ok) {
+      offeringsData = (await res.json()) as Record<string, string[]>;
+    }
+  } catch {
+    // Data unavailable; app works without offering badges
+  }
+}
+
+export function getOfferings(): Record<string, string[]> | null {
+  return offeringsData;
+}
+
 export type DescriptionInfo = {
   title: string;
   credits: string;

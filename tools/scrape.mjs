@@ -270,6 +270,33 @@ async function main() {
     );
   }
 
+  // offerings.json: per-course term archive derived from all semester files.
+  // Regenerated on every run so the frontend "offered when" badge stays fresh.
+  const offeringsFile = path.join(DATA_DIR, "offerings.json");
+  const offerings = {};
+  for (const entry of existingFiles) {
+    if (!/^\d{4}-\d{4}-\d\.json$/.test(entry)) continue;
+    const termData = readJson(entry);
+    for (const key of Object.keys(termData)) {
+      const base = key.split(".")[0].replace(/\s+/g, "");
+      const terms = (offerings[base] ??= new Set());
+      terms.add(entry.replace(".json", ""));
+    }
+  }
+  const out = {};
+  for (const k of Object.keys(offerings)) out[k] = [...offerings[k]].sort();
+  const offeringsJson = JSON.stringify(out) + "\n";
+  if (
+    !existsSync(offeringsFile) ||
+    readFileSync(offeringsFile, "utf8") !== offeringsJson
+  ) {
+    writeFileSync(offeringsFile, offeringsJson);
+    changed.push("offerings.json");
+    console.log(
+      `  offerings.json: written (${Object.keys(out).length} courses)`,
+    );
+  }
+
   if (changed.length === 0 && missingDates.length === 0) {
     console.log("Everything already up to date.");
   } else if (changed.length > 0) {

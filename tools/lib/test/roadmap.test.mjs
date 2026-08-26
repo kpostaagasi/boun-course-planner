@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkRoadmapPrereqs, termCredits, sortTermsNewestFirst } from "../../../src/lib/roadmapLogic.mjs";
+import { checkRoadmapPrereqs, termCredits, termEcts, sortTermsNewestFirst } from "../../../src/lib/roadmapLogic.mjs";
 
 const prereqs = {
   CMPE210: { prereqs: ["CMPE150"] },
@@ -40,6 +40,15 @@ test("termCredits sums credits from term data", () => {
 
 test("termCredits counts unknown courses as 0", () => {
   assert.equal(termCredits("t", { t: ["NOPE101"] }, {}), 0);
+});
+
+test("termEcts sums ects from term data", () => {
+  const termData = { "CMPE150.01": { ects: "5" }, "MATH101.01": { ects: 6 } };
+  assert.equal(termEcts("2026-2027-1", { "2026-2027-1": ["CMPE150", "MATH101"] }, termData), 11);
+});
+
+test("termEcts counts unknown courses as 0", () => {
+  assert.equal(termEcts("t", { t: ["NOPE101"] }, {}), 0);
 });
 
 test("sortTermsNewestFirst orders YYYY/YYYY-T descending", () => {

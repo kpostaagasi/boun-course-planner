@@ -13,9 +13,10 @@
     getPrereqsAll,
     getDescriptionFor,
   } from "./globalState.svelte";
-  import { t } from "./i18n.svelte";
+  import { t, getLang } from "./i18n.svelte";
   import { getEligibility } from "./eligibility";
-  import { toggleCompleted, isCompleted, getCompletedCourses } from "./globalState.svelte";
+  import { toggleCompleted, isCompleted, getCompletedCourses, getOfferings } from "./globalState.svelte";
+  import { termHistory } from "./termHistory";
 
   let { course, courseName, striped, currentSemester, selected } = $props();
   const syllabusLink = $derived.by(() => {
@@ -52,6 +53,21 @@
   const eligibility = $derived(
     getEligibility(course.code.split(".")[0].replace(/\s+/g, ""), completedSet, prereqMap),
   );
+  const baseCode = $derived(course.code.split(".")[0].replace(/\s+/g, ""));
+  const offeringsMap = $derived(getOfferings());
+  const offeredTerms = $derived(offeringsMap ? offeringsMap[baseCode] ?? null : null);
+  const offeringHistory = $derived(offeredTerms ? termHistory(offeredTerms) : null);
+  const seasonGlyphs = $derived.by(() => {
+    if (!offeringHistory) return "";
+    const names: Record<number, string> = {
+      1: "Fall",
+      2: "Spring",
+      3: "Summer",
+    };
+    return offeringHistory.seasons
+      .map((s) => (getLang() === "tr" ? { 1: "Güz", 2: "Bahar", 3: "Yaz" }[s] : names[s]))
+      .join("/");
+  });
   const prereqInfo = $derived(getPrereqsFor(course.code.split(".")[0].replace(/\s+/g, "")));
 
   const descriptionInfo = $derived(getDescriptionFor(course.code.split(".")[0].replace(/\s+/g, "")));
@@ -120,6 +136,14 @@
           {/if}
           {#if "ects" in course}
             <span>{course.ects} ECTS</span>
+          {/if}
+          {#if offeringHistory}
+            <span
+              class="text-xs text-zinc-400 dark:text-zinc-500 mr-2"
+              title={t("course.offeredTerms").replace("{n}", String(offeringHistory.count))}
+            >
+              {offeringHistory.count}× · {seasonGlyphs}
+            </span>
           {/if}
         </span>
       </span>

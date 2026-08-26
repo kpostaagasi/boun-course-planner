@@ -15,6 +15,7 @@
   import {
     checkRoadmapPrereqs,
     termCredits,
+    termEcts,
     sortTermsNewestFirst,
   } from "./roadmapLogic";
   import IconX from "./icons/IconX.svelte";
@@ -188,6 +189,10 @@
     return termCredits(info.term, getRoadmap(), info.data ?? {});
   }
 
+  function ectsFor(info: TermInfo): number {
+    return termEcts(info.term, getRoadmap(), info.data ?? {});
+  }
+
   function suggestions(term: string): { code: string; name: string }[] {
     const q = (addQuery[term] ?? "").trim().toUpperCase();
     const info = terms.find((t) => t.term === term);
@@ -284,9 +289,11 @@
               {/each}
             {/if}
           </div>
-
           <div class="py-1 px-3 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-700/60">
-            {creditsFor(info)} {t("roadmap.credits")}
+            {creditsFor(info)} {t("roadmap.credits")} · {ectsFor(info)} ECTS
+            {#if ectsFor(info) > 40}
+              <div class="text-red-500 text-xs">{t("roadmap.overload")}</div>
+            {/if}
           </div>
 
           <div class="relative py-2 px-2 border-t border-gray-200 dark:border-zinc-600">

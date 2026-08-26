@@ -5,7 +5,8 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import CommandPalette from "./lib/CommandPalette.svelte";
-  import { loadPrereqs, loadDescriptions, loadCompleted, loadRoadmap } from "./lib/globalState.svelte";
+  import NewlyEligible from "./lib/NewlyEligible.svelte";
+  import { loadPrereqs, loadDescriptions, loadCompleted, loadRoadmap, loadOfferings } from "./lib/globalState.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
 
@@ -15,6 +16,8 @@
     loadPrereqs();
     // Fire-and-forget: errors handled inside loadDescriptions
     loadDescriptions();
+    // Fire-and-forget: errors handled inside loadOfferings
+    loadOfferings();
     // Fire-and-forget: localStorage restore, errors handled inside loadCompleted
     loadCompleted();
     // Fire-and-forget: localStorage restore, errors handled inside loadRoadmap
@@ -33,6 +36,7 @@
     >
       <Timetable />
       <CourseList />
+      <NewlyEligible />
     </div>
     <div class="w-full md:w-7/12 p-2 flex flex-col grow h-full">
       <CourseCatalogue />

@@ -5,6 +5,47 @@
     getCurSemesterData,
     getCurrentSemester,
   } from "./globalState.svelte";
+  import { onMount } from "svelte";
+  import { t, getLang } from "./i18n.svelte";
+
+  type Holiday = { date: string; name?: string; timeType?: string; time?: string };
+  type SemesterDates = { start?: string; end?: string; holidays?: Holiday[] };
+
+  let semesterDates = $state<Record<string, SemesterDates> | null>(null);
+
+  onMount(async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}data/semester-dates.json`);
+      if (!res.ok) return;
+      semesterDates = await res.json();
+    } catch {
+      // no date data available
+    }
+  });
+
+  type CalendarInfo = {
+    start: string;
+    end: string;
+    holidays: Holiday[];
+  };
+
+  function formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString(getLang() === "tr" ? "tr-TR" : "en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  const calendarInfo = $derived<CalendarInfo | null>(
+    semesterDates && getCurrentSemester() && semesterDates[getCurrentSemester()]
+      ? {
+          start: semesterDates[getCurrentSemester()].start ?? "",
+          end: semesterDates[getCurrentSemester()].end ?? "",
+          holidays: semesterDates[getCurrentSemester()].holidays ?? [],
+        }
+      : null
+  );
 
   const calculateTable = $derived(
     getCurrentSemester() != "" &&
@@ -173,6 +214,21 @@
   };
 </script>
 
+{#if calendarInfo}
+  <div class="flex flex-wrap gap-1 text-xs items-center mb-2 px-1">
+    <span class="text-zinc-500 dark:text-zinc-400">
+      {t("timetable.semesterStart")}: {formatDate(calendarInfo.start)}
+    </span>
+    <span class="text-zinc-500 dark:text-zinc-400">
+      {t("timetable.semesterEnd")}: {formatDate(calendarInfo.end)}
+    </span>
+    {#each calendarInfo.holidays as h}
+      <span class="bg-zinc-200 dark:bg-zinc-700 rounded px-1.5 py-0.5">
+        {h.name} ({formatDate(h.date)})
+      </span>
+    {/each}
+  </div>
+{/if}
 <div
   class="bg-white dark:bg-gray-800 dark:text-white shadow rounded-lg w-full shrink-0 overflow-x-auto"
 >
