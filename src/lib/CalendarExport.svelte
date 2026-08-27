@@ -29,6 +29,18 @@
   // State for showing import instructions
   let showInstructions = $state(false);
 
+  /**
+   * Outcome of the `semester-dates.json` fetch, tracked instead of inferred
+   * from an empty `semesterDates`.
+   *
+   * The file covers 6 of the 25 published terms, so "no entry for this term" is
+   * the normal case and must not be reported as a failure. A fetch that really
+   * fails is a different story, and used to leave the export button disabled
+   * behind the misleading "select courses" hint with the only explanation going
+   * to `console.error`.
+   */
+  let datesStatus = $state<"loading" | "ready" | "failed">("loading");
+
   // Load semester dates and holidays from JSON file
   onMount(async () => {
     try {
@@ -47,10 +59,13 @@
             }
           }
         );
+        datesStatus = "ready";
       } else {
+        datesStatus = "failed";
         console.error("Failed to load semester dates:", res.statusText);
       }
     } catch (error) {
+      datesStatus = "failed";
       console.error("Error loading semester dates:", error);
     }
   });
@@ -562,34 +577,26 @@
 
   const hasSelectedCourses = $derived(
     getSelectedCourseNames().length > 0 &&
-      getCurrentSemester() &&
-      getCurSemesterData() &&
-      Object.keys(semesterDates).length > 0
+      !!getCurrentSemester() &&
+      !!getCurSemesterData()
   );
 
-  const isFutureSemester = $derived(
-    getCurrentSemester() && semesterDates[getCurrentSemester()]
+  const hasSemesterDates = $derived(
+    !!getCurrentSemester() && !!semesterDates[getCurrentSemester()]
   );
 
-  const canExportCalendar = $derived(hasSelectedCourses && isFutureSemester);
+  const canExportCalendar = $derived(hasSelectedCourses && hasSemesterDates);
 
-  // Google Calendar TEMPLATE links are per-event; usable whenever export is.
-  const canUseGoogleCalendar = $derived(canExportCalendar);
-
+  // Ordered by how actionable the reason is: a failed fetch blocks export no
+  // matter what is selected, so it wins over the selection hint.
   const calendarTooltip = $derived(
-    !canExportCalendar
-      ? !hasSelectedCourses
-        ? t("calendar.tooltipSelectCourses")
-        : t("calendar.tooltipNoDates")
-      : t("calendar.tooltipIcs"),
-  );
-
-  const googleCalendarTooltip = $derived(
-    !canExportCalendar
-      ? !hasSelectedCourses
-        ? t("calendar.tooltipSelectCourses")
-        : t("calendar.tooltipNoDates")
-      : t("calendar.addToGcal"),
+    canExportCalendar
+      ? t("calendar.tooltipIcs")
+      : datesStatus === "failed"
+        ? t("calendar.datesLoadFailed")
+        : !hasSelectedCourses
+          ? t("calendar.tooltipSelectCourses")
+          : t("calendar.tooltipNoDates")
   );
 </script>
 
@@ -601,16 +608,18 @@
       onclick={downloadCalendar}
       disabled={!canExportCalendar}
       title={calendarTooltip}
+      data-testid="calendar-ics"
     >
       <IconDocument />
       {t("calendar.addToCalendar")}
     </button>
-    {#if canUseGoogleCalendar}
+    {#if canExportCalendar}
       <button
         type="button"
         class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 rounded-lg transition-colors duration-200"
         onclick={openInGoogleCalendar}
-        title={googleCalendarTooltip}
+        title={t("calendar.addToGcal")}
+        data-testid="calendar-gcal"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -628,12 +637,17 @@
         </svg>
         {t("calendar.addToGcal")}
       </button>
-    {:else if canExportCalendar}
-      <!-- >6 courses: hidden entirely; the .ics button tooltip explains why -->
     {/if}
 
-    {#if !canExportCalendar}
-      <span class="text-xs text-zinc-500 dark:text-zinc-400">{calendarTooltip}</span>
+    <!-- A disabled export button with no explanation reads as a broken app, so
+         the reason is shown inline once the fetch has settled; during the
+         in-flight moment there is nothing truthful to say yet. -->
+    {#if !canExportCalendar && datesStatus !== "loading"}
+      <span
+        class="text-xs text-zinc-500 dark:text-zinc-400"
+        data-testid="calendar-reason"
+        data-dates-status={datesStatus}>{calendarTooltip}</span
+      >
     {/if}
 
     <button

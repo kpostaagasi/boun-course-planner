@@ -66,6 +66,7 @@
     type="button"
     aria-label={t("filters.open")}
     onclick={() => dialog.showModal()}
+    data-testid="filters-open"
     class="ml-2 p-2 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-zinc-800 cursor-pointer rounded-lg shadow"
   >
     <IconFilter />
@@ -172,9 +173,10 @@
       <button
         type="button"
         onclick={() => saveFilters()}
+        data-testid="filters-apply"
         class="mt-2 float-right cursor-pointer rounded-lg bg-white dark:bg-zinc-800 py-1 px-2"
       >
-        Apply
+        {t("filters.apply")}
       </button>
     </div>
   </div>

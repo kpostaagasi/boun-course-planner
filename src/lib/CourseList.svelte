@@ -8,7 +8,8 @@
     resetHoveredCourse,
     setCourseList,
   } from "./globalState.svelte";
-  import { solveConflictFree } from "./solver";
+  import { groupKey, solveConflictFree } from "./solver";
+  import { buildSelectionSearch } from "./urlState";
   import IconX from "./icons/IconX.svelte";
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
@@ -51,7 +52,13 @@
   let showRoadmap = $state(false);
 
   function copyShareLink() {
-    const url = `${location.origin}${location.pathname}?d=${encodeURIComponent(getCurrentSemester())}&c=${encodeURIComponent(getSelectedCourseNames().join(","))}`;
+    // urlState.mjs owns the `?d=`/`?c=` wire format; hand-rolling it here is
+    // how the share link and the history entry drift apart.
+    const url = `${location.origin}${location.pathname}${buildSelectionSearch(
+      location.search,
+      getCurrentSemester(),
+      getSelectedCourseNames()
+    )}`;
     const markCopied = () => {
       copiedLink = true;
       setTimeout(() => {
@@ -66,8 +73,55 @@
         markCopied();
       });
   }
+  /**
+   * What the last solve found, recorded as facts rather than prose so the
+   * message can be derived: flipping the language re-renders it instead of
+   * leaving a stale English sentence on screen.
+   */
+  type SolverOutcome =
+    | { kind: "applied" }
+    | { kind: "unsatisfiable"; blockedOn: string; labsPinned: boolean }
+    | { kind: "gave-up"; blockedOn: string };
+
   let prevSchedule = $state<string[] | null>(null);
-  let solverMessage = $state("");
+  let solverOutcome = $state<SolverOutcome | null>(null);
+
+  /**
+   * Does the selection contain a section the solver structurally cannot swap?
+   *
+   * `groupKey` only strips a trailing `.NN`, so `"CMPE101.01 LAB 1"` is its own
+   * group of one (see the note on `groupKey` in solver.mjs). The solver
+   * therefore never reshuffles labs or problem sessions, even when free
+   * alternatives exist, which means a fully explored search proves only "no
+   * conflict-free combination exists *with these labs pinned*". That is worth
+   * saying out loud, because the remedy belongs to the user: pick another lab.
+   * Narrowed to keys that actually name a lab or problem session so the
+   * wording is literally true.
+   */
+  function hasPinnedSubsections(selected: string[]): boolean {
+    return selected.some(
+      (key) => groupKey(key) === key && /(LAB|P\.S\.)/.test(key)
+    );
+  }
+
+  // The dictionary entries are placeholder-free sentence openers, so the key
+  // the solver reported is appended here rather than interpolated.
+  const solverMessage = $derived.by(() => {
+    const outcome = solverOutcome;
+    if (!outcome) {
+      return "";
+    }
+    if (outcome.kind === "applied") {
+      return t("list.solverApplied");
+    }
+    if (outcome.kind === "unsatisfiable") {
+      const proven = `${t("list.solverUnsatisfiable")} ${outcome.blockedOn}.`;
+      return outcome.labsPinned
+        ? `${proven} ${t("list.solverLabsFixed")}`
+        : proven;
+    }
+    return `${t("list.solverGaveUp")} ${outcome.blockedOn}. ${t("list.solverGaveUpHint")}`;
+  });
 
   function findConflictFree() {
     const current = getSelectedCourseNames();
@@ -75,10 +129,22 @@
     if (result.ok) {
       prevSchedule = [...current];
       setCourseList(result.schedule);
-      solverMessage = "Applied conflict-free schedule";
-    } else {
-      solverMessage = `No conflict-free combination exists (blocked by: ${result.blockedOn})`;
+      solverOutcome = { kind: "applied" };
+      return;
     }
+    if (result.reason === "budget-exhausted") {
+      // The search was cut off at SOLVER_TRIAL_BUDGET, so nothing was proven
+      // and "no combination exists" would be false. `blockedOn` is only where
+      // the search stalled, never a refuted requirement.
+      solverOutcome = { kind: "gave-up", blockedOn: result.blockedOn };
+      return;
+    }
+    // Search tree fully explored: the impossibility claim is earned.
+    solverOutcome = {
+      kind: "unsatisfiable",
+      blockedOn: result.blockedOn,
+      labsPinned: hasPinnedSubsections(current),
+    };
   }
 
   function undoConflictFree() {
@@ -87,7 +153,7 @@
     }
     setCourseList(prevSchedule);
     prevSchedule = null;
-    solverMessage = "";
+    solverOutcome = null;
   }
 </script>
 
@@ -107,6 +173,7 @@
         type="button"
         class="ml-auto text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
         onclick={copyShareLink}
+        data-testid="copy-share-link"
       >
         {copiedLink ? t("list.copied") : t("list.copyLink")}
       </button>
@@ -115,6 +182,7 @@
       type="button"
       class="ml-2 text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
       onclick={() => (showRoadmap = !showRoadmap)}
+      data-testid="roadmap-toggle"
     >
       {t("roadmap.title")}
     </button>
@@ -155,16 +223,18 @@
     {:else}
       <div
         class="text-zinc-500 text-sm h-8 flex flex-col justify-center items-center"
+        data-testid="courses-empty"
       >
-        You have no selected course
+        {t("list.empty")}
       </div>
     {/if}
   </div>
   {/if}
   <div
     class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 text-green-700 dark:text-green-300 font-medium"
+    data-testid="total-credits"
   >
-    Total Credits: {totalCredit}
+    {t("list.totalCredits")} {totalCredit}
   </div>
   <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center gap-2 flex-wrap">
     <button
@@ -172,19 +242,25 @@
       class="text-xs px-2 py-1 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       disabled={getSelectedCourseNames().length < 2}
       onclick={findConflictFree}
+      data-testid="find-conflict-free"
     >
-      Find conflict-free sections
+      {t("list.findConflictFree")}
     </button>
-    {#if solverMessage}
-      <span class="text-xs text-zinc-600 dark:text-zinc-300">{solverMessage}</span>
+    {#if solverOutcome}
+      <span
+        class="text-xs text-zinc-600 dark:text-zinc-300"
+        data-testid="solver-message"
+        data-solver-outcome={solverOutcome.kind}>{solverMessage}</span
+      >
     {/if}
     {#if prevSchedule}
       <button
         type="button"
         class="text-xs px-2 py-1 rounded border border-zinc-400/50 dark:border-zinc-500/50 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 cursor-pointer"
         onclick={undoConflictFree}
+        data-testid="solver-undo"
       >
-        Undo
+        {t("list.undo")}
       </button>
     {/if}
   </div>
