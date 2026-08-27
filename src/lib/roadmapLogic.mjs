@@ -1,9 +1,15 @@
 /**
- * Pure roadmap logic: cross-term prerequisite checking and credit totals.
+ * Pure roadmap logic: cross-term prerequisite checking, course metadata lookup
+ * and per-term credit totals.
  * Terms are ordered oldest-first in `orderedTerms`; a prerequisite counts as
  * satisfied if it is in `completed` OR taught in any EARLIER roadmap term.
  * Dangling prereq references are ignored (spec decision).
  */
+
+import { compareTerms } from "./futureTerms.mjs";
+
+/** More ECTS than this in one term is an overload (BOUN norm is ~30). */
+export const ECTS_OVERLOAD_THRESHOLD = 40;
 
 /**
  * @param {Record<string, string[]>} roadmap
@@ -41,24 +47,74 @@ export function checkRoadmapPrereqs(roadmap, orderedTerms, completed, prereqs) {
 }
 
 /**
+ * @typedef {Object} CatalogEntry
+ * @property {string} name
+ * @property {number | undefined} credits undefined = no dataset stated it
+ * @property {number | undefined} ects
+ */
+
+/**
+ * Collapse per-term section maps ("CMPE150.01" -> record) into a base-code
+ * catalogue. Datasets are consulted in order and the first one that states a
+ * field wins, so pass them NEWEST TERM FIRST: for a term with no data of its
+ * own, that is exactly "the numbers from the most recent known offering".
+ *
+ * @param {(Record<string, any> | null | undefined)[]} datasets
+ * @returns {Record<string, CatalogEntry>}
+ */
+export function courseCatalog(datasets) {
+  /** @type {Record<string, CatalogEntry>} */
+  const out = {};
+  for (const data of datasets) {
+    if (!data) continue;
+    for (const [sectionName, info] of Object.entries(data)) {
+      if (!info) continue;
+      const base = sectionName.split(".")[0];
+      let entry = out[base];
+      if (!entry) {
+        entry = { name: "", credits: undefined, ects: undefined };
+        out[base] = entry;
+      }
+      if (!entry.name && typeof info.name !== "undefined") {
+        entry.name = String(info.name);
+      }
+      if (typeof entry.credits === "undefined" && typeof info.credits !== "undefined") {
+        entry.credits = Number(info.credits) || 0;
+      }
+      if (typeof entry.ects === "undefined" && typeof info.ects !== "undefined") {
+        entry.ects = Number(info.ects) || 0;
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Credit and ECTS totals for one roadmap term, plus the overload verdict.
+ * @param {string} semesterKey
+ * @param {Record<string, string[]>} roadmap
+ * @param {Record<string, CatalogEntry>} catalog
+ * @returns {{ credits: number, ects: number, overload: boolean }}
+ */
+export function termLoad(semesterKey, roadmap, catalog) {
+  let credits = 0;
+  let ects = 0;
+  for (const code of roadmap[semesterKey] || []) {
+    const entry = catalog[code];
+    if (!entry) continue;
+    credits += entry.credits || 0;
+    ects += entry.ects || 0;
+  }
+  return { credits, ects, overload: ects > ECTS_OVERLOAD_THRESHOLD };
+}
+
+/**
  * @param {string} semesterKey
  * @param {Record<string, string[]>} roadmap
  * @param {Record<string, any>} termData semester course map keyed by section name
  */
 export function termCredits(semesterKey, roadmap, termData) {
-  /** @type {Record<string, number>} */
-  const codeToCredits = {};
-  for (const [sectionName, info] of Object.entries(termData)) {
-    const base = sectionName.split(".")[0];
-    if (info && typeof info.credits !== "undefined" && !(base in codeToCredits)) {
-      codeToCredits[base] = Number(info.credits) || 0;
-    }
-  }
-  let total = 0;
-  for (const code of roadmap[semesterKey] || []) {
-    total += codeToCredits[code] || 0;
-  }
-  return total;
+  return termLoad(semesterKey, roadmap, courseCatalog([termData])).credits;
 }
 
 /**
@@ -67,25 +123,16 @@ export function termCredits(semesterKey, roadmap, termData) {
  * @param {Record<string, any>} termData semester course map keyed by section name
  */
 export function termEcts(semesterKey, roadmap, termData) {
-  /** @type {Record<string, number>} */
-  const codeToEcts = {};
-  for (const [sectionName, info] of Object.entries(termData)) {
-    const base = sectionName.split(".")[0];
-    if (info && typeof info.ects !== "undefined" && !(base in codeToEcts)) {
-      codeToEcts[base] = Number(info.ects) || 0;
-    }
-  }
-  let total = 0;
-  for (const code of roadmap[semesterKey] || []) {
-    total += codeToEcts[code] || 0;
-  }
-  return total;
+  return termLoad(semesterKey, roadmap, courseCatalog([termData])).ects;
 }
 
 /**
+ * Newest-first chronological order. Delegates to `compareTerms`, which parses
+ * the key: string comparison is wrong once display-form ("2026/2027-1") and
+ * file-form ("2027-2028-1") keys meet in one list, because "-" < "/".
  * @param {string[]} terms
  * @returns {string[]}
  */
 export function sortTermsNewestFirst(terms) {
-  return [...terms].sort((a, b) => b.localeCompare(a));
+  return [...terms].sort((a, b) => compareTerms(b, a));
 }
