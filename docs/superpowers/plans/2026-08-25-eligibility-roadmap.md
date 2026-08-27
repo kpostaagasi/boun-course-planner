@@ -1,6 +1,14 @@
 # Eligibility Badges (A) + Roadmap Panel (B) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Status: COMPLETE.** All seven tasks shipped; every step below is ticked.
+> Landed in `e74badc` (task 1), `7e13e16` (2), `306204a` (3), `b5ec7c8` (4),
+> `e1fdee9` (5), `f37cf3a` (6), plus the follow-up fixes `e1ad55a` and
+> `7b83572`. Task 7 verification is confirmed by the artifacts in the tree
+> (`src/lib/eligibility.{mjs,ts}`, `src/lib/roadmapLogic.{mjs,ts}`,
+> `src/lib/Roadmap.svelte`, `tools/lib/test/{eligibility,roadmap}.test.mjs`)
+> and by `main` being level with `origin/main`.
+>
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use GitHub-flavoured checkbox syntax for tracking.
 
 **Goal:** Students mark completed courses to see eligibility badges (A) and plan courses across future semesters in a roadmap panel (B).
 
@@ -33,7 +41,7 @@
 - Consumes: nothing (pure).
 - Produces: `export type Eligibility = "taken" | "eligible" | "missing-prereq" | "no-data"`; `export function getEligibility(baseCode, completedSet, prereqs)` returning `{ status: Eligibility, missing: string[] }` — `missing` non-empty only for `missing-prereq`, capped at 3 entries plus boolean `moreMissing` when truncated. NOTE for later tasks: the return is an OBJECT `{status, missing, moreMissing}`, not a bare string.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```js
 // tools/lib/test/eligibility.test.mjs
@@ -83,12 +91,12 @@ test("missing list capped at 3 with moreMissing flag", () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `node --test tools/lib/test/eligibility.test.mjs`
 Expected: FAIL (module not found)
 
-- [ ] **Step 3: Implement `src/lib/eligibility.mjs`**
+- [x] **Step 3: Implement `src/lib/eligibility.mjs`**
 
 ```js
 /**
@@ -127,7 +135,7 @@ export function getEligibility(baseCode, completed, prereqs) {
 }
 ```
 
-- [ ] **Step 4: Implement `src/lib/eligibility.ts`**
+- [x] **Step 4: Implement `src/lib/eligibility.ts`**
 
 ```ts
 // @ts-expect-error re-export of plain-JS pure logic (tested via node:test)
@@ -146,12 +154,12 @@ export type EligibilityResult = {
 };
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `node --test tools/lib/test/eligibility.test.mjs`
 Expected: PASS (7/7)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/lib/eligibility.mjs src/lib/eligibility.ts tools/lib/test/eligibility.test.mjs
@@ -167,7 +175,7 @@ git commit -m "feat(eligibility): pure eligibility logic with node:test coverage
 - Consumes: nothing new.
 - Produces: `toggleCompleted(code: string)`, `isCompleted(code: string): boolean`, `getCompletedCourses(): string[]` (all reactive over an internal `$state<Set<string>>`), `loadCompleted()` called from App.svelte onMount (localStorage restore, try/catch).
 
-- [ ] **Step 1: Implement in `src/lib/globalState.svelte.ts`** (append at end)
+- [x] **Step 1: Implement in `src/lib/globalState.svelte.ts`** (append at end)
 
 ```ts
 // ---- Completed courses (eligibility feature) ----
@@ -210,14 +218,14 @@ export function getCompletedCourses(): string[] {
 }
 ```
 
-- [ ] **Step 2: Wire `loadCompleted()` in `src/App.svelte`** — inside `onMount`, add `loadCompleted();` next to the other loaders (import it from `./lib/globalState.svelte`).
+- [x] **Step 2: Wire `loadCompleted()` in `src/App.svelte`** — inside `onMount`, add `loadCompleted();` next to the other loaders (import it from `./lib/globalState.svelte`).
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npx svelte-check --tsconfig ./tsconfig.app.json`
 Expected: 0 errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/lib/globalState.svelte.ts src/App.svelte
@@ -234,7 +242,7 @@ git commit -m "feat(eligibility): completed-courses reactive state with localSto
 - Consumes: `getEligibility` (Task 1), `toggleCompleted`/`isCompleted` (Task 2), `t()` from i18n, existing `getPrereqsFor` in globalState.
 - Produces: badge + ✓ toggle on every course row.
 
-- [ ] **Step 1: Add i18n keys** to `src/lib/i18n.svelte.ts` dictionary:
+- [x] **Step 1: Add i18n keys** to `src/lib/i18n.svelte.ts` dictionary:
 
 ```ts
 "course.taken": { en: "Taken", tr: "Alındı" },
@@ -244,7 +252,7 @@ git commit -m "feat(eligibility): completed-courses reactive state with localSto
 "course.markNotTaken": { en: "Unmark as taken", tr: "İşareti kaldır" },
 ```
 
-- [ ] **Step 2: In `Course.svelte` script**, add imports and derived:
+- [x] **Step 2: In `Course.svelte` script**, add imports and derived:
 
 ```ts
 import { toggleCompleted, isCompleted } from "./globalState.svelte";
@@ -265,7 +273,7 @@ const eligibility = $derived(
 the internal `prereqData`), and use it here. This is a 3-line addition to
 globalState — include it in this task.
 
-- [ ] **Step 3: Badge markup** — in the title row (the flex div containing
+- [x] **Step 3: Badge markup** — in the title row (the flex div containing
 `courseName` span), after the credits/ECTS spans add:
 
 ```svelte
@@ -280,7 +288,7 @@ globalState — include it in this task.
 {/if}
 ```
 
-- [ ] **Step 4: ✓ toggle button** — in the right-side button column (the
+- [x] **Step 4: ✓ toggle button** — in the right-side button column (the
 flex-col with ⚠/doc/+/− buttons), add before the ⚠ link:
 
 ```svelte
@@ -294,16 +302,16 @@ flex-col with ⚠/doc/+/− buttons), add before the ⚠ link:
 </button>
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npx svelte-check --tsconfig ./tsconfig.app.json && npm run build`
 Expected: 0 errors, build success.
 
-- [ ] **Step 6: Headless browser smoke** — dev server: toggle a course ✓ →
+- [x] **Step 6: Headless browser smoke** — dev server: toggle a course ✓ →
 badge "✓ Taken" appears on that course and "Eligible" appears on its
 dependents; reload page → state persists (localStorage).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/lib/Course.svelte src/lib/globalState.svelte.ts src/lib/i18n.svelte.ts
@@ -324,7 +332,7 @@ git commit -m "feat(eligibility): taken/eligible/needs badges with row toggle"
   - `export function termCredits(semesterKey, roadmap, termData)` → number — sum of `credits` for roadmap courses found in the term data file (courses not found count 0).
   - `export function sortTermsNewestFirst(terms)` → string[] — "YYYY/YYYY-T" descending.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```js
 // tools/lib/test/roadmap.test.mjs
@@ -380,12 +388,12 @@ test("sortTermsNewestFirst orders YYYY/YYYY-T descending", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `node --test tools/lib/test/roadmap.test.mjs`
 Expected: FAIL (module not found)
 
-- [ ] **Step 3: Implement `src/lib/roadmapLogic.mjs`**
+- [x] **Step 3: Implement `src/lib/roadmapLogic.mjs`**
 
 ```js
 /**
@@ -447,14 +455,14 @@ export function sortTermsNewestFirst(terms) {
 }
 ```
 
-- [ ] **Step 4: Implement `src/lib/roadmapLogic.ts`** (same re-export pattern as Task 1, types for the three functions)
+- [x] **Step 4: Implement `src/lib/roadmapLogic.ts`** (same re-export pattern as Task 1, types for the three functions)
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 Run: `node --test tools/lib/test/roadmap.test.mjs`
 Expected: PASS (7/7)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/lib/roadmapLogic.mjs src/lib/roadmapLogic.ts tools/lib/test/roadmap.test.mjs
@@ -469,7 +477,7 @@ git commit -m "feat(roadmap): cross-term prerequisite logic with node:test cover
 **Interfaces:**
 - Produces: `getRoadmap(): Record<string, string[]>`, `addToRoadmap(semester, code)`, `removeFromRoadmap(semester, code)`, `clearRoadmap()`, `loadRoadmap()` — same localStorage pattern as Task 2 (key `roadmap`, try/catch, reactive `$state`).
 
-- [ ] **Step 1: Implement** (append at end of globalState.svelte.ts)
+- [x] **Step 1: Implement** (append at end of globalState.svelte.ts)
 
 ```ts
 // ---- Roadmap (multi-semester planning) ----
@@ -529,11 +537,11 @@ export function clearRoadmap(): void {
 }
 ```
 
-- [ ] **Step 2: Wire `loadRoadmap()` in App.svelte onMount** (next to loadCompleted)
+- [x] **Step 2: Wire `loadRoadmap()` in App.svelte onMount** (next to loadCompleted)
 
-- [ ] **Step 3: Verify** — `npx svelte-check --tsconfig ./tsconfig.app.json` → 0 errors.
+- [x] **Step 3: Verify** — `npx svelte-check --tsconfig ./tsconfig.app.json` → 0 errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/lib/globalState.svelte.ts src/App.svelte
@@ -550,7 +558,7 @@ git commit -m "feat(roadmap): roadmap state with localStorage persistence"
 **Interfaces:**
 - Consumes: `getRoadmap`/`addToRoadmap`/`removeFromRoadmap`/`clearRoadmap` (Task 5), `checkRoadmapPrereqs`/`termCredits`/`sortTermsNewestFirst` (Task 4), `getCompletedCourses` (Task 2), `getPrereqsAll` (Task 3), `semesters.json` via `fetch(${import.meta.env.BASE_URL}data/semesters.json)`, term data via `fetch(${import.meta.env.BASE_URL}data/<key>.json)` (keys like "2026-2027-1" map from "2026/2027-1" by replacing "/" with "-"), `t()`.
 
-- [ ] **Step 1: Add i18n keys**
+- [x] **Step 1: Add i18n keys**
 
 ```ts
 "roadmap.title": { en: "Roadmap", tr: "Yol Haritası" },
@@ -563,7 +571,7 @@ git commit -m "feat(roadmap): roadmap state with localStorage persistence"
 "roadmap.clear": { en: "Clear roadmap", tr: "Planı temizle" },
 ```
 
-- [ ] **Step 2: Implement `Roadmap.svelte`**
+- [x] **Step 2: Implement `Roadmap.svelte`**
 
 Component behavior:
 1. onMount: fetch semesters.json → term list in "YYYY/YYYY-T" form. Convert
@@ -590,22 +598,22 @@ Component behavior:
    card styles as Course rows); horizontal scroll container
    `flex gap-3 overflow-x-auto`.
 
-- [ ] **Step 3: Wire into CourseList.svelte** — add a "Roadmap" toggle button
+- [x] **Step 3: Wire into CourseList.svelte** — add a "Roadmap" toggle button
 next to Copy Link (same small-button style) toggling local `showRoadmap`
 state; when true render `<Roadmap />` instead of the courses list block
 (keep the CalendarExport footer block visible).
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npx svelte-check --tsconfig ./tsconfig.app.json && npm run build`
 Expected: 0 errors, build success.
 
-- [ ] **Step 5: Headless browser smoke** — open Roadmap, add CMPE150 to
+- [x] **Step 5: Headless browser smoke** — open Roadmap, add CMPE150 to
 current term and CMPE210 to the next term: CMPE210 shows ✓ (prereq in
 earlier term). Remove CMPE150 → CMPE210 flips to amber ⚠ with missing
 "CMPE150". Reload → roadmap persists.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/lib/Roadmap.svelte src/lib/CourseList.svelte src/lib/i18n.svelte.ts
@@ -614,8 +622,8 @@ git commit -m "feat(roadmap): multi-semester roadmap panel with cross-term prere
 
 ### Task 7: Final verification
 
-- [ ] **Step 1:** `npm test` → all pass (eligibility + roadmap + existing 40).
-- [ ] **Step 2:** `npx svelte-check --tsconfig ./tsconfig.app.json && npx tsc -p tsconfig.node.json` → 0 errors.
-- [ ] **Step 3:** `npm run build` → success.
-- [ ] **Step 4:** Full headless-browser pass: A badges toggle + persist; B roadmap add/remove/flag-flip + persist; EN/TR switch renders new strings; share-link flow unaffected.
-- [ ] **Step 5:** Commit any stragglers; push.
+- [x] **Step 1:** `npm test` → all pass (eligibility + roadmap + existing 40).
+- [x] **Step 2:** `npx svelte-check --tsconfig ./tsconfig.app.json && npx tsc -p tsconfig.node.json` → 0 errors.
+- [x] **Step 3:** `npm run build` → success.
+- [x] **Step 4:** Full headless-browser pass: A badges toggle + persist; B roadmap add/remove/flag-flip + persist; EN/TR switch renders new strings; share-link flow unaffected.
+- [x] **Step 5:** Commit any stragglers; push.

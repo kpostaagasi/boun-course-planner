@@ -31,6 +31,7 @@ concurrency:
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
@@ -46,22 +47,29 @@ jobs:
       - name: Run parser tests
         run: npm test
 
+      # Scraping is skipped for push events: a push to main only rebuilds and
+      # redeploys the site (see commit 260c6de). Hitting the university server
+      # on every commit would be abusive.
       - name: Scrape course schedules
         id: scrape
+        if: github.event_name != 'push'
+        env:
+          SEMESTER: ${{ inputs.semester }}
         run: |
-          ARGS=""
-          if [ -n "${{ inputs.semester }}" ]; then
-            ARGS="--semester ${{ inputs.semester }}"
+          if [ -n "$SEMESTER" ]; then
+            node tools/scrape.mjs --semester "$SEMESTER"
+          else
+            node tools/scrape.mjs
           fi
-          node tools/scrape.mjs $ARGS
 
       - name: Scrape academic calendar
         # Best-effort: a calendar site outage must not block the course scrape,
         # but a real layout change should surface in the run log.
+        if: github.event_name != 'push'
         run: node tools/scrape-calendar.mjs
 
       - name: Alert about missing semester dates
-        if: steps.scrape.outputs.missing_dates != ''
+        if: github.event_name != 'push' && steps.scrape.outputs.missing_dates != ''
         env:
           GH_TOKEN: ${{ github.token }}
           KEYS: ${{ steps.scrape.outputs.missing_dates }}
@@ -93,6 +101,7 @@ jobs:
 
       - name: Commit new data
         id: commit
+        if: github.event_name != 'push'
         run: |
           if [ -z "$(git status --porcelain public/data)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -107,23 +116,25 @@ jobs:
           fi
 
       - name: Build site
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        # Deploy on every push and manual run; on the daily cron only when the
+        # scrape actually produced new data.
+        if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
         run: npm run build
 
       - uses: actions/configure-pages@v5
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
 
       - uses: actions/upload-pages-artifact@v3
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
         with:
           path: dist
 
       - id: deployment
         uses: actions/deploy-pages@v4
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
 
       - name: Smoke test deployment
-        if: steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
         run: |
           BASE="${{ steps.deployment.outputs.page_url }}"
           FAIL=0
@@ -158,6 +169,7 @@ jobs:
     needs: scrape-and-deploy
     if: failure()
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write

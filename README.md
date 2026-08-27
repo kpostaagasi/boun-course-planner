@@ -87,10 +87,82 @@ missing an entry there.
 
 ## Features
 
-- Course search
-- Supports Lab and PS hours
-- Shows all the necessary info about courses
-- Shows individual and total credits of selected courses
+**Search and browse**
+
+- Course search that matches the code first, then falls back to course name,
+  instructor and finally the catalogue description text.
+- Category badges and day/hour filters for narrowing the catalogue.
+- Cmd+K / Ctrl+K command palette ranking code prefix > code substring >
+  title/instructor match.
+- LAB and P.S. sessions are listed as separate, individually selectable
+  entries.
+- Official catalogue descriptions shown on each course.
+
+**Planning**
+
+- Colour-coded timetable of the selected sections, with individual and total
+  credits and an ECTS load warning.
+- Conflict-free section solver: picks a non-overlapping set of sections for
+  the courses you want.
+- Prerequisites on every course, with an expandable tree of the transitive
+  prerequisite chain.
+- Mark courses as taken → Taken / Eligible / "Needs: …" badges on every row,
+  plus a panel listing the courses your completed set has just unlocked.
+- Multi-semester roadmap: plan future terms with cross-term prerequisite
+  checking and per-term credit totals.
+- Offering history: in which past terms a course was actually offered.
+
+**Export and sharing**
+
+- `.ics` download and Google Calendar export using the real semester
+  start/end dates and official holidays.
+- Semester date/holiday strip above the timetable.
+- Share links that encode the selected sections.
+- EN/TR interface, dark mode, data-freshness indicator and a "report bad
+  data" button.
+
+Selections, completed courses and the roadmap are persisted in
+`localStorage`.
+
+## Architecture
+
+Static SPA: Vite + Svelte 5 (runes) + Tailwind 4 + TypeScript, no backend.
+Everything the client needs is a JSON file under `public/data/`, served from
+the same GitHub Pages origin.
+
+**Pure logic lives in `.mjs`, types live next to it in `.ts`.** Each logic
+module is a plain-JS `src/lib/<name>.mjs` holding the pure functions, plus a
+thin `src/lib/<name>.ts` that re-exports it and declares the TypeScript types
+(`export * from "./<name>.mjs"`). The app imports the `.ts`; the tests import
+the `.mjs` directly, so `node --test` can exercise the frontend logic with no
+build step and no TS loader. Modules following this pattern: `eligibility`,
+`roadmapLogic`, `prereqGraph`, `paletteSearch`, `termHistory`. Tests live in
+`tools/lib/test/*.test.mjs`, fixtures in `tools/lib/fixtures/`.
+
+**State is module-level runes, not stores.** `src/lib/globalState.svelte.ts`
+owns the app state as module-scope `$state` and exposes plain getter/setter
+functions (`getSelectedCourses()`, `toggleCompleted()`, `addToRoadmap()`, …).
+There are no Svelte stores anywhere; components import the functions and read
+them inside `$derived`.
+
+**What the client fetches, and when.** On mount: `semesters.json` (term list)
+and `meta.json` (scrape timestamp for the freshness indicator), then the
+selected term's `<YYYY-YYYY>-<n>.json`, plus `prereqs.json`, `offerings.json`
+and `descriptions.json` in the background. `semester-dates.json` is loaded by
+the timetable strip and the calendar export. The roadmap lazily fetches
+additional term files as columns are opened. Every fetch is
+`${import.meta.env.BASE_URL}data/<file>.json`.
+
+**Scrapers** are four independent Node entry points under `tools/`, all
+sharing `tools/lib/http.mjs` (retry, throttle, ISO-8859-9 decoding) and all
+writing to `public/data/`:
+
+| Entry point | Output | Trigger |
+| --- | --- | --- |
+| `tools/scrape.mjs` | `<term>.json`, `semesters.json`, `meta.json`, `offerings.json` | daily cron |
+| `tools/scrape-prereqs.mjs` | `prereqs.json` | manual |
+| `tools/scrape-descriptions.mjs` | `descriptions.json` | manual |
+| `tools/scrape-calendar.mjs` | `semester-dates.json` | daily cron |
 
 ## Built With
 

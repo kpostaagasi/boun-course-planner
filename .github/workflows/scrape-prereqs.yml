@@ -1,6 +1,6 @@
 name: Scrape prerequisites
 
-# Full prerequisite crawl (~2000+ courses, ~20-40 min with throttling).
+# Full prerequisite crawl (~7000 courses at a 500 ms throttle — several hours).
 # Manual only — the daily course-schedule pipeline does NOT run this.
 # --resume skips courses already present in public/data/prereqs.json,
 # so re-running after an interruption continues where it left off.
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
