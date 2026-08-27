@@ -57,6 +57,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `automation-failure` issue, and a post-deploy smoke test fetches the index
   and every data JSON.
 - MIT License.
+- **Live quota and enrolment.** `tools/scrape-quota.mjs` reads
+  `quotasearch.asp` — reachable only through a JS link, so the schedule
+  table's `Quota` column had always been dropped — into
+  `public/data/quota.json`, on its own scheduled workflow. Course rows show
+  seats taken, seats left, FULL and over-enrolment, classroom capacity,
+  departmental restrictions and surname restrictions, each stamped with the
+  snapshot time because the numbers move continuously during registration.
+- **Exam information and final-exam clash detection.** The parser now keeps
+  the `Course Delivery Method`, `Final Exam Location`, `Exam` and `Sl.`
+  columns, and the card warns when two selected sections share a final.
+  An unparseable exam cell reports "unknown", never "no clash".
+- **Instructor view.** An instructor index built from data already on disk:
+  click a name to see that person's sections, with a panel covering a bounded
+  window of recent terms. 2032 scraped spellings collapse to 2011 people
+  without tripping the Turkish İ/ı case trap; STAFF/TBA placeholders are
+  never presented as people.
+- **Timetable image export.** Download the grid as a PNG, drawn on a canvas
+  with no new dependency and sharing one colour source of truth with the DOM.
+- **Offline support.** A hand-written service worker precaches the app shell
+  and serves `public/data/*.json` stale-while-revalidate, so the planner works
+  in campus dead zones. The web manifest is now a real installable manifest.
+- **Roadmap reaches unpublished terms.** Future term keys are synthesised
+  instead of being limited to the terms BOUN has already published, and
+  offering likelihood is inferred from `offerings.json` history — labelled as
+  a prediction, with its confidence and basis spelled out, never as fact.
+- **End-to-end tests.** Playwright covers the catalogue, selection, share
+  URLs, timetable layout and export, roadmap, palette, quota, instructor view
+  and the offline service worker.
+- **Initial-payload budget gate.** `npm run payload` observes what the app
+  actually fetches on first load and fails above 180 KB gzipped.
 
 ### Changed
 
@@ -65,6 +95,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ~60 requests at the university server.
 - Every workflow job has a `timeout-minutes` bound.
 - Recovered the 2025/2026-2 semester from legacy local data.
+- Course rows distinguish "no prerequisite data for this course" from a
+  verified "Eligible". `prereqs.json` gained a `meta` block recording which
+  courses were really crawled, so the 314 courses of this term that were never
+  fetched are no longer reported as eligible.
+- `descriptions.json` (238 KB gzipped, 64% of the old first load) is no longer
+  fetched eagerly; it loads on demand behind the description panel and the
+  search fallback. Initial load dropped from ~379 KB to 131.8 KB gzipped.
+- Overlapping timetable courses sit side by side in sub-columns at constant
+  row height instead of stacking and inflating the row.
+- The command palette shows each section's number, meeting times and free
+  seats; sibling sections of one course used to be indistinguishable.
+- The URL is now two-way: the selected term and sections are mirrored into the
+  address bar, Back undoes an edit, and share parameters are consumed once and
+  scrubbed.
+- The conflict-free solver has a trial budget and reports a search that gave up
+  distinctly from a proven impossibility, instead of claiming both are "no
+  combination exists".
+- Logic modules follow the `.mjs` + typed `.ts` re-export convention
+  throughout; `solver.ts` was the last holdout and had no tests.
 
 ### Fixed
 
@@ -76,6 +125,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Google Calendar button is hidden when export is not possible.
 - The `--semester` workflow-dispatch input was interpolated straight into a
   shell command; it is now passed through `env` and quoted.
+- Searching for `C++` or `((` crashed the catalogue: search tokens were
+  spliced raw into a `RegExp` inside a derived. Tokens are now escaped, which
+  also makes `F.YILMAZ` match a literal dot rather than any character.
+- A share link carrying `?c=` but no `?d=` silently dropped the whole
+  selection, because the term was read at module-init time when it was still
+  empty. This was also the project's only build warning.
+- The timetable clipped its rightmost day column at phone widths: the table
+  was pinned to the container width, so the scroll container never engaged.
+- The prefilled "report bad data" issue was written in Turkish regardless of
+  the interface language, and `calendar.tooltipNoDates` shipped Turkish text in
+  its English slot.
+- Calendar export explains itself when term dates cannot be loaded instead of
+  leaving a dead button.
 
 ### Removed
 

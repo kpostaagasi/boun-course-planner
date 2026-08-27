@@ -92,11 +92,13 @@ missing an entry there.
 - Course search that matches the code first, then falls back to course name,
   instructor and finally the catalogue description text.
 - Category badges and day/hour filters for narrowing the catalogue.
-- Cmd+K / Ctrl+K command palette ranking code prefix > code substring >
-  title/instructor match.
+- Cmd+K / Ctrl+K command palette, showing each result's section number,
+  meeting times and free seats so sibling sections are told apart.
 - LAB and P.S. sessions are listed as separate, individually selectable
   entries.
-- Official catalogue descriptions shown on each course.
+- Official catalogue descriptions shown on each course, loaded on demand.
+- Instructor view: click a name to filter the catalogue to that person's
+  sections, or open a panel covering a window of recent terms.
 
 **Planning**
 
@@ -111,6 +113,13 @@ missing an entry there.
 - Multi-semester roadmap: plan future terms with cross-term prerequisite
   checking and per-term credit totals.
 - Offering history: in which past terms a course was actually offered.
+- Live quota and enrolment per section: seats taken, seats left, FULL and
+  over-enrolment, classroom capacity, departmental and surname restrictions —
+  each stamped with the snapshot time, because the numbers move continuously
+  during registration. A section we have no data for says so rather than
+  showing a zero.
+- Final exam date, session and location where the registration system
+  publishes them, with a warning when two selected sections share a final.
 
 **Export and sharing**
 
@@ -118,6 +127,9 @@ missing an entry there.
   start/end dates and official holidays.
 - Semester date/holiday strip above the timetable.
 - Share links that encode the selected sections.
+- Download the timetable as a PNG.
+- Works offline: a service worker caches the app and its data, and the app is
+  installable.
 - EN/TR interface, dark mode, data-freshness indicator and a "report bad
   data" button.
 
