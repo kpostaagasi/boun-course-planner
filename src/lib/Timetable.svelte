@@ -7,6 +7,14 @@
   } from "./globalState.svelte";
   import { onMount } from "svelte";
   import { t, getLang } from "./i18n.svelte";
+  import {
+    DAYS,
+    DAY_LABEL_KEYS,
+    PALETTE,
+    buildTimetableLayout,
+  } from "./timetableLayout";
+  import type { Layout, Occupant } from "./timetableLayout";
+  import IconDownload from "./icons/IconDownload.svelte";
 
   type Holiday = { date: string; name?: string; timeType?: string; time?: string };
   type SemesterDates = { start?: string; end?: string; holidays?: Holiday[] };
@@ -47,175 +55,276 @@
       : null
   );
 
-  const calculateTable = $derived(
-    getCurrentSemester() != "" &&
-      getCurSemesterData() !== undefined &&
-      getCurSemesterData() !== null
+  // One pass produces the rows, the Saturday flag and the sub-column
+  // allocation together; the old code walked the selection twice.
+  const layout = $derived<Layout>(
+    getCurrentSemester() != "" && getCurSemesterData()
+      ? buildTimetableLayout(
+          getSelectedCourseNames(),
+          getCurSemesterData(),
+          getHoveredCourse()
+        )
+      : buildTimetableLayout([], null)
   );
 
-  const courseOnSaturday = $derived(
-    getCourseOnSaturday(
-      calculateTable,
-      getSelectedCourseNames(),
-      getCurSemesterData(),
-      getHoveredCourse()
-    )
-  );
-
-  const tableItems = $derived(
-    getTableItems(
-      calculateTable,
-      getSelectedCourseNames(),
-      getHoveredCourse(),
-      getCurSemesterData()
-    )
-  );
-
-  function getCourseOnSaturday(
-    calculateTable: boolean,
-    selectedCourseNames: string[],
-    curSemesterData: any,
-    hoveredCourse: string
-  ) {
-    if (!calculateTable) {
-      return false;
-    }
-
-    for (let i = 0; i < selectedCourseNames.length; i++) {
-      const courseName = selectedCourseNames[i];
-      if (courseName in curSemesterData) {
-        const days = curSemesterData[courseName].days;
-        if (days) {
-          for (let j = 0; j < days.length; j++) {
-            if (days[j] == "St") {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    if (hoveredCourse != "") {
-      const days = curSemesterData[hoveredCourse].days;
-      if (days) {
-        for (let j = 0; j < days.length; j++) {
-          if (days[j] == "St") {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  type HourData = {
-    hour: number;
-    M: string[];
-    T: string[];
-    W: string[];
-    Th: string[];
-    F: string[];
-    St: string[];
-  };
-
-  type Days = "M" | "T" | "W" | "Th" | "F" | "St";
-
-  function getTableItems(
-    calculateTable: boolean,
-    selectedCourseNames: string[],
-    hoveredCourse: string,
-    curSemesterData: any
-  ) {
-    let table: HourData[] = [];
-    let latestCourseHour;
-    for (let i = 9; i < 23; i++) {
-      table.push({
-        hour: i,
-        M: [],
-        T: [],
-        W: [],
-        Th: [],
-        F: [],
-        St: [],
-      });
-    }
-    latestCourseHour = 16;
-    if (calculateTable) {
-      for (let i = 0; i < selectedCourseNames.length; i++) {
-        const courseName = selectedCourseNames[i];
-        if (!(courseName in curSemesterData)) {
-          continue;
-        }
-        const { hours, days }: { hours: number[]; days: Days[] } =
-          curSemesterData[courseName];
-        if (days) {
-          for (let j = 0; j < days.length; j++) {
-            latestCourseHour = Math.max(latestCourseHour, hours[j] + 8);
-            table[Number(hours[j]) - 1][days[j]].push(courseName);
-          }
-        }
-      }
-      if (hoveredCourse != "" && !selectedCourseNames.includes(hoveredCourse)) {
-        const { hours, days }: { hours: number[]; days: Days[] } =
-          curSemesterData[hoveredCourse];
-        if (days) {
-          for (let j = 0; j < days.length; j++) {
-            latestCourseHour = Math.max(latestCourseHour, hours[j] + 8);
-            table[Number(hours[j]) - 1][days[j]].push(hoveredCourse);
-          }
-        }
-      }
-    }
-
-    for (let i = latestCourseHour + 1; i < 23; i++) {
-      table.pop();
-    }
-    return table;
-  }
-
-  // Translucent tinted fill + same-hue bright text + saturated left accent:
-  // reads crisply on dark rows instead of turning into muddy -900 slabs.
-  // Full literal class strings so Tailwind's JIT scanner can see them.
-  const PALETTE = [
-    { bg: "bg-red-50 dark:bg-red-500/20", text: "text-red-800 dark:text-red-200", border: "border-red-400 dark:border-red-400/80" },
-    { bg: "bg-orange-50 dark:bg-orange-500/20", text: "text-orange-800 dark:text-orange-200", border: "border-orange-400 dark:border-orange-400/80" },
-    { bg: "bg-amber-50 dark:bg-amber-500/20", text: "text-amber-800 dark:text-amber-200", border: "border-amber-400 dark:border-amber-400/80" },
-    { bg: "bg-yellow-50 dark:bg-yellow-500/20", text: "text-yellow-800 dark:text-yellow-200", border: "border-yellow-400 dark:border-yellow-400/80" },
-    { bg: "bg-lime-50 dark:bg-lime-500/20", text: "text-lime-800 dark:text-lime-200", border: "border-lime-400 dark:border-lime-400/80" },
-    { bg: "bg-emerald-50 dark:bg-emerald-500/20", text: "text-emerald-800 dark:text-emerald-200", border: "border-emerald-400 dark:border-emerald-400/80" },
-    { bg: "bg-teal-50 dark:bg-teal-500/20", text: "text-teal-800 dark:text-teal-200", border: "border-teal-400 dark:border-teal-400/80" },
-    { bg: "bg-sky-50 dark:bg-sky-500/20", text: "text-sky-800 dark:text-sky-200", border: "border-sky-400 dark:border-sky-400/80" },
-    { bg: "bg-blue-50 dark:bg-blue-500/20", text: "text-blue-800 dark:text-blue-200", border: "border-blue-400 dark:border-blue-400/80" },
-    { bg: "bg-indigo-50 dark:bg-indigo-500/20", text: "text-indigo-800 dark:text-indigo-200", border: "border-indigo-400 dark:border-indigo-400/80" },
-    { bg: "bg-fuchsia-50 dark:bg-fuchsia-500/20", text: "text-fuchsia-800 dark:text-fuchsia-200", border: "border-fuchsia-400 dark:border-fuchsia-400/80" },
-    { bg: "bg-pink-50 dark:bg-pink-500/20", text: "text-pink-800 dark:text-pink-200", border: "border-pink-400 dark:border-pink-400/80" },
-  ];
-
-  // FNV-1a: spreads course names across the 12 hues better than a 31-multi hash.
-  function courseColor(name: string) {
-    let hash = 2166136261;
-    for (let i = 0; i < name.length; i++) {
-      hash ^= name.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-    return PALETTE[Math.abs(hash) % PALETTE.length];
-  }
-
+  const courseOnSaturday = $derived(layout.courseOnSaturday);
   const hoveredCourse = $derived(getHoveredCourse());
   const selectedCourses = $derived(getSelectedCourseNames());
 
-  const DAYS: Days[] = ["M", "T", "W", "Th", "F", "St"];
-  const DAY_LABELS: Record<Days, string> = {
-    M: "Mon",
-    T: "Tue",
-    W: "Wed",
-    Th: "Thu",
-    F: "Fri",
-    St: "Sat",
+  /** Percentage geometry for one sub-column. 1px of air guarantees no overlap. */
+  function boxStyle(occ: Occupant): string {
+    const left = ((occ.col * 100) / occ.cols).toFixed(4);
+    const width = (100 / occ.cols).toFixed(4);
+    return `left:${left}%;width:calc(${width}% - 1px)`;
+  }
+
+  // ---------------------------------------------------------------- PNG export
+
+  const canExportPng = $derived(layout.occupantCount > 0);
+
+  const CANVAS = {
+    scale: 2, // 2x so the PNG stays crisp when viewed on a phone
+    pad: 14,
+    gutterW: 54,
+    // Wide enough that a bare section key ("CMPE101.01") fits on one line at
+    // 11px, so clashes stay readable instead of hard-breaking mid-code.
+    subW: 96,
+    minDayW: 130,
+    // Every day column shares one width, so the worst clash in the grid must
+    // not blow the sheet up to several thousand pixels: past three-way the
+    // sub-columns shrink and the font drops instead.
+    maxDayW: 264,
+    rowH: 34,
+    headH: 28,
+    titleH: 52,
+    footH: 22,
   };
+
+  const SANS =
+    "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+  /** Break `text` into at most `maxLines` lines that each fit `maxW`, ellipsising the rest. */
+  function fitLines(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    maxW: number,
+    maxLines: number
+  ): string[] {
+    const lines: string[] = [];
+    let cur = "";
+    const flush = () => {
+      if (cur !== "") {
+        lines.push(cur);
+        cur = "";
+      }
+    };
+    for (const word of text.split(/\s+/).filter(Boolean)) {
+      let rest = word;
+      // A single token wider than the box has to be hard-broken.
+      while (ctx.measureText(rest).width > maxW && rest.length > 1) {
+        flush();
+        let cut = rest.length;
+        while (cut > 1 && ctx.measureText(rest.slice(0, cut)).width > maxW) cut--;
+        lines.push(rest.slice(0, cut));
+        rest = rest.slice(cut);
+        if (lines.length >= maxLines) break;
+      }
+      if (lines.length >= maxLines) break;
+      const candidate = cur === "" ? rest : `${cur} ${rest}`;
+      if (cur !== "" && ctx.measureText(candidate).width > maxW) {
+        flush();
+        cur = rest;
+      } else {
+        cur = candidate;
+      }
+    }
+    flush();
+    if (lines.length > maxLines) lines.length = maxLines;
+    const kept = lines.join("").replace(/\s+/g, "");
+    if (kept !== text.replace(/\s+/g, "") && lines.length > 0) {
+      let last = lines[lines.length - 1];
+      while (last.length > 0 && ctx.measureText(`${last}…`).width > maxW) {
+        last = last.slice(0, -1);
+      }
+      lines[lines.length - 1] = `${last}…`;
+    }
+    return lines;
+  }
+
+  /**
+   * The PNG is deliberately ALWAYS light, regardless of the app's appearance:
+   * it is an artifact people paste into group chats, docs and printouts whose
+   * background we do not control, and the dark half of `PALETTE` is a set of
+   * translucent overlays that only reads correctly on a dark substrate. A
+   * light sheet is legible everywhere.
+   */
+  function renderPng(): HTMLCanvasElement {
+    const days = DAYS.map((_, i) => i).filter(
+      (i) => DAYS[i] !== "St" || courseOnSaturday
+    );
+    const { scale, pad, gutterW, subW, minDayW, maxDayW, rowH, headH, titleH, footH } =
+      CANVAS;
+    const dayW = Math.min(maxDayW, Math.max(minDayW, layout.maxCols * subW));
+    const gridW = gutterW + days.length * dayW;
+    const gridH = headH + layout.rows.length * rowH;
+    const width = pad * 2 + gridW;
+    const height = pad * 2 + titleH + gridH + footH;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return canvas;
+    ctx.scale(scale, scale);
+    ctx.textBaseline = "alphabetic";
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = "#18181b";
+    ctx.font = `700 18px ${SANS}`;
+    ctx.textAlign = "left";
+    ctx.fillText(t("header.title"), pad, pad + 18);
+    ctx.fillStyle = "#71717a";
+    ctx.font = `500 13px ${SANS}`;
+    ctx.fillText(getCurrentSemester(), pad, pad + 38);
+
+    const x0 = pad;
+    const y0 = pad + titleH;
+
+    ctx.fillStyle = "#f4f4f5";
+    ctx.fillRect(x0, y0, gridW, headH);
+    ctx.fillStyle = "#3f3f46";
+    ctx.font = `700 12px ${SANS}`;
+    ctx.textAlign = "center";
+    days.forEach((dayIdx, i) => {
+      ctx.fillText(
+        t(DAY_LABEL_KEYS[dayIdx]),
+        x0 + gutterW + i * dayW + dayW / 2,
+        y0 + headH / 2 + 4
+      );
+    });
+
+    layout.rows.forEach((row, r) => {
+      const y = y0 + headH + r * rowH;
+      if (r % 2 === 0) {
+        ctx.fillStyle = "#fafafa";
+        ctx.fillRect(x0, y, gridW, rowH);
+      }
+      ctx.fillStyle = "#52525b";
+      ctx.font = `600 11px ${SANS}`;
+      ctx.textAlign = "right";
+      ctx.fillText(
+        `${String(row.hour).padStart(2, "0")}:00`,
+        x0 + gutterW - 7,
+        y + rowH / 2 + 4
+      );
+
+      days.forEach((dayIdx, i) => {
+        const cell = row.cells[dayIdx];
+        if (cell.length === 0) return;
+        const cx = x0 + gutterW + i * dayW;
+        if (cell.length > 1) {
+          ctx.fillStyle = "#fee2e2";
+          ctx.fillRect(cx, y, dayW, rowH);
+          // Outline the clash region, not each row of it, so a multi-hour
+          // block is not sliced by red lines at every hour boundary.
+          const above = r > 0 && layout.rows[r - 1].cells[dayIdx].length > 1;
+          const below =
+            r < layout.rows.length - 1 && layout.rows[r + 1].cells[dayIdx].length > 1;
+          ctx.strokeStyle = "#ef4444";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(cx + 0.5, y);
+          ctx.lineTo(cx + 0.5, y + rowH);
+          ctx.moveTo(cx + dayW - 0.5, y);
+          ctx.lineTo(cx + dayW - 0.5, y + rowH);
+          if (!above) {
+            ctx.moveTo(cx, y + 0.5);
+            ctx.lineTo(cx + dayW, y + 0.5);
+          }
+          if (!below) {
+            ctx.moveTo(cx, y + rowH - 0.5);
+            ctx.lineTo(cx + dayW, y + rowH - 0.5);
+          }
+          ctx.stroke();
+        }
+        for (const occ of cell) {
+          const entry = PALETTE[occ.color];
+          const bw = dayW / occ.cols;
+          const bx = cx + occ.col * bw;
+          ctx.fillStyle = entry.fill;
+          ctx.fillRect(bx + 1, y + 1, bw - 2, rowH - 2);
+          ctx.fillStyle = entry.accent;
+          ctx.fillRect(bx + 1, y + 1, 3, rowH - 2);
+          if (!occ.isFirst) continue;
+          const textW = bw - 12;
+          ctx.fillStyle = entry.ink;
+          ctx.font = `600 ${textW >= 64 ? 11 : 9}px ${SANS}`;
+          ctx.textAlign = "left";
+          const lineH = textW >= 64 ? 12 : 10;
+          const lines = fitLines(ctx, occ.course, textW, Math.floor((rowH - 6) / lineH));
+          lines.forEach((line, li) => {
+            ctx.fillText(line, bx + 7, y + 12 + li * lineH);
+          });
+        }
+      });
+    });
+
+    ctx.strokeStyle = "#e4e4e7";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let r = 0; r <= layout.rows.length; r++) {
+      const y = Math.round(y0 + headH + r * rowH) + 0.5;
+      ctx.moveTo(x0, y);
+      ctx.lineTo(x0 + gridW, y);
+    }
+    for (let i = 0; i <= days.length; i++) {
+      const x = Math.round(x0 + gutterW + i * dayW) + 0.5;
+      ctx.moveTo(x, y0);
+      ctx.lineTo(x, y0 + gridH);
+    }
+    ctx.moveTo(x0 + 0.5, y0 + 0.5);
+    ctx.lineTo(x0 + 0.5, y0 + gridH);
+    ctx.moveTo(x0, y0 + 0.5);
+    ctx.lineTo(x0 + gridW, y0 + 0.5);
+    ctx.stroke();
+
+    ctx.fillStyle = "#a1a1aa";
+    ctx.font = `400 10px ${SANS}`;
+    ctx.textAlign = "left";
+    ctx.fillText(
+      `${location.host}${import.meta.env.BASE_URL}`,
+      x0,
+      y0 + gridH + footH - 4
+    );
+
+    return canvas;
+  }
+
+  function downloadPng() {
+    if (!canExportPng) return;
+    const canvas = renderPng();
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      // Same anchor + blob-URL dance as CalendarExport's downloadCalendar().
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `BOUN-${getCurrentSemester()}-timetable.png`;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+    }, "image/png");
+  }
 </script>
 
-{#if calendarInfo}
-  <div class="flex flex-wrap gap-1 text-xs items-center mb-2 px-1">
+<div class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-xs">
+  {#if calendarInfo}
     <span class="text-zinc-500 dark:text-zinc-400">
       {t("timetable.semesterStart")}: {formatDate(calendarInfo.start)}
     </span>
@@ -227,43 +336,77 @@
         {h.name} ({formatDate(h.date)})
       </span>
     {/each}
-  </div>
-{/if}
+  {/if}
+  <button
+    type="button"
+    data-testid="timetable-export-png"
+    class="ml-auto flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-700 px-2.5 py-1.5 font-medium text-white transition-colors duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-500"
+    onclick={downloadPng}
+    disabled={!canExportPng}
+    title={canExportPng ? t("timetable.exportPng") : t("timetable.exportPngEmpty")}
+  >
+    <IconDownload />
+    {t("timetable.exportPng")}
+  </button>
+</div>
 <div
+  data-testid="timetable-scroll"
   class="bg-white dark:bg-gray-800 dark:text-white shadow rounded-lg w-full shrink-0 overflow-x-auto"
 >
   <table
-    class="table-fixed text-center w-full text-sm lg:text-base antialiased tracking-tight sm:tracking-normal"
+    class="table-fixed text-center w-full min-w-[32rem] text-sm lg:text-base antialiased tracking-tight sm:tracking-normal"
   >
     <thead>
       <tr>
-        <th class="w-4 md:w-6"></th>
-        {#each DAYS as day}
+        <th
+          class="sticky left-0 z-40 w-14 border-r border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+        ></th>
+        {#each DAYS as day, dayIdx}
           <th class="w-20 {day == 'St' && !courseOnSaturday ? 'hidden' : ''}">
-            {DAY_LABELS[day]}
+            {t(DAY_LABEL_KEYS[dayIdx])}
           </th>
         {/each}
       </tr>
     </thead>
     <tbody>
-    {#each tableItems as row, i}
+    {#each layout.rows as row, i}
       <tr class={i % 2 == 0 ? "bg-gray-50 dark:bg-gray-700" : ""}>
-        <th class="md:p-1"> {row["hour"]} </th>
-        {#each DAYS as day}
+        <th
+          class="sticky left-0 z-30 w-14 border-r border-gray-200 tabular-nums md:p-1 dark:border-gray-600 {i %
+            2 ==
+          0
+            ? 'bg-gray-50 dark:bg-gray-700'
+            : 'bg-white dark:bg-gray-800'}"
+        >
+          {row.hour}
+        </th>
+        {#each DAYS as day, dayIdx}
+          {@const cell = row.cells[dayIdx]}
+          {@const conflict = cell.length > 1}
           <td
-            class="{day == 'St' && !courseOnSaturday ? 'hidden' : ''} {row[day].length > 1
-              ? 'bg-red-100 dark:bg-red-900'
+            title={conflict ? t("course.conflict") : undefined}
+            aria-label={conflict ? t("course.conflict") : undefined}
+            class="relative h-9 p-0 align-top {day == 'St' && !courseOnSaturday
+              ? 'hidden'
+              : ''} {conflict
+              ? 'bg-red-100 ring-2 ring-red-500 ring-inset dark:bg-red-500/15 dark:ring-red-400'
               : ''}"
-            >{#each row[day] as course}{@const color = courseColor(course)}<div
-                class="leading-tight px-1 py-px rounded-r border-l-2 {color.bg} {color.text} {color.border}
-                  {course == hoveredCourse && !selectedCourses.includes(course)
+            >{#each cell as occ}{@const color = PALETTE[occ.color]}<div
+                data-testid="tt-box"
+                data-course={occ.course}
+                data-hour={row.hour}
+                data-day={day}
+                title={occ.course}
+                style={boxStyle(occ)}
+                class="absolute inset-y-0 overflow-hidden border-l-2 px-1 text-left leading-[1.15] text-[10px] sm:text-xs {color.bg} {color.text} {color.border}
+                  {occ.isFirst ? 'rounded-tr' : ''} {occ.isLast ? 'rounded-br' : ''}
+                  {occ.course == hoveredCourse && !selectedCourses.includes(occ.course)
                   ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
-                  : course == hoveredCourse
+                  : occ.course == hoveredCourse
                   ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
                   : ''}"
-              >
-                {course}
-              </div>{/each}</td
+              >{#if occ.isFirst}{occ.course}{/if}</div
+              >{/each}</td
           >
         {/each}
       </tr>
