@@ -70,11 +70,21 @@ test("a section in the quota dataset shows a real occupancy indicator, dated", a
   }
 
   const termData = await readJson<Record<string, unknown>>(page, `${quotaTerm}.json`);
-  // Prefer a record with enrolment rows — the richest state — and fall back to a
-  // capacity-only one, which is what the file holds between scrapes.
+  // Three real states exist in the live file, and they render differently on
+  // purpose. Measured on the full 2026/2027-1 sweep (2937 sections): 124 carry
+  // departmental rows, but some of those rows are 0/0 placeholders whose only
+  // payload is a note such as "Consent Of Instructor" — the card shows the note
+  // rather than a meaningless "0/0 seats taken". 1249 publish a capacity with no
+  // rows at all. Prefer the richest genuine state and fall back in that order.
+  const hasNumericRow = (key: string) =>
+    (sections[key].rows ?? []).some(
+      (row) => !row.note && typeof row.quota === "number",
+    );
+  const inTerm = (key: string) => key in termData;
   const present =
-    quotaKeys.find((key) => key in termData && (sections[key].rows?.length ?? 0) > 0) ??
-    quotaKeys.find((key) => key in termData && typeof sections[key].cap === "number");
+    quotaKeys.find((key) => inTerm(key) && hasNumericRow(key)) ??
+    quotaKeys.find((key) => inTerm(key) && (sections[key].rows?.length ?? 0) > 0) ??
+    quotaKeys.find((key) => inTerm(key) && typeof sections[key].cap === "number");
   expect(present, "quota.json must describe a section of its own term").toBeTruthy();
 
   await searchCourses(page, present!.split(" ")[0]);
@@ -86,11 +96,17 @@ test("a section in the quota dataset shows a real occupancy indicator, dated", a
   const record = sections[present!];
   const rows = record.rows ?? [];
   const numeric = rows.filter((row) => !row.note && typeof row.quota === "number");
+  const note = rows.find((row) => row.note)?.note;
   if (numeric.length > 0) {
     const totalQuota = numeric.reduce((sum, row) => sum + (row.quota ?? 0), 0);
     const totalCurrent = rows.reduce((sum, row) => sum + (row.current ?? 0), 0);
     await expect(state).toContainText(String(totalQuota));
     await expect(state).toContainText(String(totalCurrent));
+  } else if (note) {
+    // A quota cell carrying only a restriction must surface that restriction,
+    // never a fabricated 0-of-0.
+    await expect(state).toContainText(note);
+    await expect(state).not.toContainText("0/0");
   } else {
     await expect(state).toContainText(String(record.cap));
   }
