@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import {
     getCurSemesterData,
-    getCompletedCourses,
+    getCompletedCourseSet,
     getPrereqsAll,
     getOfferings,
     loadCompleted,
@@ -12,6 +12,7 @@
   } from "./globalState.svelte";
   import { sortTermsNewestFirst } from "./roadmapLogic";
   import { getEligibility } from "./eligibility";
+  import { baseCode } from "./courseKey";
   import { t, getLang } from "./i18n.svelte";
 
   const SEASON: Record<string, { en: string; tr: string }> = {
@@ -75,8 +76,13 @@
     const prereqs = getPrereqsAll();
     const offerings = getOfferings();
 
-    // Completed set, optionally joined with everything offered in the term.
-    const completedSet = new Set(getCompletedCourses());
+    // The "now" set is the live backing store: allocation-free, and `has()`
+    // tracks a single member rather than the whole collection.
+    const nowCompleted = getCompletedCourseSet();
+
+    // The hypothetical set must stay a private copy — it is mutated below with
+    // everything the selected term offered.
+    const completedSet = new Set(nowCompleted);
     if (selectedTerm !== "now" && offerings) {
       // offerings.json is keyed by course code → invert: which courses were
       // offered in the selected term?
@@ -90,11 +96,11 @@
     const seen = new Set<string>();
     const out: NewlyCourse[] = [];
     for (const [sectionName, info] of Object.entries(curData)) {
-      const base = sectionName.split(".")[0].replace(/\s+/g, "");
+      const base = baseCode(sectionName);
       if (seen.has(base)) continue;
       seen.add(base);
 
-      const nowStatus = getEligibility(base, new Set(getCompletedCourses()), prereqs);
+      const nowStatus = getEligibility(base, nowCompleted, prereqs);
       if (nowStatus.status !== "missing-prereq") continue;
       const thenStatus = getEligibility(base, completedSet, prereqs);
       if (thenStatus.status !== "eligible") continue;

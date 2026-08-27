@@ -133,9 +133,149 @@ export const dict = {
     en: "Open course palette (Ctrl/Cmd+K)",
     tr: "Ders paletini aç (Ctrl/Cmd+K)",
   },
+  "palette.unscheduled": { en: "Unscheduled", tr: "Programsız" },
+  "palette.full": { en: "Full", tr: "Dolu" },
+  // Rendered as "{n} seats left", so the value comes first in both languages.
+  "palette.seatsLeft": { en: "seats left", tr: "yer kaldı" },
+  "palette.credits": { en: "Cr", tr: "Kr" },
+  "palette.alreadyAdded": { en: "already added", tr: "zaten ekli" },
+  "palette.results": { en: "Course results", tr: "Ders sonuçları" },
+  "palette.sections": { en: "sections", tr: "şube" },
+  "roadmap.predicted": { en: "Predicted", tr: "Tahmini" },
+  // The roadmap must never present inference as an official listing; these two
+  // notes are what keep a synthesised future term honest.
+  "roadmap.predictedNote": {
+    en: "Inferred from past terms — not an official listing",
+    tr: "Geçmiş dönemlerden çıkarıldı — resmî ilan değil",
+  },
+  "roadmap.unavailable": { en: "Not expected", tr: "Beklenmiyor" },
+  "roadmap.unavailableNote": {
+    en: "Never offered in this season in the recorded history",
+    tr: "Kayıtlı geçmişte bu mevsimde hiç açılmamış",
+  },
+  "roadmap.seasonCount": {
+    en: "Times offered in this season",
+    tr: "Bu mevsimde açılma sayısı",
+  },
+  "roadmap.otherSeasonsOnly": {
+    en: "Offered only in other seasons",
+    tr: "Yalnızca diğer mevsimlerde açıldı",
+  },
+  "roadmap.lastOffered": { en: "Last offered", tr: "Son açılma" },
+  "roadmap.estimatedLoad": {
+    en: "Estimated from the most recent known offering",
+    tr: "En son bilinen açılıştan tahmin edildi",
+  },
   "course.prereqTree": { en: "Prerequisite tree", tr: "Ön koşul ağacı" },
   "course.showTree": { en: "Show prereq tree", tr: "Ön koşul ağacını göster" },
   "course.hideTree": { en: "Hide prereq tree", tr: "Ön koşul ağacını gizle" },
+  "course.eligibleTitle": {
+    en: "Every prerequisite we have on record for this course is complete.",
+    tr: "Bu ders için kayıtlı tüm ön koşullar tamamlanmış.",
+  },
+  // "Absent from the prerequisite data" is not "has no prerequisites". 314 of
+  // the current term's courses were never crawled, and the card used to render
+  // them identically to a verified pass.
+  "course.prereqUnknown": { en: "prereqs unchecked", tr: "ön koşul bilinmiyor" },
+  "course.prereqUnknownTitle": {
+    en: 'This course is not in our prerequisite data, so eligibility has not been checked. Absent is not the same as "no prerequisites".',
+    tr: 'Bu ders ön koşul verimizde yok, bu yüzden alınabilirlik kontrol edilmedi. Verinin olmaması "ön koşulu yok" demek değildir.',
+  },
+  "course.searchInstructor": {
+    en: "Show this instructor's sections",
+    tr: "Bu hocanın derslerini göster",
+  },
+  "course.delivery": { en: "Delivery:", tr: "Ders şekli:" },
+  "course.finalExam": { en: "Final exam:", tr: "Final sınavı:" },
+  "course.examSession": { en: "session", tr: "oturum" },
+  "course.examLocation": { en: "Exam location:", tr: "Sınav yeri:" },
+  "course.examClash": {
+    en: "Final exam clashes with {keys}",
+    tr: "Final sınavı {keys} ile çakışıyor",
+  },
+  // An unparseable exam cell must never be reported as "no clash".
+  "course.examMaybeClash": {
+    en: "Same final-exam day as {keys} — session unknown",
+    tr: "{keys} ile aynı final gününde — oturum bilinmiyor",
+  },
+  "course.examNoClash": { en: "No final-exam clash", tr: "Final çakışması yok" },
+  "quota.seats": {
+    en: "{current}/{quota} seats taken",
+    tr: "{current}/{quota} kontenjan dolu",
+  },
+  "quota.left": { en: "{n} left", tr: "{n} boş" },
+  "quota.full": { en: "FULL", tr: "DOLU" },
+  "quota.over": { en: "over-enrolled by {n}", tr: "{n} kişi fazla kayıtlı" },
+  "quota.capacity": { en: "Room capacity {cap}", tr: "Sınıf kapasitesi {cap}" },
+  "quota.enrolmentUnpublished": {
+    en: "enrolment not published",
+    tr: "kayıt sayısı yayınlanmadı",
+  },
+  // MUST stay digit-free in both languages: e2e/quota.spec.ts proves we never
+  // fabricate a "0" for unknown enrolment by asserting this state has no digit.
+  "quota.noData": { en: "Seats: no data", tr: "Kontenjan: veri yok" },
+  "quota.restricted": { en: "Only {depts}", tr: "Sadece {depts}" },
+  "quota.surname": { en: "Surname restriction", tr: "Soyadı kısıtı" },
+  "quota.asOf": { en: "as of {time}", tr: "{time} itibarıyla" },
+  "quota.scrapedTitle": {
+    en: "Enrolment snapshot taken {time}. These numbers change continuously during registration.",
+    tr: "Kayıt anlık görüntüsü {time} tarihinde alındı. Bu sayılar kayıt döneminde sürekli değişir.",
+  },
+  // Offering-likelihood tiers from futureTerms.mjs. Deliberately hedged
+  // wording: only "known" is a published fact, the rest are inference from
+  // offerings.json history and must never read as an official listing.
+  "roadmap.conf.known": { en: "Published", tr: "Yayınlandı" },
+  "roadmap.conf.high": { en: "Very likely", tr: "Çok olası" },
+  "roadmap.conf.medium": { en: "Likely", tr: "Olası" },
+  "roadmap.conf.low": { en: "Uncertain", tr: "Belirsiz" },
+  "roadmap.conf.none": { en: "Unlikely", tr: "Olası değil" },
+  // Prefilled GitHub issue for a data error. The body used to be hardcoded
+  // Turkish no matter the UI language.
+  "report.title": { en: "Data error", tr: "Veri hatası" },
+  "report.term": { en: "Term", tr: "Dönem" },
+  "report.key": { en: "Key", tr: "Anahtar" },
+  "report.code": { en: "Code", tr: "Kod" },
+  "report.name": { en: "Name", tr: "Ad" },
+  "report.instructor": { en: "Instructor", tr: "Hoca" },
+  "report.days": { en: "Days", tr: "Günler" },
+  "report.hours": { en: "Hours", tr: "Saatler" },
+  "report.rooms": { en: "Rooms", tr: "Odalar" },
+  "report.reason": {
+    en: "This information is wrong or missing because:",
+    tr: "Bu bilgiler yanlış/eksik çünkü:",
+  },
+  "report.source": { en: "Source page", tr: "Kaynak sayfa" },
+  "report.tooltip": { en: "Report incorrect data", tr: "Hatalı veriyi bildir" },
+  "instructor.title": { en: "Instructor", tr: "Öğretim üyesi" },
+  "instructor.sections": { en: "{n} sections this term", tr: "Bu dönem {n} şube" },
+  "instructor.clear": { en: "Clear", tr: "Temizle" },
+  "instructor.scopeNote": {
+    en: "Listing only this instructor's sections; other filters are off.",
+    tr: "Yalnızca bu öğretim üyesinin şubeleri listeleniyor; diğer filtreler kapalı.",
+  },
+  "instructor.alsoListedAs": {
+    en: "Also listed as: {names}",
+    tr: "Şu şekilde de yazılmış: {names}",
+  },
+  "instructor.matches": { en: "Instructors:", tr: "Öğretim üyeleri:" },
+  "instructor.history": { en: "Teaching history", tr: "Ders geçmişi" },
+  // Only the currently loaded terms are indexed; the other 24 term files are
+  // ~12 MB, so the scope has to be stated rather than implied.
+  "instructor.historyScope": { en: "last {n} terms", tr: "son {n} dönem" },
+  "instructor.historyCurrentOnly": {
+    en: "this term only",
+    tr: "yalnızca bu dönem",
+  },
+  "instructor.historyLoading": {
+    en: "loading earlier terms…",
+    tr: "önceki dönemler yükleniyor…",
+  },
+  "instructor.termsTaught": {
+    en: "{n} of {m} terms",
+    tr: "{m} dönemin {n} tanesinde",
+  },
+  "instructor.alsoTaughtBy": { en: "Also taught by:", tr: "Ayrıca veren:" },
+  "instructor.moreCourses": { en: "+{n} more courses", tr: "+{n} ders daha" },
   "timetable.semesterStart": { en: "Start", tr: "Başlangıç" },
   "timetable.semesterEnd": { en: "End", tr: "Bitiş" },
   "timetable.exportPng": { en: "Download PNG", tr: "PNG İndir" },

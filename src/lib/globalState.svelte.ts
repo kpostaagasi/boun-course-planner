@@ -9,6 +9,8 @@ import {
   stripSelectionSearch,
   type UrlSelection,
 } from "./urlState";
+import { compileSearch } from "./searchQuery";
+import type { QuotaRow, QuotaSection } from "./quotaInfo";
 
 let currentSemester = $state(""); // Currently selected semester
 
@@ -286,17 +288,13 @@ const searchedCourseNames: string[] = $derived.by(() => {
     return [];
   }
 
-  // Perform search filtering
-  const regexString = searchQuery
-    .trim()
-    .split(" ")
-    .filter((str) => str.length >= 2)
-    .join("|");
+  // Escaping lives in searchQuery.mjs so node --test can pin it: unescaped,
+  // "C++" and "((" threw from inside this derived and blanked the catalogue.
+  const regex = compileSearch(searchQuery);
 
   let searchedCourses: [string, any][];
 
-  if (regexString) {
-    const regex = new RegExp(regexString, "i");
+  if (regex) {
 
     // First, try searching by the course code (the object key)
     searchedCourses = allCourseEntries.filter(([courseName, _]) =>
@@ -407,14 +405,33 @@ export type PrereqInfo = {
 let prereqData = $state<Record<string, PrereqInfo> | null>(null); // Prerequisite data keyed by course code ("CMPE150")
 let prereqLoadStarted = false;
 
-// Fetch prerequisite data once; missing/404/error leaves prereqData null
+/**
+ * Fetch prerequisite data once; missing/404/error leaves `prereqData` null.
+ *
+ * `public/data/prereqs.json` carries a reserved top-level `meta` key
+ * (`PREREQS_META_KEY` in tools/lib/parse-prereqs.mjs) recording the crawl that
+ * produced it. It is stripped here instead of being handed to consumers as if
+ * it were a course record — `roadmapLogic.checkRoadmapPrereqs` builds its
+ * "known courses" set straight from `Object.keys()` of this map, so a
+ * non-course key does not belong in it.
+ *
+ * Stripping is also what makes the three prerequisite states distinguishable
+ * downstream: a code PRESENT with an empty `prereqs` array was crawled and
+ * genuinely has no prerequisite, while a code ABSENT was never crawled and
+ * nothing at all is known about it. `getEligibility` maps the second case to
+ * `no-data`, and callers must render it as such rather than as "eligible".
+ */
 export async function loadPrereqs(): Promise<void> {
   if (prereqLoadStarted) return;
   prereqLoadStarted = true;
   try {
     const res = await fetch(`${import.meta.env.BASE_URL}data/prereqs.json`);
     if (res.ok) {
-      prereqData = (await res.json()) as Record<string, PrereqInfo>;
+      const parsed = (await res.json()) as Record<string, unknown>;
+      // Mutating the freshly parsed object rather than spreading it: the file
+      // holds 6937 course records and nothing else references it yet.
+      delete parsed.meta;
+      prereqData = parsed as Record<string, PrereqInfo>;
     }
   } catch {
     // Data unavailable; app works without prerequisites
@@ -486,6 +503,104 @@ export function getDescriptionFor(code: string): DescriptionInfo | null {
   return descriptionData ? (descriptionData[code] ?? null) : null;
 }
 
+// ---- Live quota / enrolment (data/quota.json) ----
+
+// The shapes live with the logic that reads them, in ./quotaInfo; re-exported
+// here so a consumer needs one import for both the accessors and their types.
+export type { QuotaRow, QuotaSection };
+
+/** The `meta` block of `data/quota.json`. */
+export type QuotaMeta = {
+  /** Term the file was scraped for, in the site's own `2026/2027-1` spelling. */
+  term: string;
+  /** ISO timestamp of the scrape. */
+  scrapedAt: string;
+};
+
+type QuotaFile = {
+  meta?: Partial<QuotaMeta>;
+  sections?: Record<string, QuotaSection>;
+};
+
+let quotaFile = $state<QuotaFile | null>(null);
+let quotaLoad: Promise<void> | null = null;
+
+/**
+ * Fetch live quota / enrolment once. Idempotent, and never rejects: a 404, a
+ * network failure or malformed JSON all leave `quotaFile` null, which every
+ * accessor reports as "unknown".
+ *
+ * Eagerness, decided from measurements rather than taste. Quota is
+ * list-level information — every catalogue row wants it — so a per-card lazy
+ * fetch is nonsense, and `getQuotaFor` is called from a derived that runs for
+ * all 20+ rendered cards, so it must stay pure (same reasoning as
+ * `getDescriptionFor`). That leaves one decision: boot or first card.
+ *
+ * Measured 2026-08-27: quota.json is 752 B raw / 246 B gzipped for its first
+ * 30 sections, and the full ~2900-section run extrapolates to roughly
+ * 20-40 KB gzipped. The app's initial payload is 134.9 KB gzipped
+ * (2026-2027-1.json 75.6 + offerings 30.4 + prereqs 27.8 + meta/semesters/
+ * semester-dates ~1.0) against a hard 180 KB budget, so quota fits — but it
+ * would consume most of the remaining headroom. So it is kicked off from
+ * `Course.svelte`'s instance init instead of from `App.svelte`'s `onMount`:
+ * the request starts the moment the first catalogue row exists, i.e. after the
+ * term JSON that actually gates first paint, and never competes with it.
+ */
+export function loadQuota(): Promise<void> {
+  quotaLoad ??= (async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}data/quota.json`);
+      if (res.ok) {
+        const parsed = (await res.json()) as QuotaFile;
+        if (parsed && typeof parsed === "object") quotaFile = parsed;
+      }
+    } catch {
+      // Offline or malformed JSON: seat counts stay unknown.
+    }
+  })();
+  return quotaLoad;
+}
+
+/**
+ * Every quota record for the current term, or null when we have none for it.
+ *
+ * quota.json holds exactly one term, and section keys repeat across terms, so
+ * serving 2026/2027-1 enrolment while the user browses 2021/2022-1 would
+ * attribute one term's numbers to another — a fabrication, not a staleness
+ * problem. An unlabelled file could belong to any term and is not trusted
+ * either. The two spellings of a term (`2026/2027-1` on the site,
+ * `2026-2027-1` in our filenames) are compared slash-insensitively.
+ *
+ * Pure by design: this and `getQuotaFor` are read from a per-card derived, so
+ * neither may start a fetch. Call `loadQuota()` once, separately.
+ */
+export function getQuotaSections(): Record<string, QuotaSection> | null {
+  const sections = quotaFile?.sections;
+  const term = quotaFile?.meta?.term;
+  if (!sections || typeof sections !== "object" || typeof term !== "string") {
+    return null;
+  }
+  return term.trim().replace(/\//g, "-") === currentSemester.trim().replace(/\//g, "-")
+    ? sections
+    : null;
+}
+
+/** Stored quota for one section key, or null when we have nothing for it. */
+export function getQuotaFor(sectionKey: string): QuotaSection | null {
+  return getQuotaSections()?.[sectionKey] ?? null;
+}
+
+/**
+ * The scrape timestamp, or null when the file is absent or belongs to another
+ * term. Enrolment counts go stale within minutes during registration, so a
+ * consumer that renders the numbers must render this next to them.
+ */
+export function getQuotaScrapedAt(): string | null {
+  if (getQuotaSections() === null) return null;
+  const scrapedAt = quotaFile?.meta?.scrapedAt;
+  return typeof scrapedAt === "string" && scrapedAt ? scrapedAt : null;
+}
+
 // ---- Completed courses (eligibility feature) ----
 const completedCourses = new SvelteSet<string>();
 let completedLoaded = false;
@@ -523,6 +638,25 @@ export function isCompleted(code: string): boolean {
 
 export function getCompletedCourses(): string[] {
   return [...completedCourses];
+}
+
+/**
+ * The live completed-course set, for the eligibility check.
+ *
+ * Every course card used to build its own `new Set(getCompletedCourses())` in a
+ * derived, so ticking one course reallocated a Set per rendered card — 20+ at
+ * a time in the catalogue, each copying the whole completed list. The backing
+ * store is already a `SvelteSet`, so handing it out directly is both
+ * allocation-free and *more* precise: `has()` tracks that one member instead of
+ * the whole collection, so marking CS101 complete only re-runs the cards that
+ * actually mention CS101.
+ *
+ * Returned as a plain `Set` because that is what `getEligibility` accepts.
+ * Treat it as read-only; `toggleCompleted` is the only writer, and it is the
+ * only one that persists.
+ */
+export function getCompletedCourseSet(): Set<string> {
+  return completedCourses;
 }
 
 // ---- Roadmap (multi-semester planning) ----

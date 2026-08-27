@@ -1,9 +1,10 @@
 <script lang="ts">
   import {
     getCurSemesterData,
-    getCurrentSemester,
     addCourse,
     getSelectedCourseNames,
+    loadQuota,
+    getQuotaSections,
   } from "./globalState.svelte";
   import { t } from "./i18n.svelte";
   import {
@@ -34,42 +35,11 @@
   // predate the scrape). Everything below degrades to "no seat badges" on a
   // 404, a network error, or a shape we do not recognise.
   //
-  // `activeQuotaSections` is the single read path: when globalState grows a
-  // central loader, this derived becomes a one-line call to it.
-  let quotaSections: Record<string, any> | null = $state(null);
-  let quotaTerm = $state("");
-  let quotaLoadStarted = false;
-
-  function normalizeTerm(term: string): string {
-    return term.trim().replace(/\//g, "-");
-  }
-
-  async function loadQuotaOnce(): Promise<void> {
-    if (quotaLoadStarted) return;
-    quotaLoadStarted = true;
-    try {
-      const res = await fetch(`${import.meta.env.BASE_URL}data/quota.json`);
-      if (!res.ok) return;
-      const json = await res.json();
-      const sections = json?.sections;
-      if (!sections || typeof sections !== "object") return;
-      quotaTerm =
-        typeof json?.meta?.term === "string" ? normalizeTerm(json.meta.term) : "";
-      quotaSections = sections;
-    } catch {
-      // Offline or malformed JSON: seat counts stay unknown.
-    }
-  }
-
-  // Seat counts are only shown for the term they were scraped for. An
-  // unlabelled quota file could belong to any term, so it is not trusted.
-  const activeQuotaSections = $derived(
-    quotaSections !== null &&
-      quotaTerm !== "" &&
-      quotaTerm === normalizeTerm(getCurrentSemester())
-      ? quotaSections
-      : null,
-  );
+  // globalState owns the fetch, the term gate and the scrape timestamp. This is
+  // a read-only view: getQuotaSections() already returns null unless the file's
+  // meta.term matches the term being browsed, so one term's enrolment can never
+  // be attributed to another.
+  const activeQuotaSections = $derived(getQuotaSections());
 
   // Entries are rebuilt only when the semester dataset or the quota map
   // changes, not on every keystroke: a live term holds 3000+ sections.
@@ -148,7 +118,7 @@
     open = true;
     query = "";
     activeIndex = 0;
-    void loadQuotaOnce();
+    void loadQuota();
   }
 
   function close() {

@@ -5,7 +5,7 @@
     addToRoadmap,
     removeFromRoadmap,
     clearRoadmap,
-    getCompletedCourses,
+    getCompletedCourseSet,
     getPrereqsAll,
     getOfferings,
     getSemesterData,
@@ -201,7 +201,7 @@
     checkRoadmapPrereqs(
       getRoadmap(),
       orderedTermsOldestFirst,
-      new Set(getCompletedCourses()),
+      getCompletedCourseSet(),
       getPrereqsAll() ?? {},
     ),
   );

@@ -48,6 +48,13 @@ const MAX_FAILURE_RATIO = 0.05;
 const MAX_SHRINK_RATIO = 0.5;
 /** Parse warnings tolerated before the run is rejected. */
 const MAX_WARNINGS = 20;
+/**
+ * How far the share of sections publishing a capacity may fall relative to the
+ * stored file before the run is treated as a layout change rather than a data
+ * change. Deliberately loose: the share is a property of which course levels a
+ * term offers (projects and theses publish none), not of parser health.
+ */
+const MIN_CAP_RATIO_OF_PREVIOUS = 0.5;
 
 /**
  * Section keys look like "<DEPT><NUM>.<SECTION>", e.g. "CMPE150.01" or
@@ -172,13 +179,39 @@ function validate(sections, attempted, failed, partial) {
   if (count < MIN_SECTIONS) {
     throw new Error(`only ${count} sections parsed (min ${MIN_SECTIONS})`);
   }
-  // Every real page states a capacity; a term where almost none do means the
-  // capacity label moved and every record is junk.
+  // Capacity presence is NOT a health signal. Measured live on 2026/2027-1:
+  // 1249/2937 sections (42.5%) publish a capacity; the other 1688 are project,
+  // seminar and thesis sections (490/491/574/591/601/690 levels) whose pages
+  // carry the "Departmental Quota(s), Class Quota(s), and Surname
+  // Restriction(s), if any, for <KEY>" heading but list no classroom capacity
+  // at all. Spot-checked BIO491.11, EF591.09, HIST601.13, MATH490.02,
+  // PHIL690.04 and SWE574.01 — all recognised, all genuinely empty.
+  //
+  // A real layout change cannot slip past this: parseQuotaPage throws on a page
+  // it does not recognise and the fetch loop aborts on the first such throw, so
+  // reaching validate() already proves every page was recognised. What is worth
+  // guarding here is a *regression* — the capacity label moving would make the
+  // ratio collapse against the file we already have.
   const withCap = Object.values(sections).filter((s) => typeof s.cap === "number").length;
-  if (withCap / count < 0.5) {
-    throw new Error(
-      `only ${withCap}/${count} sections have a capacity — quotasearch.asp layout changed`,
-    );
+  const capRatio = withCap / count;
+  console.log(
+    `  ${withCap}/${count} sections publish a capacity (${(capRatio * 100).toFixed(1)}%)`,
+  );
+  if (existsSync(OUT_FILE)) {
+    const stored = JSON.parse(readFileSync(OUT_FILE, "utf8"));
+    const storedSections = Object.values(stored.sections ?? {});
+    const storedWithCap = storedSections.filter(
+      (/** @type {StoredSection} */ s) => typeof s.cap === "number",
+    ).length;
+    if (storedSections.length >= MIN_SECTIONS) {
+      const storedRatio = storedWithCap / storedSections.length;
+      if (storedRatio > 0 && capRatio < storedRatio * MIN_CAP_RATIO_OF_PREVIOUS) {
+        throw new Error(
+          `capacity coverage collapsed ${(storedRatio * 100).toFixed(1)}% -> ` +
+            `${(capRatio * 100).toFixed(1)}% — quotasearch.asp layout likely changed`,
+        );
+      }
+    }
   }
   if (existsSync(OUT_FILE)) {
     const previous = JSON.parse(readFileSync(OUT_FILE, "utf8"));
