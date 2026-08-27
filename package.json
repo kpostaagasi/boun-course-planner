@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "scrape": "node tools/scrape.mjs",
+    "payload": "node tools/measure-payload.mjs",
     "test": "node --test tools/lib/test/*.test.mjs",
     "test:e2e": "playwright test"
   },
