@@ -1,4 +1,10 @@
 {
+  "meta": {
+    "scrapedAt": "2026-08-27T14:23:20.260Z",
+    "failed": 0,
+    "derived": true,
+    "courses": 6937
+  },
   "ACL122": {
     "prereqs": [],
     "coreqs": [],

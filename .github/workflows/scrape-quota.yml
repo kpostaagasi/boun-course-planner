@@ -1,0 +1,178 @@
+name: Scrape section quotas
+
+# Per-section live quotas from /scripts/quotasearch.asp into
+# public/data/quota.json. One request per section — ~2900 for a full term,
+# ~25 minutes at the scraper's 400 ms throttle.
+#
+# CADENCE. Quota numbers are only interesting while a registration or add-drop
+# window is open: that is when "Current" moves and when a student cares whether
+# a section is full. Outside those windows the numbers sit still for months, so
+# a daily cron would spend ~2900 requests a day on the university's server to
+# rewrite an identical file — and during registration a daily cron is too slow
+# to be useful anyway. So:
+#
+#   * workflow_dispatch is the PRIMARY trigger. Registration and add-drop dates
+#     are published human-known dates; a human kicking this off on the right
+#     morning beats any fixed cron.
+#   * The cron is a twice-daily safety net restricted to the four months that
+#     contain BOUN's registration and add-drop windows for both terms
+#     (August/September for the fall term, January/February for the spring one).
+#     06:00 and 18:00 Istanbul, so a snapshot exists at the start and the end of
+#     each working day.
+#   * There is deliberately NO cron in the other eight months. A snapshot that
+#     is labelled stale (quota.json carries meta.scrapedAt) is strictly better
+#     than 2900 pointless requests, and workflow_dispatch covers the exceptions.
+#
+# This workflow is intentionally NOT wired into update-data.yml: the schedule
+# scrape runs daily and must not grow a 25-minute tail.
+
+on:
+  workflow_dispatch:
+    inputs:
+      semester:
+        description: 'Semester, e.g. "2026/2027-1" (empty = newest known)'
+        required: false
+        type: string
+      limit:
+        description: "Fetch only N sections (smoke run; does not commit a full file)"
+        required: false
+        type: string
+  schedule:
+    # 03:00 and 15:00 UTC = 06:00 and 18:00 Istanbul, Jan/Feb and Aug/Sep only.
+    - cron: "0 3,15 * 1,2,8,9 *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape-quota
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    # A full term is ~25 min; 60 leaves room for a slow server without letting a
+    # hung run burn an hour and a half.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Gate before touching the university server: if the quota parser is
+      # broken there is no point fetching 2900 pages.
+      - name: Run parser tests
+        run: node --test tools/lib/test/quota.test.mjs tools/lib/test/parse.test.mjs
+
+      - name: Resolve semester
+        id: term
+        env:
+          SEMESTER: ${{ inputs.semester }}
+        run: |
+          if [ -n "$SEMESTER" ]; then
+            TERM_CODE="$SEMESTER"
+          else
+            # semesters.json is newest-first (see tools/scrape.mjs).
+            TERM_CODE=$(node -e 'console.log(require("./public/data/semesters.json")[0])')
+          fi
+          echo "code=$TERM_CODE" >> "$GITHUB_OUTPUT"
+          echo "Scraping quotas for $TERM_CODE"
+
+      # A --limit run is a smoke test of the parser against live HTML, so it is
+      # forced to --dry-run: writing a 10-section quota.json over the real one
+      # would be a data loss dressed up as a successful run.
+      - name: Smoke-scrape quotas
+        if: inputs.limit != ''
+        env:
+          TERM_CODE: ${{ steps.term.outputs.code }}
+          LIMIT: ${{ inputs.limit }}
+        run: node tools/scrape-quota.mjs --semester "$TERM_CODE" --limit "$LIMIT" --dry-run
+
+      - name: Scrape quotas
+        if: inputs.limit == ''
+        env:
+          TERM_CODE: ${{ steps.term.outputs.code }}
+        run: node tools/scrape-quota.mjs --semester "$TERM_CODE"
+
+      # The scraper already refuses to write a run that failed validation, so
+      # reaching here means the file is self-consistent. These gates guard the
+      # things the scraper cannot know: that the file is loadable by the
+      # frontend and still inside the app's payload budget.
+      - name: Validate quota.json
+        if: inputs.limit == ''
+        run: |
+          set -e
+          node -e '
+            const data = require("./public/data/quota.json");
+            const n = Object.keys(data.sections).length;
+            if (!data.meta?.term || !data.meta?.scrapedAt) throw new Error("meta missing");
+            if (n < 5) throw new Error(`only ${n} sections`);
+            for (const [key, s] of Object.entries(data.sections)) {
+              if (s.cap !== undefined && typeof s.cap !== "number") throw new Error(`${key}: bad cap`);
+              for (const r of s.rows ?? []) {
+                if (typeof r.quota !== "number" || typeof r.current !== "number") {
+                  throw new Error(`${key}: bad row`);
+                }
+              }
+            }
+            console.log(`quota.json OK: ${n} sections, term ${data.meta.term}`);
+          '
+          GZ=$(gzip -c public/data/quota.json | wc -c)
+          echo "quota.json gzipped: $GZ bytes"
+          if [ "$GZ" -gt 40960 ]; then
+            echo "quota.json is $GZ bytes gzipped, over the 40 KB budget"
+            exit 1
+          fi
+
+      - name: Commit updated quotas
+        if: inputs.limit == ''
+        run: |
+          if [ -z "$(git status --porcelain public/data/quota.json)" ]; then
+            echo "No quota changes."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/data/quota.json
+            git commit -m "chore(data): update section quotas from registration.boun.edu.tr"
+            git push
+          fi
+
+  notify-failure:
+    needs: crawl
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or comment on a failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="Quota scrape failed (run ${{ github.run_number }})"
+          BODY="Automated quota scrape from registration.boun.edu.tr failed.
+          public/data/quota.json was left untouched, so the site still serves the
+          previous snapshot (its staleness is visible in \`meta.scrapedAt\`).
+
+          A parse failure here usually means quotasearch.asp changed layout —
+          tools/lib/parse-quota.mjs throws on purpose rather than writing zeroes.
+
+          Failed run: $RUN_URL"
+
+          gh label create automation-failure --repo ${{ github.repository }} \
+            --description "Automated scrape/deploy failures" --color D73A4A --force 2>/dev/null || true
+          OPEN_ISSUE=$(gh issue list --repo ${{ github.repository }} \
+            --label automation-failure --state open --json number --jq '.[0].number')
+          if [ -n "$OPEN_ISSUE" ]; then
+            gh issue comment "$OPEN_ISSUE" --repo ${{ github.repository }} --body "$BODY"
+          else
+            gh issue create --repo ${{ github.repository }} \
+              --title "$TITLE" --body "$BODY" --label automation-failure
+          fi

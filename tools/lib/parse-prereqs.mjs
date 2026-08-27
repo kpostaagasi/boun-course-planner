@@ -10,6 +10,12 @@
  *
  * A section with no data contains the marker
  * `<center><u>This Type of Prerequisite not Found</u></center>`.
+ *
+ * This module also owns the shape of public/data/prereqs.json itself
+ * (`serializePrereqsFile` / `splitPrereqsFile` / `derivePrereqsMeta`), so the
+ * schema and its invariants live next to the parser that produces it and stay
+ * testable without touching the network. See scrape-prereqs.mjs for the
+ * rationale behind the reserved "meta" key.
  */
 
 import * as cheerio from "cheerio";
@@ -95,7 +101,52 @@ function parseConsentTable(html) {
 }
 
 /**
- * Parse one prerequisitecheck.asp page.
+ * Is this really a prerequisitecheck.asp answer?
+ *
+ * `parsePrereqPage` degrades gracefully: given an error page, a session-expired
+ * redirect or any other 200-with-garbage body it finds none of the three
+ * section markers and returns `{prereqs: [], coreqs: [], consent: false,
+ * gpa: null}` — byte-identical to a course that genuinely has no prerequisite.
+ * That made "no prerequisite" and "we never actually read the page"
+ * indistinguishable in prereqs.json, so the crawler asks this first and simply
+ * does not record a course whose page fails the check. Every key in
+ * prereqs.json is therefore a course whose page we really parsed, and a course
+ * absent from the file has UNKNOWN prerequisites.
+ *
+ * All three markers are required: the real pages all carry all three, including
+ * the fully-empty CMPE150 answer where every section says "This Type of
+ * Prerequisite not Found" (see tools/lib/fixtures/prerequisitecheck-*.html). If
+ * BOUN ever stops emitting one, the crawler rejects everything at once and the
+ * run fails loudly instead of quietly wiping the file.
+ *
+ * @param {string} html decoded page HTML
+ * @returns {boolean}
+ */
+export function isPrereqPage(html) {
+  return (
+    /Course\s*Prerequisites\s*:/i.test(html) &&
+    /GPA,\s*Being\s*Senior/i.test(html) &&
+    /Corequisites\s*:/i.test(html)
+  );
+}
+
+/**
+ * Parse one prerequisitecheck.asp page. Call `isPrereqPage` first: this
+ * function is deliberately lenient and will happily report "no prerequisites"
+ * for a page that is not a prerequisite page at all.
+ *
+ * `gpa` is null in all 6937 entries of the current prereqs.json. It is KEPT,
+ * not dropped, because:
+ *   - the extraction works and is pinned by a test against real consent-table
+ *     markup ("first positive GPA limit wins"), so null means BOUN's catalogue
+ *     currently sets no GPA limit anywhere, not that the code is dead;
+ *   - Course.svelte reads and renders it, and its TypeScript type lives in
+ *     globalState.svelte.ts, so removing the field is a frontend change rather
+ *     than a data one;
+ *   - it is nearly free: dropping "gpa": null from every entry shrinks the file
+ *     by 118 KB raw but only 236 bytes gzipped (24179 -> 23943 at level 9),
+ *     because the repeated literal compresses away.
+ *
  * @param {string} html decoded page HTML
  * @returns {{ prereqs: string[], coreqs: string[], consent: boolean, gpa: string | null }}
  */
@@ -146,4 +197,60 @@ export function parseDepartmentCodes(html) {
     if (bolum && !codes.includes(bolum)) codes.push(bolum);
   }
   return codes;
+}
+
+/**
+ * Reserved top-level key of public/data/prereqs.json. Safe because a course
+ * code always contains digits (see COURSE_CODE), so it can never collide.
+ */
+export const PREREQS_META_KEY = "meta";
+
+/**
+ * @typedef {object} PrereqsMeta
+ * @property {string} scrapedAt ISO timestamp of the crawl that produced the file
+ * @property {number} failed courses attempted but deliberately not recorded
+ * @property {number} courses number of course entries in the file
+ * @property {true} [derived] set when the block was migrated onto a pre-existing
+ *   file rather than written by a crawl, so `scrapedAt` is the migration time
+ */
+
+/**
+ * Serialize course records plus the meta block. "meta" is written first so the
+ * file reads as metadata-then-data; course keys stay sorted as before.
+ * @param {Record<string, unknown>} courses records, without any meta key
+ * @param {{scrapedAt: string, failed: number, derived?: boolean}} meta
+ * @returns {string} JSON text, newline-terminated
+ */
+export function serializePrereqsFile(courses, meta) {
+  const ordered = {
+    [PREREQS_META_KEY]: { ...meta, courses: Object.keys(courses).length },
+    ...Object.fromEntries(Object.entries(courses).sort()),
+  };
+  return JSON.stringify(ordered, null, 2) + "\n";
+}
+
+/**
+ * Split a loaded prereqs.json into its meta block and its course records.
+ * `meta` is null for a file written before the block existed.
+ * @param {Record<string, unknown>} stored
+ * @returns {{meta: PrereqsMeta | null, courses: Record<string, unknown>}}
+ */
+export function splitPrereqsFile(stored) {
+  const { [PREREQS_META_KEY]: meta, ...courses } = stored;
+  return { meta: /** @type {PrereqsMeta | null} */ (meta ?? null), courses };
+}
+
+/**
+ * Derive a meta block for a file that predates it.
+ *
+ * Honest about its limitation: every entry already in the file was written by a
+ * successful `parsePrereqPage` call, so treating the existing key set as the
+ * scraped set is sound — that is exactly the invariant the crawler enforces.
+ * What cannot be recovered is WHEN each course was fetched, or how many courses
+ * failed during those old runs, so `scrapedAt` is the migration time, `failed`
+ * is 0, and `derived: true` marks the block as not a real crawl result.
+ * @returns {{scrapedAt: string, failed: number, derived: true}}
+ */
+export function derivePrereqsMeta() {
+  return { scrapedAt: new Date().toISOString(), failed: 0, derived: true };
 }

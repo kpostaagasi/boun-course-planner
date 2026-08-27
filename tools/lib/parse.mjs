@@ -4,13 +4,19 @@
  * Department list:  /scripts/schdepsel.asp
  * Schedule pages:   /scripts/sch.asp?donem=YYYY/YYYY-T&kisaadi=XX&bolum=FULL+NAME
  *
- * A schedule page is a table whose rows are:
- *  - main row (first cell holds e.g. "CMPE150.03"): code, desc, name, credits,
- *    ects, instructor, days, slots, _, _, rooms, examDate, _
+ * A schedule page is a table whose 15-16 columns are located by their header
+ * labels (see COLUMN_ALIASES) rather than by position, because current terms
+ * carry an extra "Quota" column that archived terms lack. Rows are:
+ *  - main row (first cell holds e.g. "CMPE150.03"): the section itself
  *  - continuation rows (class contains "labps", first cell empty): the LAB /
- *    P.S. meetings of the section above; cells shift left because there is no
- *    code / desc / name / credits / ects: type, _, instructor, days, slots,
- *    _, _, rooms
+ *    P.S. meetings of the section above. These reuse the same column indices
+ *    (the cells are blank-padded, not shifted) but carry filler values in the
+ *    exam columns, so only days / hours / rooms / instructor are read.
+ *
+ * "Course Delivery Method", "Final Exam Location", "Exam" and "Sl." are all
+ * sparse: the exam pair is empty for the whole term until the exam schedule is
+ * published, and delivery method was only filled during the 2020-2022 online
+ * terms. They are therefore omitted from a section rather than stored empty.
  *
  * Day tokens are variable length ("M", "T", "W", "Th", "F", "St") and slot
  * numbers can be two digits (10-13), both concatenated without separators
@@ -114,9 +120,27 @@ const COLUMN_ALIASES = {
   instructor: ["Instr."],
   days: ["Days"],
   slots: ["Hours"],
+  deliveryMethod: ["Course Delivery Method"],
+  finalExamLocation: ["Final Exam Location"],
   rooms: ["Rooms"],
+  examDate: ["Exam"],
+  examSlot: ["Sl.", "Sl"],
   requiredForDept: ["Required for Dept.(*)", "Required for Dept."],
 };
+
+/**
+ * Copy a verbatim header column onto a section, but only when the source cell
+ * is non-empty. The exam columns are blank for a whole term until the exam
+ * schedule is published (and "Course Delivery Method" has been blank in every
+ * term we sampled), so writing empty strings would add thousands of dead keys
+ * to every semester file.
+ * @param {Record<string, unknown>} entry
+ * @param {string} field
+ * @param {string | undefined} value
+ */
+function setIfPresent(entry, field, value) {
+  if (value) entry[field] = value;
+}
 
 function findColumnMap($) {
   for (const headerRow of $("tr").toArray()) {
@@ -169,18 +193,24 @@ export function parseSchedulePage(html, { kisaadi } = {}) {
           ?.split(",")
           .map((c) => c.trim())
           .filter(Boolean);
+        // Keys stay alphabetical to match the historical data files, so the
+        // optional columns are assigned at their sorted position instead of
+        // being appended after the literal.
         const entry = {
           code: rawCode,
           credits: Number(cells[columns.credits]) || 0,
           days: [],
-          dept: kisaadi ? [kisaadi] : undefined,
-          ects: Number(cells[columns.ects]) || 0,
-          hours: [],
-          instructor: cells[columns.instructor],
-          name: cells[columns.name],
         };
+        setIfPresent(entry, "deliveryMethod", cells[columns.deliveryMethod]);
+        entry.dept = kisaadi ? [kisaadi] : undefined;
+        entry.ects = Number(cells[columns.ects]) || 0;
+        setIfPresent(entry, "examDate", cells[columns.examDate]);
+        setIfPresent(entry, "examSlot", cells[columns.examSlot]);
+        setIfPresent(entry, "finalExamLocation", cells[columns.finalExamLocation]);
+        entry.hours = [];
+        entry.instructor = cells[columns.instructor];
+        entry.name = cells[columns.name];
         if (requiredFor?.length) {
-          // Keys stay alphabetical to match the historical data files.
           entry.requiredForDept = requiredFor;
         }
         entry.rooms = [];
