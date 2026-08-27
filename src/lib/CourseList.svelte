@@ -171,7 +171,7 @@
     {#if getSelectedCourseNames().length > 0}
       <button
         type="button"
-        class="ml-auto text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
+        class="btn-quiet ml-auto"
         onclick={copyShareLink}
         data-testid="copy-share-link"
       >
@@ -180,7 +180,7 @@
     {/if}
     <button
       type="button"
-      class="ml-2 text-xs px-2 py-0.5 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
+      class="btn-quiet ml-2"
       onclick={() => (showRoadmap = !showRoadmap)}
       data-testid="roadmap-toggle"
     >
@@ -239,7 +239,7 @@
   <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center gap-2 flex-wrap">
     <button
       type="button"
-      class="text-xs px-2 py-1 rounded border border-blue-600/50 dark:border-blue-400/50 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      class="btn-quiet"
       disabled={getSelectedCourseNames().length < 2}
       onclick={findConflictFree}
       data-testid="find-conflict-free"
@@ -256,7 +256,7 @@
     {#if prevSchedule}
       <button
         type="button"
-        class="text-xs px-2 py-1 rounded border border-zinc-400/50 dark:border-zinc-500/50 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 cursor-pointer"
+        class="btn-quiet"
         onclick={undoConflictFree}
         data-testid="solver-undo"
       >

@@ -604,7 +604,7 @@
   <div class="flex items-center gap-3">
     <button
       type="button"
-      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-md transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
       onclick={downloadCalendar}
       disabled={!canExportCalendar}
       title={calendarTooltip}
@@ -616,7 +616,7 @@
     {#if canExportCalendar}
       <button
         type="button"
-        class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 rounded-lg transition-colors duration-200"
+        class="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium rounded-md border border-zinc-300 text-zinc-600 hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
         onclick={openInGoogleCalendar}
         title={t("calendar.addToGcal")}
         data-testid="calendar-gcal"

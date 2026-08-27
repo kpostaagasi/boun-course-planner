@@ -66,7 +66,7 @@ const sw = /** @type {ServiceWorkerGlobalScope} */ (
   /** @type {unknown} */ (self)
 );
 
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `bcp-shell-${VERSION}`;
 const DATA_CACHE = `bcp-data-${VERSION}`;
 const CACHE_PREFIX = "bcp-";
@@ -81,19 +81,39 @@ const DATA_PREFIX = new URL("data/", SCOPE_URL).pathname;
 /** Vite's content-hashed build output; the only entries safe to prune. */
 const ASSETS_PREFIX = new URL("assets/", SCOPE_URL).pathname;
 
+/**
+ * Self-hosted webfonts, precached explicitly.
+ *
+ * They are referenced from the stylesheet rather than from `index.html`, so
+ * `extractShellAssets` cannot see them, and on a first visit the stylesheet
+ * requests them before the worker controls the page — which means without this
+ * list the very first "load once, then go offline" trip falls back to a system
+ * font. Unhashed and stable, so they are precached like the icons and never
+ * pruned. Turkish needs both subsets: ı lives in `latin`, İ/ş/ğ in `latin-ext`.
+ */
+const SHELL_FONTS = [
+  "fonts/archivo-latin.woff2",
+  "fonts/archivo-latin-ext.woff2",
+  "fonts/plexmono-400-latin.woff2",
+  "fonts/plexmono-400-latin-ext.woff2",
+  "fonts/plexmono-600-latin.woff2",
+  "fonts/plexmono-600-latin-ext.woff2",
+].map((path) => new URL(path, SCOPE_URL).href);
+
 /** `<script src>` / `<link href>` references in the shell HTML. */
 const SHELL_ASSET_RE =
   /<(?:script|link)\b[^>]*?\b(?:src|href)\s*=\s*(?:"([^"]+)"|'([^']+)')/gi;
 
 /**
  * Pull the asset URLs the deployed shell references, keeping only same-origin ones inside
- * our scope. Cross-origin tags (analytics, fonts) and `data:` URLs are dropped.
+ * our scope, plus the self-hosted fonts the stylesheet pulls in. Cross-origin tags (notably
+ * the analytics script) and `data:` URLs are dropped.
  * @param {string} html
  * @returns {string[]}
  */
 function extractShellAssets(html) {
   /** @type {Set<string>} */
-  const urls = new Set();
+  const urls = new Set(SHELL_FONTS);
   for (const match of html.matchAll(SHELL_ASSET_RE)) {
     const raw = match[1] ?? match[2];
     if (!raw || raw.startsWith("data:") || raw.startsWith("#")) continue;

@@ -132,7 +132,31 @@ test("serves the course list from cache with the network switched off", async ({
 
   const caches0 = await cacheContents(page);
   const allCached = Object.values(caches0).flat();
-  expect(Object.keys(caches0).sort()).toEqual(["bcp-data-v1", "bcp-shell-v1"]);
+  // Asserted by shape, not by literal version. sw.js's own contract is to bump
+  // VERSION whenever the strategies or the precached file set change, so pinning
+  // "bcp-shell-v1" here turned every intentional bump into a test failure.
+  const cacheNames = Object.keys(caches0).sort();
+  expect(cacheNames).toHaveLength(2);
+  expect(cacheNames.filter((n) => /^bcp-shell-v\d+$/.test(n))).toHaveLength(1);
+  expect(cacheNames.filter((n) => /^bcp-data-v\d+$/.test(n))).toHaveLength(1);
+
+  // The self-hosted webfonts are referenced from the stylesheet, not from
+  // index.html, and on a first visit they are requested before the worker
+  // controls the page — so they are precached explicitly. Without that, the
+  // first "load once, then go offline" trip silently loses the typography.
+  // Turkish needs both subsets: ı is in `latin`, İ/ş/ğ in `latin-ext`.
+  const cachedFonts = allCached
+    .filter((url) => url.endsWith(".woff2"))
+    .map((url) => url.split("/").pop())
+    .sort();
+  expect(cachedFonts).toEqual([
+    "archivo-latin-ext.woff2",
+    "archivo-latin.woff2",
+    "plexmono-400-latin-ext.woff2",
+    "plexmono-400-latin.woff2",
+    "plexmono-600-latin-ext.woff2",
+    "plexmono-600-latin.woff2",
+  ]);
 
   // Nothing cross-origin and nothing outside our own deploy path ever gets stored.
   const origin = new URL(page.url()).origin;
@@ -143,7 +167,8 @@ test("serves the course list from cache with the network switched off", async ({
   expect(
     allCached.some((url) => /\/assets\/index-[^/]+\.js$/.test(url))
   ).toBe(true);
-  expect(caches0["bcp-data-v1"].some((url) => url.endsWith(".json"))).toBe(true);
+  const dataCacheName = cacheNames.find((n) => /^bcp-data-v\d+$/.test(n))!;
+  expect(caches0[dataCacheName].some((url) => url.endsWith(".json"))).toBe(true);
 
   await context.setOffline(true);
 

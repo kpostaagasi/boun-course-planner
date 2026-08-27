@@ -340,7 +340,7 @@
   <button
     type="button"
     data-testid="timetable-export-png"
-    class="ml-auto flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-700 px-2.5 py-1.5 font-medium text-white transition-colors duration-200 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-500"
+    class="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-300 px-2 py-1 text-[0.8125rem] font-medium text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300"
     onclick={downloadPng}
     disabled={!canExportPng}
     title={canExportPng ? t("timetable.exportPng") : t("timetable.exportPngEmpty")}
@@ -351,7 +351,7 @@
 </div>
 <div
   data-testid="timetable-scroll"
-  class="bg-white dark:bg-gray-800 dark:text-white shadow rounded-lg w-full shrink-0 overflow-x-auto"
+  class="bg-white dark:bg-zinc-800 dark:text-white border border-zinc-200 dark:border-zinc-700 rounded-lg w-full shrink-0 overflow-x-auto"
 >
   <table
     class="table-fixed text-center w-full min-w-[32rem] text-sm lg:text-base antialiased tracking-tight sm:tracking-normal"
@@ -359,10 +359,15 @@
     <thead>
       <tr>
         <th
-          class="sticky left-0 z-40 w-14 border-r border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+          class="sticky left-0 z-40 w-14 border-r border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
         ></th>
         {#each DAYS as day, dayIdx}
-          <th class="w-20 {day == 'St' && !courseOnSaturday ? 'hidden' : ''}">
+          <th
+            class="eyebrow w-20 border-b border-zinc-200 pb-1.5 pt-2 text-zinc-500 dark:border-zinc-700 dark:text-zinc-300 {day ==
+              'St' && !courseOnSaturday
+              ? 'hidden'
+              : ''}"
+          >
             {t(DAY_LABEL_KEYS[dayIdx])}
           </th>
         {/each}
@@ -370,15 +375,23 @@
     </thead>
     <tbody>
     {#each layout.rows as row, i}
-      <tr class={i % 2 == 0 ? "bg-gray-50 dark:bg-gray-700" : ""}>
+      <tr>
+        <!--
+          The hour spine. Time is the organising principle of the entire product,
+          but this column used to be a 16px gutter holding a bare "9". Mono and
+          right-aligned so the hours stack into an axis, with the minutes dropped
+          to a lighter mark because they are always :00 and never the thing being
+          read.
+        -->
         <th
-          class="sticky left-0 z-30 w-14 border-r border-gray-200 tabular-nums md:p-1 dark:border-gray-600 {i %
-            2 ==
+          class="spine sticky left-0 z-30 w-14 border-r border-zinc-200 bg-white px-2 align-top dark:border-zinc-700 dark:bg-zinc-800 {i ===
           0
-            ? 'bg-gray-50 dark:bg-gray-700'
-            : 'bg-white dark:bg-gray-800'}"
+            ? ''
+            : 'row-rule'}"
         >
-          {row.hour}
+          <span class="inline-block pt-1.5"
+            >{String(row.hour).padStart(2, "0")}<span class="spine-min">:00</span></span
+          >
         </th>
         {#each DAYS as day, dayIdx}
           {@const cell = row.cells[dayIdx]}
@@ -386,7 +399,8 @@
           <td
             title={conflict ? t("course.conflict") : undefined}
             aria-label={conflict ? t("course.conflict") : undefined}
-            class="relative h-9 p-0 align-top {day == 'St' && !courseOnSaturday
+            class="relative h-9 p-0 align-top {i === 0 ? '' : 'row-rule'} {day == 'St' &&
+            !courseOnSaturday
               ? 'hidden'
               : ''} {conflict
               ? 'bg-red-100 ring-2 ring-red-500 ring-inset dark:bg-red-500/15 dark:ring-red-400'

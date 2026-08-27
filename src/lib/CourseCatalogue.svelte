@@ -238,9 +238,14 @@
         'transition-all duration-200"': true,
       }}
     >
+      <!--
+        Department abbreviations are the registration system's own vocabulary, so
+        they are set in mono. Sixty filled pills read as a wall; unfilled mono
+        text at one size lets the eye scan the column of letters instead.
+      -->
       {#each getCurSemCategories() as category}
         <button
-          class="rounded-full mr-2 mb-2 px-2.5 py-1 text-sm font-semibold bg-white dark:bg-zinc-800 dark:text-white"
+          class="u-data mr-2.5 mb-1.5 px-0.5 text-[0.75rem] font-medium text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
           onclick={() => {
             setSearchQuery(category);
           }}>{category}</button
@@ -250,20 +255,20 @@
     {#if getCurSemCategories().length > 5}
       <button
         class={{
-          "absolute left-1/2 -translate-x-1/2 rounded-full shadow px-2.5 py-1 bg-white dark:bg-zinc-800 dark:text-white": true,
+          "absolute left-1/2 -translate-x-1/2 eyebrow px-2 py-1 cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 bg-zinc-100 dark:bg-black": true,
           "translate-y-1/2 bottom-4": isExpanded,
           "bottom-0": !isExpanded,
         }}
         onclick={() => (isExpanded = !isExpanded)}
       >
-        {isExpanded ? "Show less ▲" : "Show more ▼"}
+        {isExpanded ? t("catalogue.showLess") : t("catalogue.showMore")}
       </button>
     {/if}
   </div>
 {/if}
 
 <div
-  class="mt-4 md:overflow-y-auto overflow-x-hidden flex flex-col md:min-h-0 shrink shadow rounded-lg bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-500"
+  class="mt-4 md:overflow-y-auto overflow-x-hidden flex flex-col md:min-h-0 shrink rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700"
   onmouseleave={() => setHoveredCourse("")}
   role="list"
   bind:this={courseCatalogue}
@@ -272,7 +277,6 @@
     <Course
       {courseName}
       course={getCurSemesterData()[courseName]}
-      striped={i % 2 == 0}
       currentSemester={getCurrentSemester()}
       selected={getSelectedCourseNames().includes(courseName)}
     />
@@ -281,7 +285,7 @@
   {#if hasMorePages}
     <div use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
       {#if isLoading}
-        <p>Loading...</p>
+        <p class="eyebrow px-4 py-3">{t("catalogue.loading")}</p>
       {/if}
     </div>
   {/if}

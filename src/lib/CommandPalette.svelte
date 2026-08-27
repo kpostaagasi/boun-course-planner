@@ -350,7 +350,7 @@
 <!-- Floating hint button so mobile users can reach the palette too -->
 <button
   type="button"
-  class="fixed bottom-4 right-4 z-40 w-10 h-10 bg-zinc-800 hover:bg-zinc-700 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white shadow-lg cursor-pointer"
+  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-500 shadow-sm transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
   title={t("palette.openTitle")}
   aria-label={t("palette.openTitle")}
   onclick={openPalette}

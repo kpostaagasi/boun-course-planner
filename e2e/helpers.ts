@@ -274,10 +274,16 @@ export async function setSemester(page: Page, value: string): Promise<void> {
   await expect.poll(() => courseRows(page).count(), { timeout: 30_000 }).toBeGreaterThan(0);
 }
 
-/** The black top bar: title, EN/TR toggle, semester select. */
+/**
+ * The dark top bar: title, EN/TR toggle, semester select.
+ *
+ * Addressed by testid rather than by walking up from the `<h1>`. The old
+ * `h1 -> ../..` hop silently depended on the title sitting inside a wrapper div,
+ * so removing that wrapper pushed the locator up to a scope that also contains
+ * the catalogue's two-letter department buttons — `TR` among them.
+ */
 export function header(page: Page): Locator {
-  // The `<h1>` sits one wrapper div below the bar itself.
-  return page.locator("h1").locator("xpath=../..");
+  return page.getByTestId("app-header");
 }
 
 /** The app title in the header — the one string guaranteed to be translated. */

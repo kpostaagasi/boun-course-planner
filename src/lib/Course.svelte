@@ -28,8 +28,9 @@
   import { quotaAge, quotaDisplay } from "./quotaInfo";
   import { examConflictFor, type ExamSection } from "./examConflict";
   import { termHistory } from "./termHistory";
+  import { describeSchedule, uniqueRooms, DAY_NAMES } from "./paletteSearch";
 
-  let { course, courseName, striped, currentSemester, selected } = $props();
+  let { course, courseName, currentSemester, selected } = $props();
 
   // Quota is list-level data — every catalogue row wants it — and `loadQuota`
   // dedupes to a single request, so starting it from card init costs one fetch
@@ -88,16 +89,38 @@
   const offeringsMap = $derived(getOfferings());
   const offeredTerms = $derived(offeringsMap ? offeringsMap[base] ?? null : null);
   const offeringHistory = $derived(offeredTerms ? termHistory(offeredTerms) : null);
-  const seasonGlyphs = $derived.by(() => {
-    if (!offeringHistory) return "";
-    const names: Record<number, string> = {
-      1: "Fall",
-      2: "Spring",
-      3: "Summer",
-    };
-    return offeringHistory.seasons
-      .map((s) => (getLang() === "tr" ? { 1: "Güz", 2: "Bahar", 3: "Yaz" }[s] : names[s]))
-      .join("/");
+  /**
+   * Meeting times as real clock times, e.g. "Mon 11:00–13:50 · Wed 09:00".
+   * describeSchedule is the palette's formatter; reusing it keeps one
+   * slot-to-clock rule in the codebase instead of two that can drift.
+   */
+  const scheduleLabel = $derived.by(() => {
+    const days: string[] = "days" in course ? course.days : [];
+    const hours: number[] = "hours" in course ? course.hours : [];
+    if (days.length === 0) return "";
+    const dayLabels: Record<string, string> = {};
+    for (const code of Object.keys(DAY_NAMES)) {
+      dayLabels[code] = t(`day.${DAY_NAMES[code]}`);
+    }
+    return describeSchedule({ days, hours }, { dayLabels });
+  });
+
+  /** Rooms, deduplicated: a three-meeting course repeats one room three times. */
+  const roomLabel = $derived(
+    "rooms" in course ? uniqueRooms({ rooms: course.rooms }).join(" · ") : "",
+  );
+
+  /**
+   * True only when `dept` names something the course code does not already say.
+   * `base` is e.g. "AD432", so its letter prefix is the owning department for
+   * the overwhelming majority of sections.
+   */
+  const departmentsWorthShowing = $derived.by(() => {
+    if (!("dept" in course)) return false;
+    const depts: string[] = course.dept;
+    if (depts.length === 0) return false;
+    const ownPrefix = base.replace(/[0-9].*$/, "");
+    return !(depts.length === 1 && depts[0] === ownPrefix);
   });
 
   let descriptionExpanded = $state(false);
@@ -172,10 +195,13 @@
   const instructorSearchable = $derived(!isPlaceholderInstructor(course.instructor));
 </script>
 
+<!--
+  Zebra striping is gone. Two alternating surface tints fought the occupancy
+  meter for attention and made a dense list read as banded rather than as rows;
+  the list's own hairline divider separates them, and hover carries the pointer.
+-->
 <div
-  class="py-2 px-4 flex flex-row dark:text-white {striped
-    ? 'bg-gray-50 dark:bg-gray-700'
-    : 'bg-white dark:bg-zinc-800'}"
+  class="py-2.5 px-4 flex flex-row bg-white dark:bg-zinc-800 dark:text-white transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
   onmouseenter={() => setHoveredCourse(courseName)}
   role="listitem"
 >
@@ -184,71 +210,70 @@
       ? 'text-zinc-400 dark:text-zinc-500'
       : ''}"
   >
-    <div class="flex items-center flex-wrap">
-      <span class="text-lg font-medium mr-3">
-        {courseName}
-      </span>
-      <span class="text-sm break-all">{course.name}</span>
-      <span class="ml-auto mr-2">
+    <div class="flex items-baseline flex-wrap gap-x-2.5">
+      <span class="u-data text-[0.9375rem] font-semibold text-zinc-900 dark:text-zinc-100">{courseName}</span
+      ><span class="text-sm text-zinc-600 dark:text-zinc-300 break-words">{course.name}</span>
+      <span class="ml-auto flex items-baseline gap-x-2 shrink-0">
         {#if conflicts.length > 0}
-          <span class="text-red-500 text-xs font-medium p-1">{t("course.conflict")}</span>
+          <span class="eyebrow text-red-600 dark:text-red-400" title={conflicts.join(", ")}
+            >{t("course.conflict")}</span
+          >
         {/if}
-        <span
-          class="text-xs {conflicts.length > 0
-            ? 'text-zinc-400 dark:text-zinc-500'
-            : 'text-zinc-500 dark:text-zinc-400'}"
-        >
-          {#if "credits" in course}
-            <span class="mr-2">{course.credits} Cr</span>
-          {/if}
-          {#if "ects" in course}
-            <span>{course.ects} ECTS</span>
-          {/if}
-          {#if offeringHistory}
-            <span
-              class="text-xs text-zinc-400 dark:text-zinc-500 mr-2"
+        <span class="u-data text-[0.6875rem] text-zinc-400 dark:text-zinc-500">
+          {#if "credits" in course}<span>{course.credits}cr</span>{/if}{#if "ects" in course}<span
+              class="ml-1.5">{course.ects}ects</span
+            >{/if}{#if offeringHistory}<span
+              class="ml-1.5"
               title={t("course.offeredTerms").replace("{n}", String(offeringHistory.count))}
-            >
-              {offeringHistory.count}× · {seasonGlyphs}
-            </span>
-          {/if}
+              >{offeringHistory.count}×</span
+            >{/if}
         </span>
+        {#if eligibility.status === "taken"}
+          <span
+            class="u-data text-[0.6875rem] font-semibold text-blue-600 dark:text-blue-300"
+            title={t("course.eligibleTitle")}>✓ {t("course.taken")}</span
+          >
+        {:else if eligibility.status === "eligible"}
+          <!--
+            "Eligible" is the default state of nearly every row, so spelling it
+            out on all of them was noise, and a decorative green broke the rule
+            that saturated colour means scarcity. The signal survives as a mark
+            with the wording moved into the accessible name.
+          -->
+          <span
+            class="text-blue-500/70 dark:text-blue-300/70 text-[0.625rem] leading-none"
+            title={t("course.eligibleTitle")}
+            aria-label={t("course.eligible")}>●</span
+          >
+        {:else if eligibility.status === "missing-prereq"}
+          <span
+            class="u-data text-[0.6875rem] text-amber-500 dark:text-amber-300"
+            title={eligibility.missing.join(", ")}
+            >{t("course.needs")} {eligibility.missing.join(", ")}{eligibility.moreMissing
+              ? "…"
+              : ""}</span
+          >
+        {:else if prereqMap}
+          <!--
+            The remaining status is "no-data", and the map being loaded narrows
+            that to one meaning: this course was never part of the prerequisite
+            crawl (314 of the current term's 1324 courses). Rendering nothing here
+            made an unverified course look identical to a checked one, which is how
+            a card could imply eligibility it had never established.
+          -->
+          <span
+            class="text-[0.6875rem] italic text-zinc-400 dark:text-zinc-500"
+            data-testid="course-prereq-unknown"
+            title={t("course.prereqUnknownTitle")}>? {t("course.prereqUnknown")}</span
+          >
+        {/if}
       </span>
-      {#if eligibility.status === "taken"}
-        <span class="text-xs font-medium text-green-600 dark:text-green-400 mr-2">✓ {t("course.taken")}</span>
-      {:else if eligibility.status === "eligible"}
-        <span
-          class="text-xs text-emerald-600 dark:text-emerald-400 mr-2"
-          title={t("course.eligibleTitle")}
-        >
-          {t("course.eligible")}
-        </span>
-      {:else if eligibility.status === "missing-prereq"}
-        <span class="text-xs text-amber-600 dark:text-amber-400 mr-2" title={eligibility.missing.join(", ")}>
-          {t("course.needs")} {eligibility.missing.join(", ")}{eligibility.moreMissing ? "…" : ""}
-        </span>
-      {:else if prereqMap}
-        <!--
-          The remaining status is "no-data", and the map being loaded narrows
-          that to one meaning: this course was never part of the prerequisite
-          crawl (314 of the current term's 1324 courses). Rendering nothing here
-          made an unverified course look identical to a checked one, which is how
-          a card could imply eligibility it had never established.
-        -->
-        <span
-          class="text-xs italic text-zinc-400 dark:text-zinc-500 mr-2"
-          data-testid="course-prereq-unknown"
-          title={t("course.prereqUnknownTitle")}
-        >
-          ? {t("course.prereqUnknown")}
-        </span>
-      {/if}
     </div>
-    <div>
+    <div class="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-[0.8125rem]">
       {#if instructorSearchable}
         <button
           type="button"
-          class="mr-2 text-left cursor-pointer hover:underline"
+          class="text-left cursor-pointer text-zinc-700 dark:text-zinc-200 hover:text-blue-600 dark:hover:text-blue-300 hover:underline decoration-1 underline-offset-2"
           data-testid="course-instructor"
           title={t("course.searchInstructor")}
           onclick={() => setSearchQuery(course.instructor)}
@@ -257,19 +282,21 @@
         </button>
       {:else}
         <!-- "STAFF STAFF": searching for it returns 82 unrelated sections. -->
-        <span class="mr-2">{course.instructor}</span>
+        <span class="text-zinc-500 dark:text-zinc-400">{course.instructor}</span>
       {/if}
-      {#if "days" in course}
-        <!-- <span class="mr-2">Days: {course.days.join("")}</span> -->
-        <span class="mr-2">📅 {course.days.join("")}</span>
+      <!--
+        The days/hours/rooms line used to be three emoji-prefixed fragments
+        (📅 MMM ⏱️ 345 🏠 BM A2) which rendered differently on every OS and left
+        the reader to decode slot digits. describeSchedule already turns the same
+        arrays into real clock times for the palette, so it is reused here rather
+        than reimplemented, and the result is set in mono because it is data the
+        registration system produced.
+      -->
+      {#if scheduleLabel}
+        <span class="u-data text-zinc-500 dark:text-zinc-400">{scheduleLabel}</span>
       {/if}
-      {#if "hours" in course}
-        <!-- <span class="mr-2">Hours: {course.hours.join("")}</span> -->
-        <span class="mr-2">⏱️ {course.hours.join("")}</span>
-      {/if}
-      {#if "rooms" in course}
-        <!-- <span class="">Rooms: {course.rooms.join(" ")}</span> -->
-        <span class="">🏠 {course.rooms.join(" ")}</span>
+      {#if roomLabel}
+        <span class="u-data text-zinc-400 dark:text-zinc-500">{roomLabel}</span>
       {/if}
     </div>
     {#if quotaScrapedAt}
@@ -281,13 +308,13 @@
         space is not.
       -->
       <div
-        class="text-sm flex flex-wrap items-baseline gap-x-2 {conflicts.length > 0
+        class="text-[0.8125rem] flex flex-wrap items-baseline gap-x-2 {conflicts.length > 0
           ? 'text-zinc-400 dark:text-zinc-500'
           : 'text-zinc-500 dark:text-zinc-400'}"
         data-testid="course-quota"
       >
         {#if quota.kind === "enrolment" && quota.quota !== null && quota.current !== null}
-          <span data-testid="course-quota-state">
+          <span class="u-data" data-testid="course-quota-state">
             {t("quota.seats", { current: quota.current, quota: quota.quota })}
           </span>
           {#if quota.overEnrolled}
@@ -333,6 +360,28 @@
           {t("quota.asOf", { time: quotaClock })}
         </span>
       </div>
+      <!--
+        The occupancy meter. The one place this design is allowed to be loud,
+        because whether a section is gettable is the question the whole app
+        exists to answer, and no other BOUN tool answers it. The fill is
+        current/quota; past 100% it keeps going into a hatched tail rather than
+        clamping, so an over-enrolled section looks over-enrolled instead of
+        merely looking finished.
+      -->
+      {#if quota.kind === "enrolment" && quota.quota !== null && quota.current !== null && quota.quota > 0}
+        {@const ratio = quota.current / quota.quota}
+        <div
+          class="meter mt-1 {quota.overEnrolled || quota.full
+            ? 'text-red-500 dark:text-red-400'
+            : ratio >= 0.85
+              ? 'text-amber-400 dark:text-amber-300'
+              : 'text-green-500 dark:text-green-400'}"
+          style="--fill:{Math.min(ratio, 1)};--over:{Math.min(Math.max(ratio - 1, 0), 1)}"
+          data-testid="course-quota-meter"
+          data-ratio={ratio.toFixed(3)}
+          aria-hidden="true"
+        ></div>
+      {/if}
     {/if}
     {#if "deliveryMethod" in course || "examDate" in course || "examSlot" in course || "finalExamLocation" in course}
       <!--
@@ -378,20 +427,29 @@
     {/if}
     {#if "requiredForDept" in course}
       <div
-        class="text-sm {conflicts.length > 0
+        class="text-[0.8125rem] {conflicts.length > 0
           ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500'}"
+          : 'text-zinc-500 dark:text-zinc-400'}"
       >
-        {t("course.requiredFor")} {course.requiredForDept.join(", ")}
+        {t("course.requiredFor")}
+        <span class="u-data">{course.requiredForDept.join(", ")}</span>
       </div>
     {/if}
-    {#if "dept" in course}
+    <!--
+      Only shown when it says something the course code does not. For 93% of
+      sections `dept` is a single entry equal to the code's own letter prefix, so
+      "Departments: AD" under AD432.01 was a line of pure restatement on almost
+      every row. Cross-listed courses, where it names a department you could not
+      have guessed, still get it.
+    -->
+    {#if departmentsWorthShowing}
       <div
-        class="text-sm {conflicts.length > 0
+        class="text-[0.8125rem] {conflicts.length > 0
           ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500'}"
+          : 'text-zinc-500 dark:text-zinc-400'}"
       >
-        {t("course.departments")} {course.dept.join(", ")}
+        {t("course.departments")}
+        <span class="u-data">{course.dept.join(", ")}</span>
       </div>
     {/if}
     {#if prereqInfo && (prereqInfo.prereqs.length > 0 || prereqInfo.consent || prereqInfo.gpa)}
