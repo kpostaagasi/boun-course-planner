@@ -1,4 +1,14 @@
 import { SvelteSet } from "svelte/reactivity";
+import {
+  buildSelectionSearch,
+  decodeHistoryState,
+  encodeHistoryState,
+  parseSelectionParams,
+  resolveInitialSelection,
+  sameCourses,
+  stripSelectionSearch,
+  type UrlSelection,
+} from "./urlState";
 
 let currentSemester = $state(""); // Currently selected semester
 
@@ -7,7 +17,16 @@ export function getCurrentSemester() {
 }
 
 export function setCurrentSemester(value: string) {
+  if (!semesterBootstrapped && value) {
+    // First term the app actually knows about (SemesterSelect resolves it from
+    // data/semesters.json). Deferred share params are consumed here.
+    semesterBootstrapped = true;
+    bootstrapFromUrl(value);
+    return;
+  }
+  if (currentSemester === value) return;
   currentSemester = value;
+  writeHistory("replace");
 }
 
 let semesterData: Record<string, any> = $state({}); // Stores the course data for each downloaded semester
@@ -51,30 +70,110 @@ export function resetHoveredCourse() {
 
 let selectedCourseNamesAll = $state(readSelectedCourseNames()); // selected course names for all semesters
 
-// Read share parameters from the URL query string (?d=<semester>&c=<course,course>)
-export function getShareParams(): { semester: string | null; courses: string[] } {
-  const searchParams = new URLSearchParams(location.search);
-  const semester = searchParams.get("d");
-  const coursesParam = searchParams.get("c");
-  const courses = coursesParam
-    ? coursesParam.split(",").filter((courseName) => courseName.length > 0)
-    : [];
-  return { semester, courses };
+// ---- URL <-> selection sync (pure logic lives in ./urlState.mjs) ----
+//
+// Share params are parsed at module load but deliberately NOT applied here.
+// A link may carry `?c=` without `?d=`, and at module-init no semester exists
+// yet — SemesterSelect calls setCurrentSemester() only after fetching
+// data/semesters.json. Reading the `currentSemester` rune from module scope
+// would capture "" forever (the `state_referenced_locally` compiler warning),
+// which silently dropped the whole selection of every `?c=`-only share link.
+let pendingShareParams: UrlSelection | null = parseSelectionParams(
+  location.search
+);
+let semesterBootstrapped = false;
+let restoringHistory = false;
+
+// Consume the share params once a real term is known. A snapshot of the
+// resulting selection always goes into history.state, so Back from the first
+// edit returns here even when the address bar has been cleaned.
+function bootstrapFromUrl(defaultSemester: string) {
+  const share = pendingShareParams;
+  pendingShareParams = null;
+  const resolved = resolveInitialSelection(
+    selectedCourseNamesAll,
+    share,
+    defaultSemester
+  );
+  currentSemester = resolved.semester;
+  if (resolved.changed) {
+    selectedCourseNamesAll = resolved.selection;
+    persistSelectedCourseNames();
+  }
+  // Scrub `?d=`/`?c=` once consumed, so a later reload cannot resurrect a stale
+  // shared selection over the user's own subsequent edits. Only a link that
+  // actually carried a selection is scrubbed: a bare `?d=` is this module's own
+  // output (see writeHistory), and leaving it alone is what makes the chosen
+  // term survive every reload rather than just the first one.
+  const carriedSelection = (share?.courses.length ?? 0) > 0;
+  writeHistory(
+    "replace",
+    carriedSelection ? stripSelectionSearch(location.search) : location.search
+  );
 }
 
-// Apply a shared selection from the URL on first load (?d=2026-2027-1&c=CMPE150.01,...)
-const shareParams = getShareParams();
-if (shareParams.courses.length > 0) {
-  const shareSemesterKey = shareParams.semester ?? currentSemester;
-  if (shareSemesterKey) {
-    selectedCourseNamesAll[shareSemesterKey] = [...shareParams.courses];
-    persistSelectedCourseNames();
+// History granularity, decided deliberately:
+//   push  - adding or removing a single course. Each is a discrete, intentional
+//           edit, so Back works as undo, which is genuinely useful in a
+//           planner. A session produces tens of these, not thousands: nothing
+//           keystroke-level ever reaches the URL (typing in the search box does
+//           not touch it).
+//   replace - everything else: switching term, the availability filtering that
+//           runs when a semester's data lands, and the solver applying a
+//           schedule. Back stays reserved for undoing hand-made edits.
+//
+// `search` is passed only by the bootstrap, which must always write in order to
+// seed history.state (and, for a share link, to scrub the params). Every other
+// call is a no-op when the current entry already describes this exact state, so
+// the availability pass that runs right after bootstrap does not immediately
+// put `?d=`/`?c=` back.
+function writeHistory(mode: "push" | "replace", search?: string) {
+  if (restoringHistory) return;
+  const semester = currentSemester;
+  const courses = selectedCourseNamesAll[semester] ?? [];
+  if (search === undefined) {
+    const current = decodeHistoryState(history.state, location.search);
+    if (current.semester === semester && sameCourses(current.courses, courses)) {
+      return;
+    }
+  }
+  const query =
+    search ?? buildSelectionSearch(location.search, semester, courses);
+  const url = `${location.pathname}${query}${location.hash}`;
+  const entry = encodeHistoryState(semester, courses);
+  if (mode === "push") {
+    history.pushState(entry, "", url);
+  } else {
+    history.replaceState(entry, "", url);
   }
 }
 
-// Remove share parameters from the URL after they have been applied
-export function clearShareUrl() {
-  history.replaceState(null, "", location.pathname);
+function applyHistoryEntry(selection: UrlSelection) {
+  restoringHistory = true;
+  try {
+    if (selection.semester && selection.semester !== currentSemester) {
+      currentSemester = selection.semester;
+    }
+    const semester = currentSemester;
+    if (!semester) return;
+    if (sameCourses(selectedCourseNamesAll[semester], selection.courses)) {
+      return;
+    }
+    selectedCourseNamesAll[semester] = [...selection.courses];
+    persistSelectedCourseNames();
+  } finally {
+    restoringHistory = false;
+  }
+}
+
+// Wire Back/Forward to the selection. Called from App.svelte's onMount so the
+// listener has an owner and a cleanup path; returns the unsubscriber.
+export function initUrlSync(): () => void {
+  const onPopState = (event: PopStateEvent) => {
+    applyHistoryEntry(decodeHistoryState(event.state, location.search));
+  };
+  window.addEventListener("popstate", onPopState);
+  return () => window.removeEventListener("popstate", onPopState);
 }
 
 export function getSelectedCourseNamesAll() {
@@ -88,6 +187,7 @@ export function addCourse(newCour: string) {
   selectedCourseNamesAll[currentSemester].push(newCour);
   selectedCourseNamesAll[currentSemester].sort();
   persistSelectedCourseNames();
+  writeHistory("push");
 }
 
 export function delCourse(delCour: string) {
@@ -98,11 +198,13 @@ export function delCourse(delCour: string) {
   selectedCourseNamesAll[currentSemester].splice(indexArr, 1);
   selectedCourseNamesAll[currentSemester].sort();
   persistSelectedCourseNames();
+  writeHistory("push");
 }
 
 export function setCourseList(courseList: string[]) {
   selectedCourseNamesAll[currentSemester] = courseList;
   persistSelectedCourseNames();
+  writeHistory("replace");
 }
 
 function readSelectedCourseNames() {
@@ -207,8 +309,15 @@ const searchedCourseNames: string[] = $derived.by(() => {
         ([_, courseInfo]: [string, any]) =>
           regex.test(courseInfo.name) || regex.test(courseInfo.instructor)
       );
-      // Last resort: search the catalog description text ("CMPE150" -> "CMPE" + section-less code)
+      // Last resort: the catalog description text ("CMPE150.01" -> "CMPE150").
+      // descriptions.json is ~244 KB gzipped, so it is NOT part of the initial
+      // payload; it is pulled in only once a query has already defeated both
+      // cheap branches. Reading `descriptionData` registers the dependency, so
+      // this derived re-runs and the results appear when the fetch lands.
       const descriptions = descriptionData;
+      if (searchedCourses.length === 0) {
+        ensureDescriptions();
+      }
       if (searchedCourses.length === 0 && descriptions) {
         searchedCourses = allCourseEntries.filter(([courseName, _]: [string, any]) => {
           const baseCode = courseName.split(".")[0].replace(/\s+/g, "");
@@ -350,20 +459,27 @@ export type DescriptionInfo = {
 };
 
 let descriptionData = $state<Record<string, DescriptionInfo> | null>(null); // Catalog descriptions keyed by course code ("CMPE150")
-let descriptionLoadStarted = false;
+let descriptionLoad: Promise<void> | null = null;
 
-// Fetch catalog course descriptions once; missing/404/error leaves descriptionData null
-export async function loadDescriptions(): Promise<void> {
-  if (descriptionLoadStarted) return;
-  descriptionLoadStarted = true;
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data/descriptions.json`);
-    if (res.ok) {
-      descriptionData = (await res.json()) as Record<string, DescriptionInfo>;
+// Fetch catalog course descriptions on demand; missing/404/error leaves
+// descriptionData null. NOT part of the initial payload: data/descriptions.json
+// is ~244 KB gzipped and only two things need it — expanding a course card's
+// description, and the last-resort branch of the catalogue search. Callers get
+// the same in-flight promise, so awaiting it always means "the data is here".
+export function ensureDescriptions(): Promise<void> {
+  descriptionLoad ??= (async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.BASE_URL}data/descriptions.json`
+      );
+      if (res.ok) {
+        descriptionData = (await res.json()) as Record<string, DescriptionInfo>;
+      }
+    } catch {
+      // Data unavailable; app works without descriptions
     }
-  } catch {
-    // Data unavailable; app works without descriptions
-  }
+  })();
+  return descriptionLoad;
 }
 
 export function getDescriptionFor(code: string): DescriptionInfo | null {
