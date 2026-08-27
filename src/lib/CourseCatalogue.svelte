@@ -1,6 +1,7 @@
 <script lang="ts">
   import Course from "./Course.svelte";
   import Footer from "./Footer.svelte";
+  import InstructorPanel from "./InstructorPanel.svelte";
   import IconSearch from "./icons/IconSearch.svelte";
   import {
     getSearchedCourseNames,
@@ -14,6 +15,11 @@
   import { setHoveredCourse, setSearchQuery } from "./globalState.svelte";
   import { onMount } from "svelte";
   import CourseFilters from "./CourseFilters.svelte";
+  import {
+    buildInstructorIndex,
+    findInstructors,
+    matchInstructorQuery,
+  } from "./instructors";
   import { t } from "./i18n.svelte";
 
   let input: HTMLInputElement;
@@ -33,9 +39,59 @@
   const pageSize = 20;
   let page = $state(1);
   let isLoading = $state(false);
-  const hasMorePages = $derived(
-    getSearchedCourseNames().length > page * pageSize
+
+  // ---- Instructor mode ----
+  //
+  // `instructor` is on 100% of sections, but the search chain can only ever
+  // approximate a person: it ORs the space-separated tokens of the query and
+  // consults `instructor` only when the course-code branch came back empty.
+  // Measured against the 703 real instructors of 2026/2027-1, feeding a raw
+  // name into it returns exactly the right sections for 139 of them; 556 also
+  // drag in other people's sections (worst case: 1514 of the 3140 sections),
+  // and for 8 — "İLHAN OR", "ÜLFET ZEYNEP ATA", "N. ELİF ULUĞ" and friends —
+  // the code branch matches POR/ATA/… courses first, so *none* of their own
+  // sections come back. So a query that names somebody exactly takes a
+  // different path: the person's own section list, straight from the index.
+  //
+  // The trigger is deliberately the query itself rather than local state, so
+  // clicking the instructor on a course card (which just calls
+  // setSearchQuery) lands here too, as does pasting a name or reloading a
+  // shared URL. Matching runs on the normalised key, so every scraped
+  // spelling of the same person resolves to the same entry.
+  const instructorIndex = $derived.by(() => {
+    const data = getCurSemesterData();
+    const term = getCurrentSemester();
+    if (!data || !term) return null;
+    return buildInstructorIndex([{ term, data }]);
+  });
+
+  // Both of these read `instructorIndex` only once the query is long enough to
+  // be a name, and deriveds are lazy, so the index (≈13 ms for 3140 sections)
+  // is built at most once per term and never on an empty search box.
+  const instructorQuery = $derived(getSearchQuery().trim());
+  const activeInstructor = $derived.by(() => {
+    const index = instructorQuery.length < 3 ? null : instructorIndex;
+    return index ? matchInstructorQuery(index, instructorQuery) : null;
+  });
+  const instructorMatches = $derived.by(() => {
+    if (instructorQuery.length < 3 || activeInstructor !== null) return [];
+    const index = instructorIndex;
+    return index ? findInstructors(index, instructorQuery) : [];
+  });
+
+  const visibleCourseNames = $derived(
+    activeInstructor
+      ? activeInstructor.sections.map((section) => section.sectionKey)
+      : getSearchedCourseNames()
   );
+
+  const hasMorePages = $derived(visibleCourseNames.length > page * pageSize);
+
+  function showInstructor(display: string) {
+    // The exact scraped spelling is what turns the query into a person.
+    setSearchQuery(display);
+    page = 1;
+  }
 
   let isLargeScreen = $state(false);
   let isExpanded = $state(true);
@@ -134,6 +190,45 @@
   <CourseFilters />
 </div>
 
+{#if instructorMatches.length > 0}
+  <!-- Discovery path: a partial name offers the people it could mean. Picking
+       one replaces the query with that exact scraped spelling, which is what
+       switches the list into instructor mode below. -->
+  <div
+    class="mt-4 flex flex-wrap items-center gap-1"
+    data-testid="instructor-matches"
+  >
+    <span class="text-xs text-zinc-500 dark:text-zinc-400 mr-1"
+      >{t("instructor.matches")}</span
+    >
+    {#each instructorMatches as person (person.key)}
+      <button
+        type="button"
+        class="rounded-full px-2.5 py-1 text-sm bg-white dark:bg-zinc-800 dark:text-white shadow cursor-pointer"
+        data-testid="instructor-chip"
+        title={t("instructor.sections", { n: person.sections.length })}
+        onclick={() => showInstructor(person.display)}
+      >
+        {person.display}
+        <span class="text-xs text-zinc-500 dark:text-zinc-400"
+          >{person.sections.length}</span
+        >
+      </button>
+    {/each}
+  </div>
+{/if}
+
+{#if activeInstructor}
+  <InstructorPanel
+    entry={activeInstructor}
+    term={getCurrentSemester()}
+    onclear={() => {
+      setSearchQuery("");
+      page = 1;
+    }}
+  />
+{/if}
+
 {#if getCurSemCategories().length > 0 && getSearchQuery() == "" && getIsDayHourFilterApplied() == false}
   <div class="mt-4 relative">
     <div
@@ -173,7 +268,7 @@
   role="list"
   bind:this={courseCatalogue}
 >
-  {#each getSearchedCourseNames().slice(0, pageSize * page) as courseName, i}
+  {#each visibleCourseNames.slice(0, pageSize * page) as courseName, i}
     <Course
       {courseName}
       course={getCurSemesterData()[courseName]}
