@@ -3,6 +3,7 @@
   import Footer from "./Footer.svelte";
   import InstructorPanel from "./InstructorPanel.svelte";
   import IconSearch from "./icons/IconSearch.svelte";
+  import IconChevronDown from "./icons/IconChevronDown.svelte";
   import {
     getSearchedCourseNames,
     getSelectedCourseNames,
@@ -161,7 +162,7 @@
 <div class="grow-0 shrink-0 w-full flex items-center">
   <div class="relative shadow rounded-lg overflow-hidden grow">
     <div
-      class="text-zinc-400 dark:text-zinc-300 absolute top-1/2 transform -translate-y-1/2 left-3"
+      class="text-zinc-600 dark:text-zinc-300 absolute top-1/2 transform -translate-y-1/2 left-3"
     >
       <IconSearch />
     </div>
@@ -169,7 +170,7 @@
     <form onsubmit={searchFormSubmit}>
       <input
         bind:this={input}
-        class="pl-10 py-1 px-2 w-full bg-white dark:text-white dark:bg-zinc-800 placeholder-zinc-500 dark:placeholder-zinc-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 antialiased"
+        class="w-full rounded-md border border-zinc-200 bg-white py-1.5 pl-10 pr-3 text-zinc-900 placeholder-zinc-400 antialiased transition-colors focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
         type="text"
         value={getSearchQuery()}
         oninput={(e) => {
@@ -198,19 +199,19 @@
     class="mt-4 flex flex-wrap items-center gap-1"
     data-testid="instructor-matches"
   >
-    <span class="text-xs text-zinc-500 dark:text-zinc-400 mr-1"
+    <span class="text-xs text-zinc-600 dark:text-zinc-400 mr-1"
       >{t("instructor.matches")}</span
     >
     {#each instructorMatches as person (person.key)}
       <button
         type="button"
-        class="rounded-full px-2.5 py-1 text-sm bg-white dark:bg-zinc-800 dark:text-white shadow cursor-pointer"
+        class="btn-quiet rounded-full"
         data-testid="instructor-chip"
         title={t("instructor.sections", { n: person.sections.length })}
         onclick={() => showInstructor(person.display)}
       >
         {person.display}
-        <span class="text-xs text-zinc-500 dark:text-zinc-400"
+        <span class="text-xs text-zinc-600 dark:text-zinc-400"
           >{person.sections.length}</span
         >
       </button>
@@ -245,7 +246,7 @@
       -->
       {#each getCurSemCategories() as category}
         <button
-          class="u-data mr-2.5 mb-1.5 px-0.5 text-[0.75rem] font-medium text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
+          class="u-data mr-2.5 mb-1.5 px-0.5 text-[0.75rem] font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
           onclick={() => {
             setSearchQuery(category);
           }}>{category}</button
@@ -255,13 +256,14 @@
     {#if getCurSemCategories().length > 5}
       <button
         class={{
-          "absolute left-1/2 -translate-x-1/2 eyebrow px-2 py-1 cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 bg-zinc-100 dark:bg-black": true,
+          "absolute left-1/2 -translate-x-1/2 eyebrow px-2 py-1 cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 bg-zinc-100 dark:bg-black": true,
           "translate-y-1/2 bottom-4": isExpanded,
           "bottom-0": !isExpanded,
         }}
         onclick={() => (isExpanded = !isExpanded)}
       >
         {isExpanded ? t("catalogue.showLess") : t("catalogue.showMore")}
+        <span class="inline-block {isExpanded ? 'rotate-180' : ''}"><IconChevronDown /></span>
       </button>
     {/if}
   </div>
@@ -283,7 +285,7 @@
   {/each}
 
   {#if hasMorePages}
-    <div use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
+    <div role="presentation" use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
       {#if isLoading}
         <p class="eyebrow px-4 py-3">{t("catalogue.loading")}</p>
       {/if}

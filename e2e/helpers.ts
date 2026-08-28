@@ -171,10 +171,11 @@ export function selectedCourse(page: Page, sectionKey: string): Locator {
 
 /** The credit figure the left panel reports for the current selection. */
 export async function totalCredits(page: Page): Promise<number> {
-  const text = await coursesPanel(page)
-    .getByText(/(Total Credits|Toplam Kredi)/i)
-    .first()
-    .innerText();
+  // The label and the figure are sibling spans, so text-matching the label
+  // yields an element with no digits in it; the testid wraps both.
+  const container = page.getByTestId("total-credits");
+  await expect(container.getByText(/(Total Credits|Toplam Kredi)/i)).toBeVisible();
+  const text = await container.innerText();
   const digits = /(\d+)/.exec(text);
   if (!digits) {
     throw new Error(`no credit total in ${JSON.stringify(text)}`);

@@ -1,0 +1,12 @@
+<!-- Disclosure chevron. Rotate with a class (`rotate-180`) for the open state. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  class="inline-block h-3 w-3 transition-transform"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  stroke-width="2.5"
+  aria-hidden="true"
+>
+  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+</svg>

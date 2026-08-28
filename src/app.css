@@ -355,21 +355,25 @@
     font-size: 0.6875rem;
     line-height: 1;
     letter-spacing: 0;
-    color: var(--color-zinc-400);
+    /* zinc-600: at 11px this is small text; zinc-500 on paper is 4.37:1,
+       measurably under the 4.5:1 AA line. */
+    color: var(--color-zinc-600);
     text-align: right;
     white-space: nowrap;
   }
   .spine-min {
     font-weight: 400;
     font-size: 0.5625rem;
-    color: var(--color-zinc-300);
+    /* Same ink as .spine: axe evaluates rendered text even under aria-hidden,
+       so the hour/minute hierarchy is carried by size and weight instead. */
+    color: var(--color-zinc-600);
   }
   @media (prefers-color-scheme: dark) {
     .spine {
-      color: var(--color-zinc-500);
+      color: var(--color-zinc-400);
     }
     .spine-min {
-      color: var(--color-zinc-600);
+      color: var(--color-zinc-400);
     }
   }
 
@@ -381,6 +385,12 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-zinc-400);
+    /* zinc-600 in light, zinc-400 in dark: 10px text needs 4.5:1 on both. */
+    color: var(--color-zinc-600);
+  }
+  @media (prefers-color-scheme: dark) {
+    .eyebrow {
+      color: var(--color-zinc-400);
+    }
   }
 }

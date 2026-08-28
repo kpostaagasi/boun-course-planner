@@ -5,6 +5,7 @@
     getCurrentSemester,
   } from "./globalState.svelte";
   import IconDocument from "./icons/IconDocument.svelte";
+  import IconX from "./icons/IconX.svelte";
   import { t as i18nT } from "./i18n.svelte";
   import { onMount } from "svelte";
 
@@ -644,7 +645,7 @@
          in-flight moment there is nothing truthful to say yet. -->
     {#if !canExportCalendar && datesStatus !== "loading"}
       <span
-        class="text-xs text-zinc-500 dark:text-zinc-400"
+        class="text-xs text-zinc-600 dark:text-zinc-400"
         data-testid="calendar-reason"
         data-dates-status={datesStatus}>{calendarTooltip}</span
       >
@@ -652,7 +653,7 @@
 
     <button
       type="button"
-      class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline cursor-pointer"
+      class="cursor-pointer text-xs text-zinc-600 underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 hover:decoration-blue-400 dark:text-zinc-400 dark:decoration-zinc-600 dark:hover:text-blue-300"
       onclick={() => (showInstructions = !showInstructions)}
     >
       {t("calendar.howToImport")}
@@ -661,32 +662,37 @@
 
   {#if showInstructions}
     <div
-      class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm"
+      class="rounded-md border border-zinc-200 p-3 text-sm dark:border-zinc-700"
     >
-      <div class="flex justify-between items-start mb-2">
-        <h4 class="font-medium text-gray-900 dark:text-gray-100">
+      <div class="mb-2 flex items-start justify-between">
+        <h4 class="eyebrow">
           {t("calendar.instructionsTitle")}
         </h4>
         <button
           type="button"
-          class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          class="cursor-pointer text-zinc-600 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+          aria-label={t("palette.close")}
           onclick={() => (showInstructions = false)}
         >
-          ✕
+          <IconX />
         </button>
       </div>
-      <ul class="space-y-1 text-gray-700 dark:text-gray-300">
+      <ul class="space-y-1 text-zinc-600 dark:text-zinc-300">
         <li>
-          <strong>macOS:</strong> {t("instructions.macos")}
+          <strong class="font-medium text-zinc-900 dark:text-zinc-100">macOS:</strong>
+          {t("instructions.macos")}
         </li>
         <li>
-          <strong>Windows:</strong> {t("instructions.windows")}
+          <strong class="font-medium text-zinc-900 dark:text-zinc-100">Windows:</strong>
+          {t("instructions.windows")}
         </li>
         <li>
-          <strong>Google Calendar:</strong> {t("instructions.gcal")}
+          <strong class="font-medium text-zinc-900 dark:text-zinc-100">Google Calendar:</strong>
+          {t("instructions.gcal")}
         </li>
         <li>
-          <strong>Outlook Web:</strong> {t("instructions.outlook")}
+          <strong class="font-medium text-zinc-900 dark:text-zinc-100">Outlook Web:</strong>
+          {t("instructions.outlook")}
         </li>
       </ul>
     </div>

@@ -325,14 +325,14 @@
 
 <div class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-xs">
   {#if calendarInfo}
-    <span class="text-zinc-500 dark:text-zinc-400">
+    <span class="text-zinc-600 dark:text-zinc-400">
       {t("timetable.semesterStart")}: {formatDate(calendarInfo.start)}
     </span>
-    <span class="text-zinc-500 dark:text-zinc-400">
+    <span class="text-zinc-600 dark:text-zinc-400">
       {t("timetable.semesterEnd")}: {formatDate(calendarInfo.end)}
     </span>
     {#each calendarInfo.holidays as h}
-      <span class="bg-zinc-200 dark:bg-zinc-700 rounded px-1.5 py-0.5">
+      <span class="rounded bg-zinc-200 px-1.5 py-0.5 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">
         {h.name} ({formatDate(h.date)})
       </span>
     {/each}
@@ -363,7 +363,7 @@
         ></th>
         {#each DAYS as day, dayIdx}
           <th
-            class="eyebrow w-20 border-b border-zinc-200 pb-1.5 pt-2 text-zinc-500 dark:border-zinc-700 dark:text-zinc-300 {day ==
+            class="eyebrow w-20 border-b border-zinc-200 pb-1.5 pt-2 dark:border-zinc-700 {day ==
               'St' && !courseOnSaturday
               ? 'hidden'
               : ''}"
@@ -390,7 +390,7 @@
             : 'row-rule'}"
         >
           <span class="inline-block pt-1.5"
-            >{String(row.hour).padStart(2, "0")}<span class="spine-min">:00</span></span
+            >{String(row.hour).padStart(2, "0")}<span class="spine-min" aria-hidden="true">:00</span></span
           >
         </th>
         {#each DAYS as day, dayIdx}

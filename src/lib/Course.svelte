@@ -3,6 +3,8 @@
   import PrereqTree from "./PrereqTree.svelte";
   import IconDocument from "./icons/IconDocument.svelte";
   import IconPlus from "./icons/IconPlus.svelte";
+  import IconChevronDown from "./icons/IconChevronDown.svelte";
+  import IconWarning from "./icons/IconWarning.svelte";
   import {
     getSelectedCourseNames,
     getCurSemesterData,
@@ -207,7 +209,7 @@
 >
   <div
     class="grow {conflicts.length > 0
-      ? 'text-zinc-400 dark:text-zinc-500'
+      ? 'text-zinc-600 dark:text-zinc-400'
       : ''}"
   >
     <div class="flex items-baseline flex-wrap gap-x-2.5">
@@ -219,7 +221,7 @@
             >{t("course.conflict")}</span
           >
         {/if}
-        <span class="u-data text-[0.6875rem] text-zinc-400 dark:text-zinc-500">
+        <span class="u-data text-[0.6875rem] text-zinc-600 dark:text-zinc-400">
           {#if "credits" in course}<span>{course.credits}cr</span>{/if}{#if "ects" in course}<span
               class="ml-1.5">{course.ects}ects</span
             >{/if}{#if offeringHistory}<span
@@ -262,7 +264,7 @@
             a card could imply eligibility it had never established.
           -->
           <span
-            class="text-[0.6875rem] italic text-zinc-400 dark:text-zinc-500"
+            class="text-[0.6875rem] italic text-zinc-600 dark:text-zinc-400"
             data-testid="course-prereq-unknown"
             title={t("course.prereqUnknownTitle")}>? {t("course.prereqUnknown")}</span
           >
@@ -282,21 +284,21 @@
         </button>
       {:else}
         <!-- "STAFF STAFF": searching for it returns 82 unrelated sections. -->
-        <span class="text-zinc-500 dark:text-zinc-400">{course.instructor}</span>
+        <span class="text-zinc-600 dark:text-zinc-400">{course.instructor}</span>
       {/if}
       <!--
         The days/hours/rooms line used to be three emoji-prefixed fragments
-        (📅 MMM ⏱️ 345 🏠 BM A2) which rendered differently on every OS and left
+        (calendar/clock/house emoji + MMM 345 BM A2) which rendered differently on every OS and left
         the reader to decode slot digits. describeSchedule already turns the same
         arrays into real clock times for the palette, so it is reused here rather
         than reimplemented, and the result is set in mono because it is data the
         registration system produced.
       -->
       {#if scheduleLabel}
-        <span class="u-data text-zinc-500 dark:text-zinc-400">{scheduleLabel}</span>
+        <span class="u-data text-zinc-600 dark:text-zinc-400">{scheduleLabel}</span>
       {/if}
       {#if roomLabel}
-        <span class="u-data text-zinc-400 dark:text-zinc-500">{roomLabel}</span>
+        <span class="u-data text-zinc-600 dark:text-zinc-400">{roomLabel}</span>
       {/if}
     </div>
     {#if quotaScrapedAt}
@@ -309,8 +311,8 @@
       -->
       <div
         class="text-[0.8125rem] flex flex-wrap items-baseline gap-x-2 {conflicts.length > 0
-          ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500 dark:text-zinc-400'}"
+          ? 'text-zinc-600 dark:text-zinc-400'
+          : 'text-zinc-600 dark:text-zinc-400'}"
         data-testid="course-quota"
       >
         {#if quota.kind === "enrolment" && quota.quota !== null && quota.current !== null}
@@ -324,7 +326,7 @@
           {:else if quota.full}
             <span class="font-medium text-red-600 dark:text-red-400">{t("quota.full")}</span>
           {:else}
-            <span class="text-emerald-600 dark:text-emerald-400">
+            <span class="text-green-600 dark:text-green-400">
               {t("quota.left", { n: quota.quota - quota.current })}
             </span>
           {/if}
@@ -354,7 +356,7 @@
         <span
           class="text-xs {quotaStale
             ? 'text-amber-600 dark:text-amber-400'
-            : 'text-zinc-400 dark:text-zinc-500'}"
+            : 'text-zinc-600 dark:text-zinc-400'}"
           title={t("quota.scrapedTitle", { time: quotaClock })}
         >
           {t("quota.asOf", { time: quotaClock })}
@@ -390,8 +392,8 @@
       -->
       <div
         class="text-sm {conflicts.length > 0
-          ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500 dark:text-zinc-400'}"
+          ? 'text-zinc-600 dark:text-zinc-400'
+          : 'text-zinc-600 dark:text-zinc-400'}"
         data-testid="course-exam"
       >
         {#if "deliveryMethod" in course}
@@ -421,15 +423,15 @@
       </div>
     {:else if examStatus.status === "clear" && examStatus.compared > 0}
       <!-- The only status that licenses a positive claim: every pair was decidable. -->
-      <div class="text-xs text-zinc-400 dark:text-zinc-500" data-testid="course-exam-clear">
+      <div class="text-xs text-zinc-600 dark:text-zinc-400" data-testid="course-exam-clear">
         {t("course.examNoClash")}
       </div>
     {/if}
     {#if "requiredForDept" in course}
       <div
         class="text-[0.8125rem] {conflicts.length > 0
-          ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500 dark:text-zinc-400'}"
+          ? 'text-zinc-600 dark:text-zinc-400'
+          : 'text-zinc-600 dark:text-zinc-400'}"
       >
         {t("course.requiredFor")}
         <span class="u-data">{course.requiredForDept.join(", ")}</span>
@@ -445,8 +447,8 @@
     {#if departmentsWorthShowing}
       <div
         class="text-[0.8125rem] {conflicts.length > 0
-          ? 'text-zinc-400 dark:text-zinc-500'
-          : 'text-zinc-500 dark:text-zinc-400'}"
+          ? 'text-zinc-600 dark:text-zinc-400'
+          : 'text-zinc-600 dark:text-zinc-400'}"
       >
         {t("course.departments")}
         <span class="u-data">{course.dept.join(", ")}</span>
@@ -456,8 +458,8 @@
       {#if prereqInfo.prereqs.length > 0}
         <div
           class="text-sm {conflicts.length > 0
-            ? 'text-zinc-400 dark:text-zinc-500'
-            : 'text-zinc-500 dark:text-zinc-400'}"
+            ? 'text-zinc-600 dark:text-zinc-400'
+            : 'text-zinc-600 dark:text-zinc-400'}"
         >
           {t("course.prerequisite")} {prereqInfo.prereqs.join(", ")}
         </div>
@@ -465,8 +467,8 @@
       {#if prereqInfo.consent}
         <div
           class="text-sm {conflicts.length > 0
-            ? 'text-zinc-400 dark:text-zinc-500'
-            : 'text-zinc-500 dark:text-zinc-400'}"
+            ? 'text-zinc-600 dark:text-zinc-400'
+            : 'text-zinc-600 dark:text-zinc-400'}"
         >
           {t("course.consentRequired")}
         </div>
@@ -474,8 +476,8 @@
       {#if prereqInfo.gpa}
         <div
           class="text-sm {conflicts.length > 0
-            ? 'text-zinc-400 dark:text-zinc-500'
-            : 'text-zinc-500 dark:text-zinc-400'}"
+            ? 'text-zinc-600 dark:text-zinc-400'
+            : 'text-zinc-600 dark:text-zinc-400'}"
         >
           {t("course.minGpa")} {prereqInfo.gpa}
         </div>
@@ -485,11 +487,12 @@
       <button
         type="button"
         class="text-xs cursor-pointer {conflicts.length > 0
-          ? 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
+          ? 'text-zinc-600 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300'
+          : 'text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
         onclick={() => (treeExpanded = !treeExpanded)}
       >
-        {treeExpanded ? t("course.hideTree") : t("course.showTree")} {treeExpanded ? "▲" : "▼"}
+        {treeExpanded ? t("course.hideTree") : t("course.showTree")}
+        <span class="inline-block {treeExpanded ? 'rotate-180' : ''}"><IconChevronDown /></span>
       </button>
       {#if treeExpanded}
         <PrereqTree
@@ -504,8 +507,8 @@
       {#if descriptionExpanded}
         <div
           class="mt-1 text-sm whitespace-pre-line {conflicts.length > 0
-            ? 'text-zinc-400 dark:text-zinc-500'
-            : 'text-zinc-500 dark:text-zinc-400'}"
+            ? 'text-zinc-600 dark:text-zinc-400'
+            : 'text-zinc-600 dark:text-zinc-400'}"
         >
           {descriptionInfo.description}
           {#if descriptionInfo.prerequisite}
@@ -516,11 +519,12 @@
       <button
         type="button"
         class="text-xs cursor-pointer {conflicts.length > 0
-          ? 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
+          ? 'text-zinc-600 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300'
+          : 'text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
         onclick={() => (descriptionExpanded = !descriptionExpanded)}
       >
         {descriptionExpanded ? t("course.hideDescription") : t("course.showDescription")}
+        <span class="inline-block {descriptionExpanded ? 'rotate-180' : ''}"><IconChevronDown /></span>
       </button>
     {/if}
   </div>
@@ -531,7 +535,7 @@
         title={isCompleted(base) ? t("course.markNotTaken") : t("course.markTaken")}
         class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-xs cursor-pointer {isCompleted(base)
           ? 'text-green-600 dark:text-green-400'
-          : 'text-zinc-400 hover:text-green-600 dark:text-zinc-500 dark:hover:text-green-400'}"
+          : 'text-zinc-600 hover:text-green-600 dark:text-zinc-400 dark:hover:text-green-400'}"
         onclick={() => toggleCompleted(base)}
       >
         ✓
@@ -541,22 +545,26 @@
         target="_blank"
         rel="noopener noreferrer"
         title={t("report.tooltip")}
-        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-zinc-400 hover:text-red-500 dark:text-zinc-500 dark:hover:text-red-500 text-xs"
+        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-zinc-600 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-500 text-xs"
       >
-        ⚠
+        <IconWarning />
       </a>
       <a
         href={syllabusLink}
         target="_blank"
         rel="noopener noreferrer"
-        class="block mr-0 mt-2 sm:mr-2 sm:mt-0 bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-400 dark:hover:text-blue-200 p-2 text-center"
+        aria-label={t("course.syllabusLink")}
+        title={t("course.syllabusLink")}
+        class="block mr-0 mt-2 sm:mr-2 sm:mt-0 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-400 dark:hover:text-blue-200 p-2 text-center"
       >
         <IconDocument />
       </a>
       {#if selected}
         <button
           type="button"
-          class="bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-400 dark:hover:text-red-200 p-2 text-center cursor-pointer"
+          aria-label={t("course.removeSection")}
+          title={t("course.removeSection")}
+          class="rounded-md bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-400 dark:hover:text-red-200 p-2 text-center cursor-pointer"
           onclick={() => delCourse(courseName)}
         >
           <IconMinus />
@@ -564,7 +572,9 @@
       {:else}
         <button
           type="button"
-          class="bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-800 dark:bg-green-900 dark:hover:bg-green-800 dark:text-green-400 dark:hover:text-green-200 p-2 text-center cursor-pointer"
+          aria-label={t("course.addSection")}
+          title={t("course.addSection")}
+          class="rounded-md bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-800 dark:bg-green-900 dark:hover:bg-green-800 dark:text-green-400 dark:hover:text-green-200 p-2 text-center cursor-pointer"
           onclick={() => addCourse(courseName)}
         >
           <IconPlus />

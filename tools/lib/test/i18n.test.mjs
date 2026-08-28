@@ -61,10 +61,13 @@ test("the English slot is not accidentally holding Turkish text", () => {
   // calendar.tooltipNoDates shipped the Turkish sentence verbatim in its `en`
   // slot, so English users read Turkish on a disabled button. Turkish-specific
   // letters in an English string are a cheap, reliable signal for that class of
-  // copy-paste mistake.
+  // copy-paste mistake — once proper nouns are excused: the university's own
+  // English materials write "Boğaziçi University", so that name is legitimate
+  // English text containing Turkish letters.
+  const properNouns = /Boğaziçi/g;
   const turkishOnly = /[çğışöüÇĞİŞÖÜ]/;
   const suspicious = Object.entries(dict)
-    .filter(([, entry]) => turkishOnly.test(entry.en))
+    .filter(([, entry]) => turkishOnly.test(entry.en.replace(properNouns, "")))
     .map(([key]) => key);
   assert.deepEqual(suspicious, []);
 });

@@ -89,7 +89,7 @@ import { baseCode, isPlaceholderInstructor } from "./courseKey.mjs";
  * @property {string[]} terms indexed term keys, primary first, caller's order
  * @property {Record<string, InstructorEntry>} byKey
  * @property {string[]} keys every key, ascending
- * @property {Record<string, string[]>} courseToKeys base code → keys, most
+ * @property {Record<string, string[]>} courseToKeys base code -> keys, most
  *   persistent teacher first
  * @property {number} placeholderSections placeholder cells skipped, all terms
  */
@@ -105,9 +105,9 @@ import { baseCode, isPlaceholderInstructor } from "./courseKey.mjs";
 /**
  * Grouping key for a scraped instructor cell. Upper-case, ASCII-folded, single
  * spaces, punctuation dropped:
- *   "FATİH F.YILMAZ"        → "FATIH F YILMAZ"
- *   "BAHAR İNCE(KASAPGİL)"  → "BAHAR INCE KASAPGIL"
- *   "müge  taşkın-aydın"    → "MUGE TASKIN AYDIN"
+ *   "FATİH F.YILMAZ"        -> "FATIH F YILMAZ"
+ *   "BAHAR İNCE(KASAPGİL)"  -> "BAHAR INCE KASAPGIL"
+ *   "müge  taşkın-aydın"    -> "MUGE TASKIN AYDIN"
  *
  * Turkish casing is the trap this function exists to avoid. `"İ".toLowerCase()`
  * is the two-code-point string `"i\u0307"`, which never round-trips back to

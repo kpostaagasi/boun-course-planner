@@ -11,10 +11,10 @@
  */
 
 /**
- * Section key → base course code.
+ * Section key -> base course code.
  *
- * `"CMPE150.01"` → `"CMPE150"`, `"AD 211.01"` → `"AD211"`,
- * `"AD251.01 P.S. 1"` → `"AD251"`, `"AD48L.01"` → `"AD48L"`.
+ * `"CMPE150.01"` -> `"CMPE150"`, `"AD 211.01"` -> `"AD211"`,
+ * `"AD251.01 P.S. 1"` -> `"AD251"`, `"AD48L.01"` -> `"AD48L"`.
  *
  * Splitting on the first `.` is what makes the P.S./LAB sub-row keys work: the
  * suffix lives after the section number, so it is discarded with it.

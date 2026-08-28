@@ -24,7 +24,7 @@
       class="cursor-pointer px-1.5 py-0.5 text-[0.6875rem] font-semibold transition-colors {getLang() ===
       'en'
         ? 'bg-white text-zinc-900'
-        : 'text-zinc-400 hover:text-white'}"
+        : 'text-zinc-300 hover:text-white'}"
       onclick={() => setLang("en")}>EN</button
     >
     <button
@@ -32,7 +32,7 @@
       class="cursor-pointer px-1.5 py-0.5 text-[0.6875rem] font-semibold transition-colors {getLang() ===
       'tr'
         ? 'bg-white text-zinc-900'
-        : 'text-zinc-400 hover:text-white'}"
+        : 'text-zinc-300 hover:text-white'}"
       onclick={() => setLang("tr")}>TR</button
     >
   </div>

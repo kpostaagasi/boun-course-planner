@@ -84,7 +84,7 @@
     // everything the selected term offered.
     const completedSet = new Set(nowCompleted);
     if (selectedTerm !== "now" && offerings) {
-      // offerings.json is keyed by course code → invert: which courses were
+      // offerings.json is keyed by course code -> invert: which courses were
       // offered in the selected term?
       for (const [code, terms] of Object.entries(offerings)) {
         if (terms.includes(selectedTerm)) completedSet.add(code);
@@ -116,27 +116,30 @@
   });
 </script>
 
-<div class="mt-4 shadow bg-white dark:bg-zinc-800 dark:text-white rounded-lg overflow-hidden shrink-0">
+<div
+  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+>
   <button
     type="button"
-    class="w-full py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center cursor-pointer text-left"
+    class="flex w-full cursor-pointer items-baseline px-4 py-2.5 text-left"
     onclick={() => (open = !open)}
   >
-    <span class="font-medium">{t("newly.title")}</span>
-    <span
-      class="ml-2 text-xs bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 border border-blue-600/50 dark:border-blue-400/50 rounded-full px-1"
+    <span class="text-[0.9375rem] font-semibold">{t("newly.title")}</span>
+    <span class="u-data ml-2 text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
       >{newlyEligible.length}</span
     >
-    <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">{open ? "−" : "+"}</span>
+    <span class="u-data ml-auto text-xs text-zinc-600 dark:text-zinc-400"
+      >{open ? "−" : "+"}</span
+    >
   </button>
   {#if open}
-    <div class="py-2 px-4 flex items-center gap-2">
+    <div class="flex items-center gap-2 border-t border-zinc-200 px-4 py-2 dark:border-zinc-700">
       <label class="text-sm text-zinc-600 dark:text-zinc-300" for="newly-term-select">
         {t("newly.completedAsOf")}
       </label>
       <select
         id="newly-term-select"
-        class="text-sm border border-zinc-300 dark:border-zinc-600 rounded px-2 py-1 bg-white dark:bg-zinc-800 cursor-pointer"
+        class="u-data cursor-pointer rounded-md border border-zinc-300 bg-white px-2 py-1 text-[0.8125rem] transition-colors hover:border-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:hover:border-blue-400"
         bind:value={selectedTerm}
       >
         <option value="now">{t("newly.now")}</option>
@@ -145,19 +148,19 @@
         {/each}
       </select>
     </div>
-    <div class="divide-y divide-gray-200 dark:divide-zinc-500">
+    <div class="divide-y divide-zinc-100 dark:divide-zinc-700/60">
       {#if newlyEligible.length === 0}
-        <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 text-sm text-zinc-600 dark:text-zinc-300">
+        <div class="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
           {t("newly.empty")}
         </div>
       {:else}
         {#each newlyEligible as course (course.code)}
-          <div class="py-2 px-4 flex items-center gap-2 flex-wrap">
-            <span class="font-medium">{course.code}</span>
+          <div class="flex flex-wrap items-baseline gap-2 px-4 py-2">
+            <span class="u-data text-sm font-semibold">{course.code}</span>
             <span class="text-sm text-zinc-600 dark:text-zinc-300">{course.name}</span>
-            <span
-              class="ml-auto text-xs border rounded-full px-1 bg-red-50 text-red-700 border-red-700/50 dark:bg-red-900 dark:text-red-300 dark:border-red-300/50"
-            >
+            <!-- Missing-prereq count is a real blocker: amber, per the colour rule
+                 (red is reserved for full/clash, this is "not yet"). -->
+            <span class="u-data ml-auto text-[0.6875rem] text-amber-500 dark:text-amber-300">
               {t("newly.missingPrereqs").replace("{n}", String(course.missingCount))}
             </span>
           </div>

@@ -158,14 +158,14 @@
 </script>
 
 <div
-  class="mt-4 shadow bg-white dark:bg-zinc-800 dark:text-white divide-y divide-gray-200 dark:divide-zinc-500 rounded-lg overflow-hidden shrink-0"
+  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white divide-y divide-zinc-200 dark:divide-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
   onmouseleave={() => setHoveredCourse("")}
   role="region"
 >
-  <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center">
-    <span class="font-medium">{t("list.courses")}</span>
-    <span
-      class="ml-2 text-xs bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 border border-blue-600/50 dark:border-blue-400/50 rounded-full px-1"
+  <div class="flex items-baseline px-4 py-2.5">
+    <span class="text-[0.9375rem] font-semibold">{t("list.courses")}</span>
+    <!-- A count is data, not an alert: mono and quiet, not a coloured pill. -->
+    <span class="u-data ml-2 text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
       >{courseCount}</span
     >
     {#if getSelectedCourseNames().length > 0}
@@ -190,53 +190,58 @@
   {#if showRoadmap}
     <Roadmap />
   {:else}
-  <div
-    class="divide-y divide-gray-200 dark:divide-zinc-500"
-    onmouseleave={() => setHoveredCourse("")}
-    role="list"
-  >
-    {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
+  <!-- The empty state lives OUTSIDE the role=list container: a list may only
+       contain listitems (axe: aria-required-children, critical). -->
+  {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
+    <div
+      class="divide-y divide-zinc-100 dark:divide-zinc-700/60"
+      onmouseleave={() => setHoveredCourse("")}
+      role="list"
+    >
       {#each getSelectedCourseNames() as courseName}
         <div
-          class="py-1 px-2 flex items-center"
+          class="group flex items-center px-4 py-1.5"
           onmouseenter={() => setHoveredCourse(courseName)}
           role="listitem"
         >
           <button
             type="button"
-            class="cursor-pointer text-zinc-600 dark:text-zinc-400"
+            aria-label="{t('course.removeSection')}: {courseName}"
+            title={t("course.removeSection")}
+            class="cursor-pointer text-zinc-600 transition-colors hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400"
             onclick={() => {
               delCourse(courseName);
               resetHoveredCourse();
             }}
           >
             <IconX />
-          </button><span class="ml-1">{courseName}</span>
+          </button><span class="u-data ml-2 text-sm font-semibold">{courseName}</span>
           {#if "credits" in getCurSemesterData()[courseName]}
-            <span
-              class="ml-2 text-xs border rounded-full px-1 bg-green-50 text-green-700 border-green-700/50 dark:bg-green-900 dark:text-green-300 dark:border-green-300/50"
-              >{getCurSemesterData()[courseName].credits} Cr</span
+            <!-- Credits are data, not a status: no green pill. Green means seats. -->
+            <span class="u-data ml-auto text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
+              >{getCurSemesterData()[courseName].credits}cr</span
             >
           {/if}
         </div>
       {/each}
-    {:else}
-      <div
-        class="text-zinc-500 text-sm h-8 flex flex-col justify-center items-center"
-        data-testid="courses-empty"
-      >
-        {t("list.empty")}
-      </div>
-    {/if}
-  </div>
+    </div>
+  {:else}
+    <div
+      class="flex h-10 flex-col items-center justify-center text-sm text-zinc-600 dark:text-zinc-400"
+      data-testid="courses-empty"
+    >
+      {t("list.empty")}
+    </div>
+  {/if}
   {/if}
   <div
-    class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 text-green-700 dark:text-green-300 font-medium"
+    class="flex items-baseline px-4 py-2.5"
     data-testid="total-credits"
   >
-    {t("list.totalCredits")} {totalCredit}
+    <span class="eyebrow">{t("list.totalCredits")}</span>
+    <span class="u-data ml-2 text-[0.9375rem] font-semibold">{totalCredit}</span>
   </div>
-  <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center gap-2 flex-wrap">
+  <div class="flex flex-wrap items-center gap-2 px-4 py-2.5">
     <button
       type="button"
       class="btn-quiet"
@@ -264,7 +269,7 @@
       </button>
     {/if}
   </div>
-  <div class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700">
+  <div class="px-4 py-2.5">
     <CalendarExport />
   </div>
 </div>

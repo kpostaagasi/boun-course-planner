@@ -18,6 +18,7 @@
 export const dict = {
   "header.title": { en: "BOUN Course Planner", tr: "BOUN Ders Planlayıcı" },
   "search.placeholder": { en: "Search courses", tr: "Ders ara" },
+  "header.semester": { en: "Semester", tr: "Dönem" },
   "filters.open": { en: "Filter Courses", tr: "Dersleri Filtrele" },
   "filters.showWithoutSchedule": {
     en: "Show courses without schedule",
@@ -44,8 +45,16 @@ export const dict = {
     tr: "Hocadan onay gerekli",
   },
   "course.minGpa": { en: "Min. GPA:", tr: "Min. GPA:" },
-  "course.showDescription": { en: "Show description ▼", tr: "Açıklamayı göster ▼" },
-  "course.hideDescription": { en: "Hide description ▲", tr: "Açıklamayı gizle ▲" },
+  "course.showDescription": { en: "Show description", tr: "Açıklamayı göster" },
+  // Accessible names for the icon-only card controls; axe flagged all three as
+  // nameless (button-name / link-name, critical and serious).
+  "course.addSection": { en: "Add to schedule", tr: "Programa ekle" },
+  "course.removeSection": { en: "Remove from schedule", tr: "Programdan çıkar" },
+  "course.syllabusLink": {
+    en: "Official course page",
+    tr: "Resmî ders sayfası",
+  },
+  "course.hideDescription": { en: "Hide description", tr: "Açıklamayı gizle" },
   "course.catalogPrerequisite": {
     en: "Catalog prerequisite:",
     tr: "Katalog ön koşulu:",
@@ -92,12 +101,12 @@ export const dict = {
     tr: "Outlook veya Takvim uygulamasında açmak için çift tıklayın",
   },
   "instructions.gcal": {
-    en: "Go to Settings → Import & Export → Import",
-    tr: "Ayarlar → İçe & Dışa Aktarma → İçe Aktar bölümüne gidin",
+    en: "Go to Settings -> Import & Export -> Import",
+    tr: "Ayarlar -> İçe & Dışa Aktarma -> İçe Aktar bölümüne gidin",
   },
   "instructions.outlook": {
-    en: "Click 'Add calendar' → 'Upload from file'",
-    tr: "'Takvim ekle' → 'Dosyadan yükle' seçeneğine tıklayın",
+    en: "Click 'Add calendar' -> 'Upload from file'",
+    tr: "'Takvim ekle' -> 'Dosyadan yükle' seçeneğine tıklayın",
   },
   "footer.dataUpdated": { en: "Schedule data updated:", tr: "Ders verisi güncellendi:" },
   "footer.goodLuck": {
@@ -105,6 +114,16 @@ export const dict = {
     tr: "Yeni dönemde başarılar!",
   },
   "footer.registration": { en: "BOUN registration", tr: "BOUN kayıt" },
+  // Split around the inline link; each half is written to read grammatically in
+  // its own language, so the halves are not word-for-word translations.
+  "footer.disclaimerPre": {
+    en: "This website has no affiliation with Boğaziçi University. Please check",
+    tr: "Bu sitenin Boğaziçi Üniversitesi ile bir bağı yoktur. En güncel program için",
+  },
+  "footer.disclaimerPost": {
+    en: "for the most up-to-date schedule; this page may sometimes lag behind it.",
+    tr: "sayfasını esas alın; bu sayfa zaman zaman onun gerisinde kalabilir.",
+  },
   "roadmap.title": { en: "Roadmap", tr: "Yol Haritası" },
   "roadmap.addCourse": { en: "Add course…", tr: "Ders ekle…" },
   "roadmap.prereqUnmet": {
@@ -335,8 +354,8 @@ export const dict = {
     en: "Term dates could not be loaded, so calendar export is unavailable.",
     tr: "Dönem tarihleri yüklenemedi, bu yüzden takvim dışa aktarımı kullanılamıyor.",
   },
-  "catalogue.showMore": { en: "Show more ▼", tr: "Daha fazla ▼" },
-  "catalogue.showLess": { en: "Show less ▲", tr: "Daha az ▲" },
+  "catalogue.showMore": { en: "Show more", tr: "Daha fazla" },
+  "catalogue.showLess": { en: "Show less", tr: "Daha az" },
   "catalogue.loading": { en: "Loading…", tr: "Yükleniyor…" },
 };
 

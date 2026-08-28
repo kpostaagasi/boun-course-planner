@@ -172,25 +172,23 @@
 </script>
 
 <div
-  class="mt-4 shadow bg-white dark:bg-zinc-800 dark:text-white rounded-lg overflow-hidden shrink-0"
+  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
   data-testid="instructor-panel"
 >
-  <div
-    class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 flex items-center gap-2 flex-wrap"
-  >
-    <span class="text-xs text-zinc-500 dark:text-zinc-400"
-      >{t("instructor.title")}</span
+  <div class="flex flex-wrap items-baseline gap-2 border-b border-zinc-200 px-4 py-2.5 dark:border-zinc-700">
+    <span class="eyebrow">{t("instructor.title")}</span>
+    <span class="text-[0.9375rem] font-semibold" data-testid="instructor-name"
+      >{entry.display}</span
     >
-    <span class="font-medium" data-testid="instructor-name">{entry.display}</span>
     <span
-      class="text-xs bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 border border-blue-600/50 dark:border-blue-400/50 rounded-full px-1"
+      class="u-data text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
       title={t("instructor.sections", { n: entry.sections.length })}
     >
-      {entry.sections.length}
+      {entry.sections.length}×
     </span>
     <button
       type="button"
-      class="ml-auto text-xs text-blue-600 dark:text-blue-400 cursor-pointer"
+      class="btn-quiet ml-auto"
       data-testid="instructor-clear"
       onclick={onclear}
     >
@@ -198,7 +196,7 @@
     </button>
   </div>
 
-  <div class="py-1 px-4 text-xs text-zinc-500 dark:text-zinc-400">
+  <div class="px-4 py-1.5 text-xs text-zinc-600 dark:text-zinc-400">
     {t("instructor.scopeNote")}
     {#if entry.variants.length > 1}
       <!-- The registrar spells some people several ways across terms; showing
@@ -213,18 +211,16 @@
 
   <!-- Every entry reaching this panel comes from the current term's index, so
        there is always at least one section to list. -->
-  <div class="divide-y divide-gray-200 dark:divide-zinc-500">
+  <div class="divide-y divide-zinc-200 dark:divide-zinc-700">
     {#each entry.sections as section (section.sectionKey)}
       <div
-        class="py-2 px-4 flex items-baseline gap-2 flex-wrap"
+        class="flex flex-wrap items-baseline gap-2 px-4 py-2"
         data-testid="instructor-section"
       >
-        <span class="font-medium">{section.sectionKey}</span>
-        <span class="text-sm text-zinc-600 dark:text-zinc-300"
-          >{section.name}</span
-        >
+        <span class="u-data text-sm font-semibold">{section.sectionKey}</span>
+        <span class="text-sm text-zinc-600 dark:text-zinc-300">{section.name}</span>
         <span
-          class="ml-auto text-sm text-zinc-500 dark:text-zinc-400"
+          class="u-data ml-auto text-[0.8125rem] text-zinc-600 dark:text-zinc-400"
           data-testid="instructor-schedule"
         >
           {describeSchedule(section, {
@@ -235,8 +231,8 @@
           })}
         </span>
         {#if section.rooms.length > 0}
-          <span class="text-sm text-zinc-500 dark:text-zinc-400"
-            >🏠 {section.rooms.join(" ")}</span
+          <span class="u-data text-[0.8125rem] text-zinc-600 dark:text-zinc-400"
+            >{section.rooms.join(" · ")}</span
           >
         {/if}
       </div>
@@ -244,12 +240,12 @@
   </div>
 
   <div
-    class="py-2 px-4 bg-zinc-50 dark:bg-zinc-700 border-t border-gray-200 dark:border-zinc-500"
+    class="border-t border-zinc-200 px-4 py-2.5 dark:border-zinc-700"
     data-testid="instructor-history"
   >
-    <div class="flex items-center gap-2 flex-wrap">
-      <span class="text-sm font-medium">{t("instructor.history")}</span>
-      <span class="text-xs text-zinc-500 dark:text-zinc-400">
+    <div class="flex flex-wrap items-baseline gap-2">
+      <span class="eyebrow">{t("instructor.history")}</span>
+      <span class="text-xs text-zinc-600 dark:text-zinc-400">
         {loading
           ? t("instructor.historyLoading")
           : scope > 1
@@ -257,20 +253,18 @@
             : t("instructor.historyCurrentOnly")}
       </span>
     </div>
-    <div class="mt-1 divide-y divide-gray-200 dark:divide-zinc-600">
+    <div class="mt-1 divide-y divide-zinc-100 dark:divide-zinc-700/60">
       {#each rows as row (row.course.code)}
         <div
-          class="py-1 flex items-baseline gap-2 flex-wrap"
+          class="flex flex-wrap items-baseline gap-2 py-1.5"
           data-testid="instructor-history-course"
         >
-          <span class="text-sm font-medium">{row.course.code}</span>
-          <span class="text-sm text-zinc-600 dark:text-zinc-300"
-            >{row.course.name}</span
-          >
+          <span class="u-data text-sm font-semibold">{row.course.code}</span>
+          <span class="text-sm text-zinc-600 dark:text-zinc-300">{row.course.name}</span>
           {#if !loading}
             <!-- No counts before the window is known: "1 of 1 terms" during
                  the fetch would understate a person's real history. -->
-            <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
+            <span class="u-data ml-auto text-[0.6875rem] text-zinc-600 dark:text-zinc-400">
               {t("instructor.termsTaught", {
                 n: row.course.terms.length,
                 m: scope,
@@ -278,7 +272,7 @@
             </span>
           {/if}
           {#if row.others.length > 0}
-            <span class="w-full text-xs text-zinc-500 dark:text-zinc-400">
+            <span class="w-full text-xs text-zinc-600 dark:text-zinc-400">
               {t("instructor.alsoTaughtBy")}
               {row.others.map((credit) => credit.display).join(", ")}
             </span>
@@ -286,7 +280,7 @@
         </div>
       {/each}
       {#if hiddenCourses > 0}
-        <div class="py-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <div class="py-1.5 text-xs text-zinc-600 dark:text-zinc-400">
           {t("instructor.moreCourses", { n: hiddenCourses })}
         </div>
       {/if}

@@ -23,20 +23,22 @@
   });
 </script>
 
-<div class="text-center text-zinc-500 py-3">
+<div class="py-3 text-center text-zinc-600 dark:text-zinc-400">
   <p class="text-sm">{t("footer.goodLuck")}</p>
   <small class="text-xs">
-    This website has no affiliation with Boğaziçi University. Please check
+    {t("footer.disclaimerPre")}
     <a
-      class="underline hover:text-blue-500"
+      class="underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 hover:decoration-blue-400 dark:decoration-zinc-600 dark:hover:text-blue-300"
       href="https://registration.boun.edu.tr"
       target="_blank"
       rel="noopener noreferrer"
       >{t("footer.registration")}</a
-    > for most up-to-date schedule. The schedule information presented in this page
-    may sometimes lag behind the registration website.
+    >
+    {t("footer.disclaimerPost")}
   </small>
   {#if updatedAt}
-    <small class="block text-xs">{t("footer.dataUpdated")} {new Date(updatedAt).toLocaleString()}</small>
+    <small class="u-data block text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
+      >{t("footer.dataUpdated")} {new Date(updatedAt).toLocaleString()}</small
+    >
   {/if}
 </div>

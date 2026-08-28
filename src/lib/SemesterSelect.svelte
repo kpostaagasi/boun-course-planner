@@ -8,6 +8,7 @@
     setSemesterDataForSemester,
   } from "./globalState.svelte";
   import { onMount } from "svelte";
+  import { t } from "./i18n.svelte";
   import IconSelector from "./icons/IconSelector.svelte";
 
   let semesters: string[] = $state([]);
@@ -63,7 +64,8 @@
 
 <div class="relative">
   <select
-    class="text-black dark:text-white bg-white dark:bg-zinc-700 appearance-none focus:outline-hidden focus:ring-2 focus:ring-blue-500 p-1 pr-5 rounded-xs"
+    aria-label={t("header.semester")}
+    class="u-data cursor-pointer appearance-none rounded border border-zinc-700 bg-zinc-800 p-1 pr-6 text-[0.8125rem] text-zinc-100 transition-colors hover:border-zinc-500 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
     value={getCurrentSemester()}
     oninput={(e) =>
       setCurrentSemester((e.currentTarget as HTMLSelectElement).value ?? "")}
@@ -73,11 +75,11 @@
         {semester}
       </option>
     {:else}
-      <option value="">Loading</option>
+      <option value="">{t("catalogue.loading")}</option>
     {/each}
   </select>
   <div
-    class="ml-3 absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none text-zinc-500 dark:text-zinc-400"
+    class="ml-3 absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none text-zinc-400"
   >
     <IconSelector />
   </div>

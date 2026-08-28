@@ -7,6 +7,7 @@
     getQuotaSections,
   } from "./globalState.svelte";
   import { t } from "./i18n.svelte";
+  import IconChevronDown from "./icons/IconChevronDown.svelte";
   import {
     buildPaletteEntries,
     searchPalette,
@@ -224,7 +225,7 @@
       bind:this={dialogEl}
       tabindex="-1"
       onkeydown={onDialogKeydown}
-      class="w-full max-w-2xl mx-4 bg-white dark:bg-zinc-800 shadow-xl focus:outline-none"
+      class="w-full max-w-2xl mx-4 rounded-lg border border-zinc-200 bg-white shadow-xl focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label={t("palette.title")}
@@ -233,7 +234,7 @@
       <input
         bind:value={query}
         oninput={() => (activeIndex = 0)}
-        class="w-full p-3 text-lg bg-transparent border-b border-zinc-200 dark:border-zinc-600 focus:outline-none text-zinc-900 dark:text-white"
+        class="w-full border-b border-zinc-200 bg-transparent p-3 text-lg text-zinc-900 placeholder-zinc-400 focus:outline-none dark:border-zinc-700 dark:text-white dark:placeholder-zinc-500"
         placeholder={t("palette.placeholder")}
         role="combobox"
         aria-expanded={results.length > 0}
@@ -256,9 +257,9 @@
                  together and in full, so the header labels a contiguous run. -->
             <li
               role="presentation"
-              class="sticky top-0 flex items-baseline gap-2 px-3 py-1 bg-zinc-100 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700"
+              class="sticky top-0 flex items-baseline gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900"
             >
-              <span class="font-semibold text-sm text-zinc-900 dark:text-white shrink-0"
+              <span class="u-data shrink-0 text-sm font-semibold text-zinc-900 dark:text-white"
                 >{group.code}</span
               >
               <span class="text-xs text-zinc-600 dark:text-zinc-300 break-all"
@@ -266,7 +267,7 @@
               >
               {#if group.sections.length > 1}
                 <span
-                  class="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
+                  class="eyebrow ml-auto shrink-0"
                   >{group.sections.length} {t("palette.sections")}</span
                 >
               {/if}
@@ -283,8 +284,8 @@
                 data-section-key={entry.courseName}
                 data-scheduled={entry.scheduled}
                 data-active={idx === active}
-                class="px-3 py-2 cursor-pointer {idx === active
-                  ? 'bg-blue-100 dark:bg-blue-900'
+                class="px-3 py-2 cursor-pointer transition-colors {idx === active
+                  ? 'bg-blue-50 dark:bg-blue-900/50'
                   : ''}"
                 onmouseenter={() => (activeIndex = idx)}
                 onclick={() => pick(entry)}
@@ -292,35 +293,35 @@
               >
                 <div class="flex items-baseline gap-2">
                   <span
-                    class="font-mono text-sm text-zinc-900 dark:text-white shrink-0"
+                    class="u-data shrink-0 text-sm font-semibold text-zinc-900 dark:text-white"
                     >{entry.courseName}</span
                   >
                   {#if entry.title !== group.title}
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400 break-all"
+                    <span class="text-xs text-zinc-600 dark:text-zinc-400 break-all"
                       >{entry.title}</span
                     >
                   {/if}
                   {#if selectedKeys.has(entry.courseName)}
                     <span
-                      class="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-green-700 dark:text-green-400"
+                      class="u-data ml-auto shrink-0 text-[0.6875rem] text-blue-600 dark:text-blue-300"
                       >✓ {t("palette.alreadyAdded")}</span
                     >
                   {:else if entry.quota.status !== "unknown"}
                     <span
-                      class="ml-auto shrink-0 text-[10px] uppercase tracking-wide {entry
-                        .quota.status === 'full'
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-zinc-500 dark:text-zinc-400'}"
+                      class="u-data ml-auto shrink-0 text-[0.6875rem] {entry.quota
+                        .status === 'full'
+                        ? 'font-semibold text-red-600 dark:text-red-400'
+                        : 'text-zinc-600 dark:text-zinc-400'}"
                       data-testid="palette-seats">{seatText(entry)}</span
                     >
                   {/if}
                 </div>
                 <div
-                  class="flex items-baseline gap-2 text-xs text-zinc-500 dark:text-zinc-400"
+                  class="flex items-baseline gap-2 text-xs text-zinc-600 dark:text-zinc-400"
                 >
                   <span
                     data-testid="palette-when"
-                    class="shrink-0 {entry.scheduled ? '' : 'italic'}"
+                    class="u-data shrink-0 {entry.scheduled ? '' : 'italic'}"
                     >{scheduleText(entry)}</span
                   >
                   <span class="truncate">{entry.instructor}</span>
@@ -338,10 +339,11 @@
           {/each}
         </ul>
       {:else if query.trim()}
-        <div class="p-3 text-sm text-zinc-500 dark:text-zinc-400">{t("palette.noResults")}</div>
+        <div class="p-3 text-sm text-zinc-600 dark:text-zinc-400">{t("palette.noResults")}</div>
       {/if}
-      <div class="px-3 py-1.5 text-xs text-zinc-400 dark:text-zinc-500 border-t border-zinc-200 dark:border-zinc-600">
-        ↑↓ {t("palette.navigate")} · ⏎ {t("palette.add")} · Esc {t("palette.close")}
+      <div class="border-t border-zinc-200 px-3 py-1.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+        <span class="inline-block rotate-180"><IconChevronDown /></span><IconChevronDown />
+        {t("palette.navigate")} · ⏎ {t("palette.add")} · Esc {t("palette.close")}
       </div>
     </div>
   </div>
@@ -350,7 +352,7 @@
 <!-- Floating hint button so mobile users can reach the palette too -->
 <button
   type="button"
-  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-500 shadow-sm transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
+  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-sm transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
   title={t("palette.openTitle")}
   aria-label={t("palette.openTitle")}
   onclick={openPalette}

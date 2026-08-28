@@ -67,114 +67,109 @@
     aria-label={t("filters.open")}
     onclick={() => dialog.showModal()}
     data-testid="filters-open"
-    class="ml-2 p-2 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-zinc-800 cursor-pointer rounded-lg shadow"
+    class="ml-2 flex h-full items-center rounded-md border border-zinc-300 bg-white px-2 text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
   >
     <IconFilter />
   </button>
 </div>
 
+<!--
+  Native <dialog> + showModal: the browser supplies the focus trap and Esc
+  handling, so none of that is reimplemented here.
+-->
 <dialog
   bind:this={dialog}
-  class="rounded-lg p-4 max-w-lg m-auto backdrop:bg-black/50 bg-zinc-100 dark:bg-black shadow"
+  class="m-auto max-w-lg rounded-lg border border-zinc-200 bg-white p-4 text-zinc-900 shadow-xl backdrop:bg-black/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
 >
-  <form method="dialog">
-    <div class="flex justify-end">
-      <button class="cursor-pointer ml-auto text-zinc-400 dark:text-zinc-300"
-        ><IconX /></button
-      >
-    </div>
+  <form method="dialog" class="mb-3 flex items-center">
+    <h2 class="eyebrow">{t("filters.open")}</h2>
+    <button
+      class="ml-auto cursor-pointer text-zinc-600 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+      aria-label={t("palette.close")}><IconX /></button
+    >
   </form>
 
-  <div class="dark:text-white mt-2">
-    <div class="overflow-auto">
-      <div class="mb-2">
-        <label for="show-courses-without-schedule" class="mr-3">
-          <input
-            id="show-courses-without-schedule"
-            type="checkbox"
-            checked={showCoursesWithoutSchedule}
-            onchange={() => {
-              showCoursesWithoutSchedule = !showCoursesWithoutSchedule;
-            }}
-            class="cursor-pointer"
-          />
-          {t("filters.showWithoutSchedule")}
-        </label>
-
-        <label for="chk-all" class="mr-3">
-          <input
-            id="chk-all"
-            type="checkbox"
-            checked={true}
-            onclick={(e) => {
-              toggleAllSelectedDayHourFilter();
-              e.preventDefault();
-              return false;
-            }}
-            class="cursor-pointer"
-          />
-          {t("filters.selectAll")}
-        </label>
-
-        <label for="chk-none">
-          <input
-            id="chk-none"
-            type="checkbox"
-            checked={false}
-            onclick={(e) => {
-              toggleNoneSelectedDayHourFilter();
-              e.preventDefault();
-              return false;
-            }}
-            class="cursor-pointer"
-          />
-          {t("filters.unselectAll")}
-        </label>
-      </div>
-
-      <table
-        class="w-full table-fixed text-sm lg:text-base rounded-lg bg-white dark:bg-gray-800 tracking-tight sm:tracking-normal"
+  <div class="overflow-auto">
+    <div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem]">
+      <label
+        for="show-courses-without-schedule"
+        class="flex cursor-pointer items-center gap-1.5 text-zinc-600 dark:text-zinc-300"
       >
-        <thead>
-          <tr>
-            <th class="text-left p-1"></th>
+        <input
+          id="show-courses-without-schedule"
+          type="checkbox"
+          checked={showCoursesWithoutSchedule}
+          onchange={() => {
+            showCoursesWithoutSchedule = !showCoursesWithoutSchedule;
+          }}
+          class="h-4 w-4 cursor-pointer appearance-none rounded-[3px] border border-zinc-300 transition-colors checked:border-blue-500 checked:bg-blue-500 dark:border-zinc-600 dark:checked:border-blue-400 dark:checked:bg-blue-400"
+        />
+        {t("filters.showWithoutSchedule")}
+      </label>
+
+      <!--
+        "Select all" / "unselect all" used to be checkboxes whose click was
+        preventDefault-ed into a command — a control that looks like state but
+        acts like a button. They are buttons.
+      -->
+      <span class="ml-auto flex gap-2">
+        <button type="button" class="btn-quiet" onclick={toggleAllSelectedDayHourFilter}
+          >{t("filters.selectAll")}</button
+        >
+        <button type="button" class="btn-quiet" onclick={toggleNoneSelectedDayHourFilter}
+          >{t("filters.unselectAll")}</button
+        >
+      </span>
+    </div>
+
+    <!--
+      The availability grid is the same domain object as the timetable — days
+      across, hours down — so it speaks the same language: mono hour spine,
+      eyebrow day headers, and a filled block meaning "this slot is shown".
+    -->
+    <table class="w-full table-fixed">
+      <thead>
+        <tr>
+          <th class="w-12 p-1"></th>
+          {#each days as day, dIdx}
+            <th
+              class="eyebrow cursor-pointer select-none p-1 text-center transition-colors hover:text-blue-600 dark:hover:text-blue-300"
+              onclick={() => toggleDaySelectedDayHourFilter(dIdx)}>{t(`day.${day}`)}</th
+            >
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each hours as h, hIdx}
+          <tr class={hIdx === 0 ? "" : "row-rule"}>
+            <td
+              class="spine cursor-pointer select-none p-1 pr-2 transition-colors hover:text-blue-600 dark:hover:text-blue-300"
+              onclick={() => toggleHourSelectedDayHourFilter(hIdx)}
+              >{String(h).padStart(2, "0")}<span class="spine-min" aria-hidden="true">:00</span></td
+            >
             {#each days as day, dIdx}
-              <th
-                class="p-1 text-center select-none cursor-pointer"
-                onclick={() => toggleDaySelectedDayHourFilter(dIdx)}>{t(`day.${day}`)}</th
-              >
+              <td class="p-0.5 text-center">
+                <input
+                  id={`chk-${dIdx}-${h}`}
+                  type="checkbox"
+                  aria-label={`${day} ${h}`}
+                  checked={selectedDayHourFilter[dIdx][hIdx]}
+                  onchange={() => toggleSelectedDayHourFilter(dIdx, hIdx)}
+                  class="h-5 w-full cursor-pointer appearance-none rounded-[3px] border border-zinc-200 transition-colors checked:border-blue-500 checked:bg-blue-500/80 hover:border-blue-400 dark:border-zinc-700 dark:checked:border-blue-400 dark:checked:bg-blue-400/70"
+                />
+              </td>
             {/each}
           </tr>
-        </thead>
-        <tbody>
-          {#each hours as h, hIdx}
-            <tr class={hIdx % 2 == 0 ? "bg-gray-50 dark:bg-gray-700" : ""}>
-              <td
-                class="p-1 select-none cursor-pointer"
-                onclick={() => toggleHourSelectedDayHourFilter(hIdx)}>{h}</td
-              >
-              {#each days as day, dIdx}
-                <td class="p-1 text-center">
-                  <input
-                    id={`chk-${dIdx}-${h}`}
-                    type="checkbox"
-                    aria-label={`${day} ${h}`}
-                    checked={selectedDayHourFilter[dIdx][hIdx]}
-                    onchange={() => toggleSelectedDayHourFilter(dIdx, hIdx)}
-                    class="cursor-pointer"
-                  />
-                </td>
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+        {/each}
+      </tbody>
+    </table>
 
+    <div class="mt-3 flex justify-end">
       <button
         type="button"
         onclick={() => saveFilters()}
         data-testid="filters-apply"
-        class="mt-2 float-right cursor-pointer rounded-lg bg-white dark:bg-zinc-800 py-1 px-2"
+        class="cursor-pointer rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
       >
         {t("filters.apply")}
       </button>
