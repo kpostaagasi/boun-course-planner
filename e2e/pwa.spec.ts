@@ -150,12 +150,12 @@ test("serves the course list from cache with the network switched off", async ({
     .map((url) => url.split("/").pop())
     .sort();
   expect(cachedFonts).toEqual([
-    "archivo-latin-ext.woff2",
-    "archivo-latin.woff2",
     "plexmono-400-latin-ext.woff2",
     "plexmono-400-latin.woff2",
     "plexmono-600-latin-ext.woff2",
     "plexmono-600-latin.woff2",
+    "schibsted-latin-ext.woff2",
+    "schibsted-latin.woff2",
   ]);
 
   // Nothing cross-origin and nothing outside our own deploy path ever gets stored.

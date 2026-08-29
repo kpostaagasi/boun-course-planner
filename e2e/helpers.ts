@@ -299,7 +299,8 @@ export function appTitle(page: Page): Locator {
 export async function setLang(page: Page, lang: "en" | "tr"): Promise<void> {
   const button = header(page).getByRole("button", { name: lang.toUpperCase(), exact: true });
   await button.click();
-  await expect(button).toHaveClass(/bg-white/);
+  // The active language is the ink-filled position of the toggle.
+  await expect(button).toHaveClass(/bg-zinc-900/);
 }
 
 /**

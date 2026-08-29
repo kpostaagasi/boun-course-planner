@@ -403,7 +403,7 @@
                   </span>
                   {#if row.offering}
                     <span
-                      class="u-data shrink-0 rounded border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
+                      class="u-data shrink-0 rounded-sm border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
                         row.offering.confidence
                       ]}"
                       data-testid="roadmap-confidence"
@@ -455,7 +455,7 @@
             {#if openDropdown === info.term}
               {@const found = suggestions(info.term)}
               {#if found.length > 0}
-                <div class="absolute left-2 right-2 bottom-full mb-1 z-10 max-h-56 overflow-y-auto rounded-md border border-zinc-200 bg-white shadow-lg divide-y divide-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:divide-zinc-700">
+                <div class="absolute left-2 right-2 bottom-full mb-1 z-10 max-h-56 overflow-y-auto rounded-md border border-zinc-900 bg-white divide-y divide-zinc-100 dark:border-zinc-400 dark:bg-zinc-800 dark:divide-zinc-700">
                   {#each found as s (s.code)}
                     <button
                       type="button"
@@ -469,7 +469,7 @@
                       <span class="u-data font-semibold">{s.code}</span>
                       {#if s.name}<span class="ml-1 text-zinc-600 dark:text-zinc-400">{s.name}</span>{/if}
                       {#if s.confidence}<span
-                          class="u-data ml-1 rounded border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
+                          class="u-data ml-1 rounded-sm border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
                             s.confidence
                           ]}">{t(`roadmap.conf.${s.confidence}`)}</span
                         >{/if}

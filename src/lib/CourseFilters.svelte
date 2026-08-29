@@ -79,7 +79,7 @@
 -->
 <dialog
   bind:this={dialog}
-  class="m-auto max-w-lg rounded-lg border border-zinc-200 bg-white p-4 text-zinc-900 shadow-xl backdrop:bg-black/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+  class="m-auto max-w-lg rounded-lg border-2 border-zinc-900 bg-white p-4 text-zinc-900 backdrop:bg-black/60 dark:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100"
 >
   <form method="dialog" class="mb-3 flex items-center">
     <h2 class="eyebrow">{t("filters.open")}</h2>

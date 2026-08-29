@@ -225,7 +225,7 @@
       bind:this={dialogEl}
       tabindex="-1"
       onkeydown={onDialogKeydown}
-      class="w-full max-w-2xl mx-4 rounded-lg border border-zinc-200 bg-white shadow-xl focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 overflow-hidden"
+      class="w-full max-w-2xl mx-4 rounded-lg border-2 border-zinc-900 bg-white focus:outline-none dark:border-zinc-300 dark:bg-zinc-800 overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label={t("palette.title")}
@@ -352,7 +352,7 @@
 <!-- Floating hint button so mobile users can reach the palette too -->
 <button
   type="button"
-  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-sm transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
+  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
   title={t("palette.openTitle")}
   aria-label={t("palette.openTitle")}
   onclick={openPalette}

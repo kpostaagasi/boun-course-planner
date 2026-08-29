@@ -101,7 +101,7 @@
   };
 
   const SANS =
-    "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    "'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
   /** Break `text` into at most `maxLines` lines that each fit `maxW`, ellipsising the rest. */
   function fitLines(
@@ -332,7 +332,7 @@
       {t("timetable.semesterEnd")}: {formatDate(calendarInfo.end)}
     </span>
     {#each calendarInfo.holidays as h}
-      <span class="rounded bg-zinc-200 px-1.5 py-0.5 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">
+      <span class="rounded-sm bg-zinc-200 px-1.5 py-0.5 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">
         {h.name} ({formatDate(h.date)})
       </span>
     {/each}
@@ -412,8 +412,7 @@
                 data-day={day}
                 title={occ.course}
                 style={boxStyle(occ)}
-                class="absolute inset-y-0 overflow-hidden border-l-2 px-1 text-left leading-[1.15] text-[10px] sm:text-xs {color.bg} {color.text} {color.border}
-                  {occ.isFirst ? 'rounded-tr' : ''} {occ.isLast ? 'rounded-br' : ''}
+                class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1 text-left leading-[1.15] text-[10px] sm:text-xs {color.bg} {color.text} {color.border}
                   {occ.course == hoveredCourse && !selectedCourses.includes(occ.course)
                   ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
                   : occ.course == hoveredCourse

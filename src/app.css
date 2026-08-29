@@ -1,19 +1,25 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   BOUN Course Planner — design tokens
+   BOUN Course Planner — design tokens, "Boğaz Editorial"
 
-   Thesis: in a registration tool the only thing worth shouting about is whether
-   you can still get a seat. So the chrome is monochrome graphite, exactly one
-   quiet ink (strait teal) carries interaction, and saturated warm colour is
-   reserved for occupancy pressure and clashes. Nothing is coloured decoratively.
+   Thesis: a registration tool is a document, not an app. It should read like
+   the official schedule form it replaces — paper, ink, rules, one stamp of
+   colour. The chrome is a cool ink-grey ramp on paper white; exactly one ink
+   (cobalt, the Bosphorus blue) carries interaction; saturated warm colour is
+   still reserved for the only thing worth shouting about — occupancy pressure
+   and clashes. Nothing is coloured decoratively, nothing floats: hierarchy is
+   drawn with hairline rules and whitespace, not shadows.
 
    The palette is applied by REMAPPING the Tailwind scales the app already uses
-   (zinc + gray -> one graphite ramp, blue -> strait) rather than rewriting ~300
-   utility classes across fifteen components. One ramp, one meaning, no drift.
+   (zinc + gray -> one ink-grey ramp, blue -> cobalt) rather than rewriting
+   ~300 utility classes across fifteen components. One ramp, one meaning, no
+   drift. Corner radii are remapped the same way: the whole app sharpens to
+   1–4px through the tokens, because a document has edges, not pillows.
 
-   Type: Archivo for the interface, IBM Plex Mono for anything the registration
-   system produced — course codes, slot times, seat counts. The mono is
+   Type: Schibsted Grotesk for the interface — a newspaper grotesk, drawn for
+   editorial mastheads — and IBM Plex Mono for anything the registration
+   system produced: course codes, slot times, seat counts. The mono is
    semantic, not decorative: it marks machine data. Both faces are self-hosted
    because the service worker only caches same-origin requests, so a webfont on
    a CDN would vanish exactly when the app is most useful — offline, mid-campus.
@@ -22,21 +28,21 @@
    ========================================================================= */
 
 @font-face {
-  font-family: "Archivo";
+  font-family: "Schibsted Grotesk";
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 400 900;
   font-display: swap;
-  src: url("/fonts/archivo-latin-ext.woff2") format("woff2");
+  src: url("/fonts/schibsted-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
     U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
     U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: "Archivo";
+  font-family: "Schibsted Grotesk";
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 400 900;
   font-display: swap;
-  src: url("/fonts/archivo-latin.woff2") format("woff2");
+  src: url("/fonts/schibsted-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
     U+2212, U+2215, U+FEFF, U+FFFD;
@@ -84,51 +90,63 @@
 }
 
 @theme {
-  --font-sans: "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans:
+    "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Softer than pure #fff / #000 — the app spends all day on screen. */
-  --color-white: #fcfcfb;
-  --color-black: #0a0d0d;
+  /* Paper and ink — softer than pure #fff / #000, cast a degree cool so the
+     cobalt reads as the same ink at full strength. */
+  --color-white: #fbfcfd;
+  --color-black: #0b0d11;
 
-  /* Graphite: a cool ramp with a faint green-slate cast, so it sits under the
-     strait teal instead of fighting it. zinc and gray both map here. */
-  --color-zinc-50: #f7f8f7;
-  --color-zinc-100: #eff1f0;
-  --color-zinc-200: #e1e4e3;
-  --color-zinc-300: #c8cdcc;
-  --color-zinc-400: #9aa2a1;
-  --color-zinc-500: #6e7877;
-  --color-zinc-600: #55605f;
-  --color-zinc-700: #3d4847;
-  --color-zinc-800: #212a29;
-  --color-zinc-900: #141b1a;
-  --color-zinc-950: #0d1312;
+  /* Ink grey: one cool ramp with a faint blue cast, the diluted version of
+     the ink everything is printed in. zinc and gray both map here. */
+  --color-zinc-50: #f5f7f9;
+  --color-zinc-100: #ecf0f3;
+  --color-zinc-200: #dde2e8;
+  --color-zinc-300: #c2cad3;
+  --color-zinc-400: #939ea9;
+  --color-zinc-500: #67737f;
+  --color-zinc-600: #4f5a66;
+  --color-zinc-700: #38424d;
+  --color-zinc-800: #1f2731;
+  --color-zinc-900: #131a22;
+  --color-zinc-950: #0c1118;
 
-  --color-gray-50: #f7f8f7;
-  --color-gray-100: #eff1f0;
-  --color-gray-200: #e1e4e3;
-  --color-gray-300: #c8cdcc;
-  --color-gray-400: #9aa2a1;
-  --color-gray-500: #6e7877;
-  --color-gray-600: #55605f;
-  --color-gray-700: #3d4847;
-  --color-gray-800: #212a29;
-  --color-gray-900: #141b1a;
-  --color-gray-950: #0d1312;
+  --color-gray-50: #f5f7f9;
+  --color-gray-100: #ecf0f3;
+  --color-gray-200: #dde2e8;
+  --color-gray-300: #c2cad3;
+  --color-gray-400: #939ea9;
+  --color-gray-500: #67737f;
+  --color-gray-600: #4f5a66;
+  --color-gray-700: #38424d;
+  --color-gray-800: #1f2731;
+  --color-gray-900: #131a22;
+  --color-gray-950: #0c1118;
 
-  /* Strait: the single interaction ink. Replaces blue everywhere. */
-  --color-blue-50: #edf5f3;
-  --color-blue-100: #d6e8e4;
-  --color-blue-200: #afd2cb;
-  --color-blue-300: #7fb5ac;
-  --color-blue-400: #4e9389;
-  --color-blue-500: #2e756b;
-  --color-blue-600: #1f5450;
-  --color-blue-700: #1a4441;
-  --color-blue-800: #163634;
-  --color-blue-900: #122b2a;
-  --color-blue-950: #0b1918;
+  /* Cobalt: the single interaction ink. Replaces blue everywhere. */
+  --color-blue-50: #eef2fd;
+  --color-blue-100: #dce4fb;
+  --color-blue-200: #c0cef8;
+  --color-blue-300: #97aef3;
+  --color-blue-400: #6485ec;
+  --color-blue-500: #3c60e0;
+  --color-blue-600: #2447c9;
+  --color-blue-700: #1d39a3;
+  --color-blue-800: #19307e;
+  --color-blue-900: #16285f;
+  --color-blue-950: #0e1738;
+
+  /* A document has edges, not pillows: every radius token collapses to a
+     near-square chamfer. rounded-full is untouched — dots stay dots. */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 6px;
 
   /* Scarcity ramp. These three are the only saturated hues in the chrome, and
      they carry meaning: room / filling / full-or-clashing. */
@@ -173,9 +191,8 @@
 
   body {
     font-family: var(--font-sans);
-    /* Archivo runs a touch wide; a hair of negative tracking keeps the dense
-       course rows from feeling loose. */
-    letter-spacing: -0.006em;
+    /* Schibsted is already compact; tracking stays at the metal. */
+    letter-spacing: 0;
     font-synthesis-weight: none;
   }
 
@@ -313,7 +330,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--color-zinc-300);
     padding: 0.125rem 0.5rem;
     font-size: 0.75rem;

@@ -66,7 +66,7 @@ const sw = /** @type {ServiceWorkerGlobalScope} */ (
   /** @type {unknown} */ (self)
 );
 
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `bcp-shell-${VERSION}`;
 const DATA_CACHE = `bcp-data-${VERSION}`;
 const CACHE_PREFIX = "bcp-";
@@ -92,8 +92,8 @@ const ASSETS_PREFIX = new URL("assets/", SCOPE_URL).pathname;
  * pruned. Turkish needs both subsets: ı lives in `latin`, İ/ş/ğ in `latin-ext`.
  */
 const SHELL_FONTS = [
-  "fonts/archivo-latin.woff2",
-  "fonts/archivo-latin-ext.woff2",
+  "fonts/schibsted-latin.woff2",
+  "fonts/schibsted-latin-ext.woff2",
   "fonts/plexmono-400-latin.woff2",
   "fonts/plexmono-400-latin-ext.woff2",
   "fonts/plexmono-600-latin.woff2",

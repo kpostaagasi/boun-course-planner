@@ -90,6 +90,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **"Boğaz Editorial" visual identity.** The interface now reads like the
+  document it replaces: paper-white ground, one cool ink-grey ramp, cobalt as
+  the single interaction ink, hairline rules instead of shadows, and corner
+  radii collapsed to 1–4px through the theme tokens. The masthead is set like
+  a letterhead and closed with an Oxford rule. Schibsted Grotesk (self-hosted,
+  latin + latin-ext) replaces Archivo; IBM Plex Mono still marks machine data.
+  Timetable blocks became ledger lines — near-white `-50` fill under a firm
+  3px `-600` ink rule — and the PNG export palette was resynchronised with the
+  rendered colours, including the red/amber/blue families that `app.css`
+  remaps. Service-worker cache bumped to v3 for the new font files.
 - Pushes to `main` rebuild and redeploy the site; the scrape itself now runs
   only on the daily cron and on manual dispatch, so a commit no longer fires
   ~60 requests at the university server.
