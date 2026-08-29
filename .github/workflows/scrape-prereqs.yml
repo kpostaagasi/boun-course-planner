@@ -41,5 +41,8 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add public/data/prereqs.json
             git commit -m "chore(data): update course prerequisites"
-            git push
+            # A crawl can outlast another workflow's push to main; rebase onto
+            # the moved tip and retry once. Each workflow owns its own data
+            # file, so the rebase cannot conflict.
+            git push || (git pull --rebase origin main && git push)
           fi
