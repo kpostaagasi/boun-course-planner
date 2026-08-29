@@ -35,6 +35,21 @@
  * trigger is the per-section heading (see SECTION_HEADING), not the capacity
  * label: a page can legitimately carry no capacity and no tables at all. So a
  * BOUN HTML change breaks the run, while a genuinely empty section does not.
+ *
+ * One page shape carries no heading and is still not a layout change: the
+ * registration system answers a section it does not know with
+ *
+ *   <!-- select ders,section from dersbilgileri … -->
+ *   <center>No Such Course In This Semester...</center>
+ *
+ * under the normal "Quota Information" title. The schedule and the quota
+ * database disagree more often than one would hope — BIO 403.02 is listed on
+ * the 2026/2027-1 schedule page but absent from `dersbilgileri`, so a full-term
+ * crawl hits this. Such a page is reported as `absent: true` rather than thrown
+ * on, because a section that does not exist has no quota to record and must not
+ * abort the other 2900 sections. Ruling out the "the query itself is wrong"
+ * case (a bad term code makes *every* page look like this) is the caller's job:
+ * see MAX_ABSENT_RATIO in tools/scrape-quota.mjs.
  */
 
 import * as cheerio from "cheerio";
@@ -76,12 +91,23 @@ import * as cheerio from "cheerio";
  * @property {QuotaRow[]} rows departmental + class quota rows, [] when none.
  * @property {SurnameRestriction[]} surname surname restrictions, [] when none.
  * @property {string[]} warnings non-fatal oddities the caller should escalate.
+ * @property {boolean} absent true when the registration system does not know
+ *   this section at all ("No Such Course In This Semester..."). Everything else
+ *   is empty in that case; the caller should record no section rather than an
+ *   empty one.
  */
 
 const CAPACITY_LABEL = /Max\.\s*Classroom\s*Capacity\s*:?\s*<\/b>\s*([^<]*)/i;
 
 /** The page's own title, used to reject a redirect or error page outright. */
 const PAGE_TITLE = /<title>\s*Quota Information\s*<\/title>/i;
+
+/**
+ * The registration system's own "this section is not in dersbilgileri" body.
+ * A well-formed answer to a question about a section that does not exist — not
+ * a layout change, and not an error page either (the title is the normal one).
+ */
+const NO_SUCH_COURSE = /No\s+Such\s+Course\s+In\s+This\s+Semester/i;
 
 /**
  * The per-section heading, e.g.
@@ -246,6 +272,10 @@ export function parseQuotaPage(html, label = "?") {
   if (!PAGE_TITLE.test(html)) {
     throw new Error(`${label}: not a Quota Information page (title missing)`);
   }
+  // Checked before the heading, because this page deliberately omits it.
+  if (NO_SUCH_COURSE.test(html)) {
+    return { cap: null, rows: [], surname: [], warnings: [], absent: true };
+  }
   const headingMatch = html.match(SECTION_HEADING);
   if (!headingMatch) {
     throw new Error(
@@ -297,5 +327,5 @@ export function parseQuotaPage(html, label = "?") {
     warnings.push(...parsed.warnings.map((w) => `${label}: ${w}`));
   }
 
-  return { cap, rows, surname, warnings };
+  return { cap, rows, surname, warnings, absent: false };
 }
