@@ -22,6 +22,10 @@
  *   - Parse warnings (an unrecognised quota table, a non-numeric cell) are
  *     counted and abort the run past a threshold, so a BOUN layout change
  *     surfaces instead of zeroing out every section's enrolment.
+ *   - Sections the registration system disowns ("No Such Course In This
+ *     Semester...", i.e. on the schedule page but not in `dersbilgileri`) are
+ *     skipped rather than stored, and are counted against MAX_ABSENT_RATIO so
+ *     a query we are asking wrong cannot pass as a few stale schedule rows.
  *   - --dump-unrecognised writes the raw HTML of any page that produced a
  *     warning to tools/lib/fixtures/ so it can become a real test fixture.
  */
@@ -48,6 +52,27 @@ const MAX_FAILURE_RATIO = 0.05;
 const MAX_SHRINK_RATIO = 0.5;
 /** Parse warnings tolerated before the run is rejected. */
 const MAX_WARNINGS = 20;
+/**
+ * Share of sections the registration system may disown ("No Such Course In This
+ * Semester...") before the run is treated as a broken query rather than as the
+ * schedule and the quota database disagreeing.
+ *
+ * Both happen. The benign case is real and unavoidable: BIO 403.02 is on the
+ * 2026/2027-1 schedule page and absent from `dersbilgileri`, and one such
+ * section used to abort the whole 2942-section crawl. The malign case is a
+ * question we asked wrong — a bad term code, or a section-key format we stopped
+ * splitting correctly — which makes *every* page answer this way. A ratio
+ * separates the two: a handful of stale schedule rows stay under it, a
+ * systematically wrong query blows straight through it.
+ */
+const MAX_ABSENT_RATIO = 0.05;
+/**
+ * Absolute floor below which MAX_ABSENT_RATIO is not applied at all. A ratio is
+ * meaningless on a `--limit 10` smoke run — one stale schedule row there is
+ * 10%, ten times the budget — while a genuinely wrong query disowns every page
+ * it asks about and clears this floor on the same tiny sample.
+ */
+const MIN_ABSENT_TO_FAIL = 3;
 /**
  * How far the share of sections publishing a capacity may fall relative to the
  * stored file before the run is treated as a layout change rather than a data
@@ -161,9 +186,10 @@ function compact(page) {
  * @param {Record<string, StoredSection>} sections
  * @param {number} attempted
  * @param {number} failed
+ * @param {number} absent sections answered with "No Such Course In This Semester..."
  * @param {boolean} partial true for a --limit smoke run: skip the size gates.
  */
-function validate(sections, attempted, failed, partial) {
+function validate(sections, attempted, failed, absent, partial) {
   const count = Object.keys(sections).length;
   if (count === 0) {
     throw new Error("no sections parsed — refusing to write");
@@ -172,6 +198,15 @@ function validate(sections, attempted, failed, partial) {
     throw new Error(
       `${failed}/${attempted} quota pages failed (max ${(MAX_FAILURE_RATIO * 100).toFixed(0)}%)` +
         " — source site likely broken",
+    );
+  }
+  // Unlike the size gates below, this one also applies to a --limit smoke run:
+  // the whole point of a smoke run is to catch a query we are asking wrong, and
+  // that is exactly what a wall of absent sections looks like.
+  if (attempted > 0 && absent >= MIN_ABSENT_TO_FAIL && absent / attempted > MAX_ABSENT_RATIO) {
+    throw new Error(
+      `${absent}/${attempted} sections unknown to the registration system ` +
+        `(max ${(MAX_ABSENT_RATIO * 100).toFixed(0)}%) — wrong term code or section-key format?`,
     );
   }
   if (partial) return;
@@ -251,6 +286,11 @@ async function main() {
 
   /** @type {string[]} */
   const warnings = [];
+  /**
+   * Sections the registration system answered "No Such Course" for.
+   * @type {string[]}
+   */
+  const absent = [];
   let failed = 0;
   let done = 0;
 
@@ -279,9 +319,16 @@ async function main() {
       if (options.dumpUnrecognised) dumpHtml(key, html);
       throw error;
     }
-    if (page.warnings.length > 0 && options.dumpUnrecognised) dumpHtml(key, html);
-    warnings.push(...page.warnings);
-    sections[key] = compact(page);
+    // A section the registration system does not know has no quota to store,
+    // and storing an empty record would misreport it as "no restrictions". It
+    // still counts as a page processed, so progress stays honest.
+    if (page.absent) {
+      absent.push(key);
+    } else {
+      if (page.warnings.length > 0 && options.dumpUnrecognised) dumpHtml(key, html);
+      warnings.push(...page.warnings);
+      sections[key] = compact(page);
+    }
 
     done++;
     if (done % 100 === 0) {
@@ -294,8 +341,15 @@ async function main() {
     throw new Error(`${warnings.length} parse warnings (max ${MAX_WARNINGS})`);
   }
 
+  if (absent.length > 0) {
+    console.warn(
+      `  ${absent.length}/${planned.length} sections unknown to the registration ` +
+        `system: ${absent.slice(0, 20).join(", ")}${absent.length > 20 ? ", …" : ""}`,
+    );
+  }
+
   const partial = options.limit !== null || planned.length < queue.length;
-  validate(sections, planned.length, failed, partial);
+  validate(sections, planned.length, failed, absent.length, partial);
 
   const output = {
     meta: { term: options.semester, scrapedAt: new Date().toISOString() },
@@ -304,7 +358,7 @@ async function main() {
 
   if (options.dryRun) {
     console.log(
-      `Dry run: ${Object.keys(sections).length} sections, ` +
+      `Dry run: ${Object.keys(sections).length} sections, ${absent.length} absent, ` +
         `${JSON.stringify(output).length} bytes — nothing written.`,
     );
     return;
@@ -313,7 +367,7 @@ async function main() {
   writeFileSync(OUT_FILE, JSON.stringify(output) + "\n");
   console.log(
     `quota.json: written (${Object.keys(sections).length} sections, ${failed} failed,` +
-      ` ${warnings.length} warnings)`,
+      ` ${absent.length} absent, ${warnings.length} warnings)`,
   );
 }
 

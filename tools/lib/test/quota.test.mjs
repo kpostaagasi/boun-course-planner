@@ -157,6 +157,47 @@ test("a quota table missing Quota/Current fails loudly", () => {
   assert.throws(() => parseQuotaPage(html, "MATH101.01"), /missing Quota\/Current/);
 });
 
+test("a section the registration system does not know is absent, not a failure (BIO 403.02)", () => {
+  // Real capture: abbr=BIO&code=403&section=02&donem=2026/2027-1. BIO 403.02 is
+  // listed on the 2026/2027-1 schedule page but is not in `dersbilgileri`, so
+  // quotasearch.asp answers "No Such Course In This Semester..." under the
+  // normal title and with no section heading. This aborted the 28 Aug 2026
+  // full-term crawl at section 2xx of 2942; it must report, not throw.
+  const page = parseQuotaPage(loadFixture("quotasearch-bio403-02.html"), "BIO403.02");
+
+  assert.equal(page.absent, true);
+  assert.equal(page.cap, null);
+  assert.deepEqual(page.rows, []);
+  assert.deepEqual(page.surname, []);
+  // Not a warning either: warnings are budgeted (MAX_WARNINGS) and a term can
+  // legitimately carry more stale schedule rows than that budget allows.
+  assert.deepEqual(page.warnings, []);
+});
+
+test("a page that does exist is not marked absent", () => {
+  for (const fixture of [
+    "quotasearch-math101-01.html",
+    "quotasearch-cmpe150-01.html",
+    "quotasearch-ad501-01.html",
+    "quotasearch-ad251-05.html",
+  ]) {
+    assert.equal(parseQuotaPage(loadFixture(fixture), "X.01").absent, false, fixture);
+  }
+});
+
+test("the absent check is not a substitute for the title check", () => {
+  // The rate-limit Alert page must still be rejected outright rather than
+  // quietly counted as "this section does not exist".
+  assert.throws(
+    () =>
+      parseQuotaPage(
+        "<html><head><title>Alert</title></head><body>No Such Course In This Semester...</body></html>",
+        "X.01",
+      ),
+    /not a Quota Information page/,
+  );
+});
+
 test("a missing section heading fails loudly instead of returning empty", () => {
   // The heading is the format-change detector, because a missing capacity block
   // is a legitimate page (AD501.01) while a missing heading is not.
