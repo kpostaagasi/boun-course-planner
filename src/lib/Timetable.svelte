@@ -331,11 +331,6 @@
     <span class="text-zinc-600 dark:text-zinc-400">
       {t("timetable.semesterEnd")}: {formatDate(calendarInfo.end)}
     </span>
-    {#each calendarInfo.holidays as h}
-      <span class="rounded-sm bg-zinc-200 px-1.5 py-0.5 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">
-        {h.name} ({formatDate(h.date)})
-      </span>
-    {/each}
   {/if}
   <button
     type="button"

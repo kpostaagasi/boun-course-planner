@@ -259,8 +259,7 @@ export function timetableCell(page: Page, dayIndex: number, hour: number): Locat
 
 /** The semester `<select>` in the header. */
 export function semesterSelect(page: Page): Locator {
-  // The only other select in the app is NewlyEligible's, which carries this id.
-  return page.locator("select:not(#newly-term-select)");
+  return page.locator("select");
 }
 
 /**

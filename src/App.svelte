@@ -5,7 +5,6 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import CommandPalette from "./lib/CommandPalette.svelte";
-  import NewlyEligible from "./lib/NewlyEligible.svelte";
   import { loadPrereqs, loadCompleted, loadRoadmap, loadOfferings, initUrlSync } from "./lib/globalState.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
@@ -40,7 +39,6 @@
     >
       <Timetable />
       <CourseList />
-      <NewlyEligible />
     </div>
     <div class="w-full md:w-7/12 p-2 flex flex-col grow h-full">
       <CourseCatalogue />

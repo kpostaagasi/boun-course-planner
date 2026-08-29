@@ -306,14 +306,6 @@ export const dict = {
     en: "Offered in {n} terms since 2017",
     tr: "2017'den beri {n} dönemde açıldı",
   },
-  "newly.title": { en: "Newly eligible", tr: "Yeni uygun hale gelenler" },
-  "newly.completedAsOf": { en: "Completed as of", tr: "Tamamlanmış kabul dönemi" },
-  "newly.now": { en: "Now", tr: "Şimdi" },
-  "newly.missingPrereqs": { en: "{n} missing prereqs", tr: "{n} eksik ön koşul" },
-  "newly.empty": {
-    en: "No courses would become newly eligible.",
-    tr: "Yeni uygun hale gelecek ders yok.",
-  },
   "list.empty": { en: "You have no selected course", tr: "Seçili dersiniz yok" },
   // The TR wording here is load-bearing: e2e/helpers.ts locates the figure with
   // /(Total Credits|Toplam Kredi)/i, so changing it breaks every spec that
