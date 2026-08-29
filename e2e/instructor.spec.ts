@@ -36,7 +36,7 @@ type Candidate = {
  * Constraints, all deliberate:
  * - never a placeholder cell (`STAFF STAFF` is 82 sections of this term and is
  *   not a person),
- * - between 2 and PAGE_SIZE sections, so instructor mode is a visible
+ * - between 2 and PAGE_SIZE-1 sections, so instructor mode is a visible
  *   narrowing *and* the whole set fits on the first pagination page,
  * - at least one section with a day and an hour, so the panel has a schedule
  *   to render.
@@ -104,7 +104,9 @@ async function pickInstructor(page: Page): Promise<Candidate> {
         .filter(
           ([name, keys]) =>
             keys.length >= 2 &&
-            keys.length <= maxSections &&
+            // Strictly below the page size: narrowing must be observable
+            // against the PAGE_SIZE rows the fresh catalogue shows.
+            keys.length < maxSections &&
             scheduledByName.has(name),
         )
         // Most sections first: the widest narrowing this term allows.
