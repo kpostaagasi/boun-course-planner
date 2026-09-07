@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-07T12:54:35.670Z",
+  "title": "Design System: BOUN Course Planner",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#fbfcfd",
+        "tonalRamp": [
+          "#0c1118",
+          "#131a22",
+          "#1f2731",
+          "#38424d",
+          "#67737f",
+          "#939ea9",
+          "#c2cad3",
+          "#f5f7f9"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#0b0d11",
+        "tonalRamp": [
+          "#0b0d11",
+          "#0c1118",
+          "#131a22",
+          "#1f2731",
+          "#38424d",
+          "#67737f",
+          "#939ea9",
+          "#dde2e8"
+        ]
+      },
+      "ink-grey-600": {
+        "role": "neutral",
+        "displayName": "Ink Grey (workhorse secondary text)",
+        "canonical": "#4f5a66",
+        "tonalRamp": [
+          "#0c1118",
+          "#131a22",
+          "#1f2731",
+          "#38424d",
+          "#4f5a66",
+          "#67737f",
+          "#939ea9",
+          "#c2cad3"
+        ]
+      },
+      "cobalt-500": {
+        "role": "primary",
+        "displayName": "Bosphorus Cobalt",
+        "canonical": "#3c60e0",
+        "tonalRamp": [
+          "#0e1738",
+          "#16285f",
+          "#19307e",
+          "#1d39a3",
+          "#2447c9",
+          "#3c60e0",
+          "#6485ec",
+          "#97aef3"
+        ]
+      },
+      "scarcity-open-500": {
+        "role": "secondary",
+        "displayName": "Scarcity Open (seats left)",
+        "canonical": "#3e7c4a",
+        "tonalRamp": [
+          "#17301d",
+          "#1e3e25",
+          "#27512f",
+          "#2f643a",
+          "#3e7c4a",
+          "#5c9666",
+          "#86b48d",
+          "#d8e8da"
+        ]
+      },
+      "scarcity-filling-400": {
+        "role": "secondary",
+        "displayName": "Scarcity Filling (near-full, stale)",
+        "canonical": "#c08428",
+        "tonalRamp": [
+          "#3f2a0c",
+          "#52350f",
+          "#6a4513",
+          "#855717",
+          "#a26d1d",
+          "#c08428",
+          "#d9a94b",
+          "#f4e4c2"
+        ]
+      },
+      "scarcity-full-500": {
+        "role": "secondary",
+        "displayName": "Scarcity Full (full, over-enrolled, clash)",
+        "canonical": "#b33a30",
+        "tonalRamp": [
+          "#481713",
+          "#5c1d18",
+          "#77251f",
+          "#942e26",
+          "#b33a30",
+          "#c4564c",
+          "#d9827a",
+          "#f5d9d6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "masthead": {
+        "displayName": "Masthead",
+        "purpose": "The app title only. One instance, in the header bar."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel and card titles, total-credit values, selection count."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Course names, descriptions, prose. Human-authored language."
+      },
+      "data": {
+        "displayName": "Data (mono, tabular)",
+        "purpose": "Anything the registration system produced: codes, hours, rooms, seats, timestamps."
+      },
+      "label": {
+        "displayName": "Eyebrow",
+        "purpose": "Uppercase mono section headings, day-column headers, dialog titles. Never decoration."
+      },
+      "spine": {
+        "displayName": "Hour Spine",
+        "purpose": "The timetable's hour gutter; minutes drop to a smaller, lighter mark at the same ink."
+      },
+      "chip": {
+        "displayName": "Chip",
+        "purpose": "Department chips only: mono 0.75rem/500, unchromed and unfilled."
+      }
+    },
+    "shadows": [
+      {
+        "name": "row-rule",
+        "value": "inset 0 1px 0 0 #ecf0f3",
+        "purpose": "The timetable's hour line. A shadow only because a real border-top would shift the cell's content box and slice a multi-hour course into slabs. Dark: inset 0 1px 0 0 color-mix(in srgb, #38424d 60%, transparent)."
+      },
+      {
+        "name": "search-lift",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "The one residual lift in the app, on the catalogue search wrapper. Not a token to reuse — this system is flat."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-colors",
+        "value": "150ms linear (color, border-color)",
+        "purpose": "The house hover: graphite to cobalt on borders and text."
+      },
+      {
+        "name": "surface-colors",
+        "value": "200ms linear",
+        "purpose": "Row hover fills, primary button fills, dialog and palette row backgrounds."
+      },
+      {
+        "name": "meter-fill",
+        "value": "220ms cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Occupancy meter fill and over-enrolment tail. Disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms !important on all animations and transitions",
+        "purpose": "Global prefers-reduced-motion reset in app.css @layer base."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid cobalt. Used sparingly — filter Apply, calendar export.",
+      "html": "<button class=\"ds-btn-primary\">Apply</button>",
+      "css": ".ds-btn-primary { font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); font-size: 0.875rem; font-weight: 500; color: var(--color-white, #fbfcfd); background: var(--color-blue-600, #2447c9); border: none; border-radius: 2px; padding: 0.375rem 0.75rem; cursor: pointer; transition: background-color 200ms; } .ds-btn-primary:hover { background: var(--color-blue-700, #1d39a3); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-blue-500, #3c60e0); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "The default secondary action: graphite at rest, cobalt border and text on contact.",
+      "html": "<button class=\"ds-btn-quiet\">Copy link</button>",
+      "css": ".ds-btn-quiet { display: inline-flex; align-items: center; gap: 0.375rem; font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); font-size: 0.75rem; font-weight: 500; color: var(--color-zinc-700, #38424d); background: transparent; border: 1px solid var(--color-zinc-300, #c2cad3); border-radius: 2px; padding: 0.125rem 0.5rem; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-btn-quiet:hover:not(:disabled) { border-color: var(--color-blue-500, #3c60e0); color: var(--color-blue-600, #2447c9); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--color-blue-500, #3c60e0); outline-offset: 2px; } .ds-btn-quiet:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Add / Remove Action Pill",
+      "kind": "button",
+      "refersTo": "pill-add",
+      "description": "Filled action pill. Three hues only: cobalt (syllabus), open-green (add), full-red (remove).",
+      "html": "<div style=\"display:flex; gap:0.5rem;\"><button class=\"ds-pill ds-pill-add\" aria-label=\"Add section\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4v16m8-8H4\"/></svg></button><button class=\"ds-pill ds-pill-remove\" aria-label=\"Remove section\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M20 12H4\"/></svg></button></div>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 2px; padding: 0.5rem; cursor: pointer; transition: background-color 200ms, color 200ms; } .ds-pill svg { height: 1.25rem; width: 1.25rem; } .ds-pill-add { background: var(--color-green-100, #d8e8da); color: var(--color-green-600, #2f643a); } .ds-pill-add:hover { background: var(--color-green-200, #b4d2b8); } .ds-pill-remove { background: var(--color-red-100, #f5d9d6); color: var(--color-red-600, #942e26); } .ds-pill-remove:hover { background: var(--color-red-200, #eab3ad); } .ds-pill:focus-visible { outline: 2px solid var(--color-blue-500, #3c60e0); outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "The catalogue search field: icon inset left, cobalt border and 1px ring on focus.",
+      "html": "<div class=\"ds-search\"><svg class=\"ds-search-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"/></svg><input class=\"ds-input-search\" type=\"search\" placeholder=\"Search courses\" /></div>",
+      "css": ".ds-search { position: relative; } .ds-search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); height: 1.25rem; width: 1.25rem; color: var(--color-zinc-400, #939ea9); pointer-events: none; } .ds-input-search { width: 100%; font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); font-size: 1rem; color: var(--color-zinc-900, #131a22); background: var(--color-white, #fbfcfd); border: 1px solid var(--color-zinc-200, #dde2e8); border-radius: 2px; padding: 0.375rem 0.75rem 0.375rem 2.5rem; transition: border-color 150ms, box-shadow 150ms; } .ds-input-search::placeholder { color: var(--color-zinc-400, #939ea9); } .ds-input-search:focus { outline: none; border-color: var(--color-blue-500, #3c60e0); box-shadow: 0 0 0 1px var(--color-blue-500, #3c60e0); }"
+    },
+    {
+      "name": "Semester Select",
+      "kind": "input",
+      "refersTo": "select-semester",
+      "description": "Mono, tabular, appearance-none with a hand-placed chevron. Hover takes the cobalt border.",
+      "html": "<div class=\"ds-select-wrap\"><select class=\"ds-select\"><option>2026/2027-1</option><option>2025/2026-2</option></select><svg class=\"ds-select-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 9l4-4 4 4m0 6l-4 4-4-4\"/></svg></div>",
+      "css": ".ds-select-wrap { position: relative; display: inline-block; } .ds-select { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.8125rem; font-weight: 600; color: var(--color-zinc-900, #131a22); background: var(--color-white, #fbfcfd); border: 1px solid var(--color-zinc-300, #c2cad3); border-radius: 2px; padding: 0.25rem 1.5rem 0.25rem 0.25rem; appearance: none; cursor: pointer; transition: border-color 150ms; } .ds-select:hover { border-color: var(--color-blue-500, #3c60e0); } .ds-select:focus { outline: none; box-shadow: 0 0 0 2px var(--color-blue-500, #3c60e0); } .ds-select-icon { position: absolute; right: 0.25rem; top: 50%; transform: translateY(-50%); height: 1.25rem; width: 1.25rem; color: var(--color-zinc-400, #939ea9); pointer-events: none; }"
+    },
+    {
+      "name": "Card / Panel",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The one container template: 3px radius, 1px hairline, paper surface, eyebrow-labelled rows divided by hairlines.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><span class=\"ds-title\">Courses</span><span class=\"ds-count\">3</span><button class=\"ds-btn-quiet\" style=\"margin-left:auto;\">Copy link</button></div><div class=\"ds-row\"><span class=\"ds-code\">CMPE150.01</span><span class=\"ds-name\">Introduction to Computing</span><span class=\"ds-credits\">3</span></div><div class=\"ds-row\"><span class=\"ds-code\">MATH101.03</span><span class=\"ds-name\">Calculus I</span><span class=\"ds-credits\">4</span></div><div class=\"ds-card-foot\"><span class=\"ds-eyebrow\">Total credits</span><span class=\"ds-total\">7</span></div></div>",
+      "css": ".ds-card { font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); background: var(--color-white, #fbfcfd); color: var(--color-zinc-900, #131a22); border: 1px solid var(--color-zinc-200, #dde2e8); border-radius: 3px; overflow: hidden; } .ds-card-head { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.625rem 1rem; border-bottom: 1px solid var(--color-zinc-200, #dde2e8); } .ds-title { font-size: 0.9375rem; font-weight: 600; } .ds-count, .ds-credits { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.6875rem; color: var(--color-zinc-600, #4f5a66); } .ds-row { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.375rem 1rem; border-top: 1px solid var(--color-zinc-100, #ecf0f3); transition: background-color 200ms; } .ds-row:first-of-type { border-top: none; } .ds-row:hover { background: var(--color-zinc-50, #f5f7f9); } .ds-code { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.875rem; font-weight: 600; } .ds-name { font-size: 0.875rem; color: var(--color-zinc-600, #4f5a66); } .ds-credits { margin-left: auto; } .ds-card-foot { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.625rem 1rem; border-top: 1px solid var(--color-zinc-200, #dde2e8); } .ds-eyebrow { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-zinc-600, #4f5a66); } .ds-total { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.9375rem; font-weight: 600; }"
+    },
+    {
+      "name": "Occupancy Meter",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature element. A 2px rule whose fill is current/quota and whose hatched tail runs PAST the end when a section is over-enrolled, instead of clamping at 100% and lying about a full section.",
+      "html": "<div style=\"display:flex; flex-direction:column; gap:0.75rem; max-width:11rem;\"><div><span class=\"ds-seats\">12 / 40</span><div class=\"ds-meter ds-meter-open\" style=\"--fill:0.3; --over:0;\" aria-hidden=\"true\"></div></div><div><span class=\"ds-seats\">36 / 40</span><div class=\"ds-meter ds-meter-filling\" style=\"--fill:0.9; --over:0;\" aria-hidden=\"true\"></div></div><div><span class=\"ds-seats ds-seats-full\">44 / 40 &middot; over 4</span><div class=\"ds-meter ds-meter-full\" style=\"--fill:1; --over:0.1;\" aria-hidden=\"true\"></div></div></div>",
+      "css": ".ds-seats { display: block; font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.8125rem; color: var(--color-zinc-600, #4f5a66); margin-bottom: 0.25rem; } .ds-seats-full { font-weight: 500; color: var(--color-red-600, #942e26); } .ds-meter { --fill: 0; --over: 0; position: relative; display: block; width: 100%; max-width: 11rem; height: 2px; background: var(--color-zinc-200, #dde2e8); overflow: visible; } .ds-meter-open { color: var(--color-green-500, #3e7c4a); } .ds-meter-filling { color: var(--color-amber-400, #c08428); } .ds-meter-full { color: var(--color-red-500, #b33a30); } .ds-meter::before { content: \"\"; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: calc(var(--fill) * 100%); background: currentColor; transition: inline-size 220ms cubic-bezier(0.2, 0, 0, 1); } .ds-meter::after { content: \"\"; position: absolute; inset-block: -1px; inset-inline-start: 100%; inline-size: calc(var(--over) * 100%); background: repeating-linear-gradient(-45deg, currentColor 0 2px, transparent 2px 4px); transition: inline-size 220ms cubic-bezier(0.2, 0, 0, 1); } @media (prefers-reduced-motion: reduce) { .ds-meter::before, .ds-meter::after { transition: none; } }"
+    },
+    {
+      "name": "Timetable Block",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "A selected course inside the grid: near-white fill, 3px left accent rule, no radius, hue assigned by hash of the section key. The hour spine and row rule frame it.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-grid-head\"><span class=\"ds-eyebrow\">Mon</span></div><div class=\"ds-grid-row ds-rule\"><span class=\"ds-spine\">9<span class=\"ds-spine-min\">:00</span></span><div class=\"ds-cell\"><div class=\"ds-block ds-block-teal\">CMPE150.01<br>TB 130</div></div></div><div class=\"ds-grid-row ds-rule\"><span class=\"ds-spine\">10<span class=\"ds-spine-min\">:00</span></span><div class=\"ds-cell\"><div class=\"ds-block ds-block-teal\"></div></div></div><div class=\"ds-grid-row ds-rule\"><span class=\"ds-spine\">11<span class=\"ds-spine-min\">:00</span></span><div class=\"ds-cell ds-cell-clash\"><div class=\"ds-block ds-block-indigo\" style=\"left:0; width:calc(50% - 1px);\">MATH101</div><div class=\"ds-block ds-block-pink\" style=\"left:50%; width:calc(50% - 1px);\">PHYS121</div></div></div></div>",
+      "css": ".ds-grid { font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); background: var(--color-white, #fbfcfd); border: 1px solid var(--color-zinc-200, #dde2e8); border-radius: 3px; overflow: hidden; width: 16rem; } .ds-grid-head { display: flex; padding: 0.5rem 0 0.375rem 3.5rem; border-bottom: 1px solid var(--color-zinc-200, #dde2e8); } .ds-grid-row { display: flex; align-items: stretch; height: 2.25rem; } .ds-rule { box-shadow: inset 0 1px 0 0 var(--color-zinc-100, #ecf0f3); } .ds-spine { flex: 0 0 3.5rem; font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 0.6875rem; line-height: 1; color: var(--color-zinc-600, #4f5a66); text-align: right; padding: 0.375rem 0.5rem 0 0; border-right: 1px solid var(--color-zinc-200, #dde2e8); white-space: nowrap; } .ds-spine-min { font-weight: 400; font-size: 0.5625rem; } .ds-cell { position: relative; flex: 1 1 auto; } .ds-cell-clash { background: var(--color-red-100, #f5d9d6); box-shadow: inset 0 0 0 2px var(--color-red-500, #b33a30); } .ds-block { position: absolute; inset-block: 0; left: 0; width: 100%; overflow: hidden; border-left: 3px solid; border-radius: 0; padding: 0 0.25rem; font-size: 0.75rem; line-height: 1.15; text-align: left; } .ds-block-teal { background: #f0fdfa; color: #005f5a; border-left-color: #009689; } .ds-block-indigo { background: #eef2ff; color: #372aac; border-left-color: #4f39f6; } .ds-block-pink { background: #fdf2f8; color: #a3004c; border-left-color: #e60076; } .ds-eyebrow { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-zinc-600, #4f5a66); }"
+    },
+    {
+      "name": "Command Palette Row",
+      "kind": "nav",
+      "refersTo": "palette-row-active",
+      "description": "42rem panel, 2px ink border, no shadow. Keyboard-active and hover share one state: a cobalt-50 fill.",
+      "html": "<div class=\"ds-palette\"><input class=\"ds-palette-input\" placeholder=\"Search courses\" value=\"calculus\" /><ul class=\"ds-palette-list\"><li class=\"ds-palette-group\"><span class=\"ds-code-sm\">MATH101</span><span class=\"ds-group-name\">Calculus I</span><span class=\"ds-eyebrow\" style=\"margin-left:auto;\">6 sections</span></li><li class=\"ds-palette-row ds-palette-row-active\"><div class=\"ds-palette-line\"><span class=\"ds-code-sm\">MATH101.03</span><span class=\"ds-palette-seats\">18 left</span></div><div class=\"ds-palette-meta\"><span class=\"ds-mono\">Mo 9 We 10 Fr 11</span><span>Y. Demir</span><span style=\"margin-left:auto;\">4 cr</span></div></li><li class=\"ds-palette-row\"><div class=\"ds-palette-line\"><span class=\"ds-code-sm\">MATH101.04</span><span class=\"ds-palette-seats ds-palette-seats-full\">FULL</span></div><div class=\"ds-palette-meta\"><span class=\"ds-mono\">Tu 10 Th 11</span><span>A. Kaya</span><span style=\"margin-left:auto;\">4 cr</span></div></li></ul><div class=\"ds-palette-foot\">Navigate &middot; &crarr; Add &middot; Esc Close</div></div>",
+      "css": ".ds-palette { font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); width: 26rem; background: var(--color-white, #fbfcfd); border: 2px solid var(--color-zinc-900, #131a22); border-radius: 3px; overflow: hidden; } .ds-palette-input { width: 100%; box-sizing: border-box; font-size: 1.125rem; padding: 0.75rem; color: var(--color-zinc-900, #131a22); background: transparent; border: none; border-bottom: 1px solid var(--color-zinc-200, #dde2e8); } .ds-palette-input:focus { outline: none; } .ds-palette-list { list-style: none; margin: 0; padding: 0; } .ds-palette-group { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.25rem 0.75rem; background: var(--color-zinc-50, #f5f7f9); border-top: 1px solid var(--color-zinc-200, #dde2e8); } .ds-group-name { font-size: 0.75rem; color: var(--color-zinc-600, #4f5a66); } .ds-palette-row { padding: 0.5rem 0.75rem; cursor: pointer; transition: background-color 200ms; } .ds-palette-row:hover, .ds-palette-row-active { background: var(--color-blue-50, #eef2fd); } .ds-palette-line { display: flex; align-items: baseline; gap: 0.5rem; } .ds-code-sm { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; font-size: 0.875rem; font-weight: 600; } .ds-palette-seats { margin-left: auto; font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-size: 0.6875rem; color: var(--color-zinc-600, #4f5a66); } .ds-palette-seats-full { font-weight: 600; color: var(--color-red-600, #942e26); } .ds-palette-meta { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.75rem; color: var(--color-zinc-600, #4f5a66); } .ds-mono { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; } .ds-palette-foot { padding: 0.375rem 0.75rem; font-size: 0.75rem; color: var(--color-zinc-600, #4f5a66); border-top: 1px solid var(--color-zinc-200, #dde2e8); } .ds-eyebrow { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-zinc-600, #4f5a66); }"
+    },
+    {
+      "name": "Category Chip",
+      "kind": "chip",
+      "refersTo": "chip-category",
+      "description": "Unchromed mono text (0.75rem/500) — sixty filled pills read as a wall. Cobalt on hover. The instructor variant is the app's only round shape.",
+      "html": "<div style=\"display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;\"><button class=\"ds-chip\">CMPE</button><button class=\"ds-chip\">MATH</button><button class=\"ds-chip\">HIST</button><button class=\"ds-chip-instructor\">Y. Demir</button></div>",
+      "css": ".ds-chip { font-family: var(--color-font-mono, Plex Mono, ui-monospace, monospace); font-size: 0.75rem; font-weight: 500; color: var(--color-zinc-600, #4f5a66); background: none; border: none; padding: 0 0.125rem; cursor: pointer; transition: color 150ms; } .ds-chip:hover { color: var(--color-blue-600, #2447c9); } .ds-chip-instructor { display: inline-flex; align-items: center; gap: 0.375rem; font-family: var(--color-font-sans, Schibsted Grotesk, system-ui, sans-serif); font-size: 0.75rem; font-weight: 500; color: var(--color-zinc-700, #38424d); background: transparent; border: 1px solid var(--color-zinc-300, #c2cad3); border-radius: 9999px; padding: 0.125rem 0.5rem; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-chip-instructor:hover { border-color: var(--color-blue-500, #3c60e0); color: var(--color-blue-600, #2447c9); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Boğaz Editorial",
+    "overview": "A registration tool is a document, not an app. This one is drawn to read like the official schedule form it replaces: paper, ink, ruled columns, and exactly one stamp of colour. The chrome is a single cool ink-grey ramp printed on paper white; cobalt — the Bosphorus blue — is the only interaction ink in the interface; saturated warm colour is withheld for the one thing worth shouting about, which is occupancy pressure and clashes. Nothing is coloured decoratively and nothing floats. Hierarchy is drawn with hairline rules, weight and whitespace.\n\nThe type does the editorial work. Schibsted Grotesk, a newspaper grotesk drawn for mastheads, carries the interface; IBM Plex Mono carries anything the registration system produced — course codes, slot times, seat counts, timestamps. The mono is semantic, not decorative: it marks machine data, and its tabular figures stop numbers from shifting width as they change. Both faces are self-hosted, because the service worker only caches same-origin requests and a CDN webfont would vanish exactly when the app matters most: offline, mid-campus.\n\nThe system is deliberately dense and deliberately quiet. Components are graphite at rest and take the cobalt ink on contact. Radii collapse to 1–4px throughout, because a document has edges, not pillows. The one place the design is allowed to be loud is the occupancy meter, since nothing else in the BOUN ecosystem tells a student whether a section is actually gettable.",
+    "keyCharacteristics": [
+      "One neutral ramp (cool ink-grey), one interaction ink (cobalt), one meaning-bearing ramp (open / filling / full).",
+      "Mono means machine data; sans means human language. No exceptions.",
+      "Hairline rules and whitespace instead of shadows; near-square corners (1–4px).",
+      "Dense, tabular, print-adjacent: 11–15px text, 2.25rem grid rows, tabular figures everywhere numbers appear.",
+      "Quiet at rest, ink on contact: graphite borders and labels that turn cobalt on hover.",
+      "Unknown data is stated, italicised or greyed — never rendered as a confident number."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Cobalt is the only interaction colour in the chrome. If an element responds to the cursor, it turns cobalt; if it turns cobalt, it responds to the cursor. No second accent is introduced for emphasis, branding or variety.",
+        "section": "colors"
+      },
+      {
+        "name": "The Scarcity Rule",
+        "body": "Green, amber and red are reserved for capacity and risk: seats, occupancy, clashes, staleness. Credits, ECTS, section counts and selection counts stay on the ink-grey ramp even when a status pill is tempting — a count is data, not an alert; green means seats.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ledger Line Rule",
+        "body": "The twelve course hues are identity, not decoration. They appear only as a timetable block's -50 fill with a 3px -600 left rule, are assigned by hash rather than by selection order, and never leak into buttons, badges or chrome.",
+        "section": "colors"
+      },
+      {
+        "name": "The Machine Data Rule",
+        "body": "If the registration system produced the value — a code, an hour, a room, a seat count, a timestamp — it is set in mono with tabular figures. If a human wrote it, it is set in the grotesk. This is how a student tells, at a glance, what is quoted and what is authored.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ink Floor Rule",
+        "body": "Small text (≤11px) never goes lighter than Ink Grey 600 on paper or Ink Grey 400 on ink. Contrast is checked by the axe gate in both schemes, so a lighter grey is not a style decision, it is a failing test.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Document Rule",
+        "body": "Surfaces do not lift. If something needs to separate from its neighbour, it gets a hairline, a tonal step, or whitespace — in that order. New shadow tokens are not part of this system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Annotation Slot Rule",
+        "body": "Every explanation on a card lands in one line at the foot of its text column, above a hairline. The marks that own an explanation are disclosure buttons that write their sentence into it, because a title tooltip reaches neither a touch user nor a screen reader. One slot per card, always in the same position.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do express interaction only in cobalt: hover:border-blue-500 hover:text-blue-600 (dark: blue-400/blue-300) is the house hover, and the global 2px Cobalt 500 :focus-visible outline is the house focus.",
+      "Do set every machine-produced value in .u-data (mono + tabular figures) and every human label in the grotesk.",
+      "Do reuse the container template — rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 with divide-y — for any new panel.",
+      "Do separate surfaces with a hairline, a tonal step or whitespace, in that order.",
+      "Do keep small text at Ink Grey 600 on paper and Ink Grey 400 on ink, and re-run the axe gate in both schemes after touching a colour.",
+      "Do state absent data as absent: italic \"unpublished\", a greyed \"?\" for unknown prerequisites, an \"≈\" for an inferred term.",
+      "Do reach for .btn-quiet for secondary actions, and let the native disabled attribute carry the disabled state.",
+      "Do honour prefers-reduced-motion: the global reset kills transitions, and the meter opts out explicitly.",
+      "Do give an inline text control at least a 24px target (min-h-6) and an icon control 44px on touch.",
+      "Do put an explanation in the annotation slot as a disclosure. A title may repeat it for the mouse; it may never be the only copy."
+    ],
+    "donts": [
+      "Don't introduce a second accent hue into the chrome. Cobalt is the only interaction ink.",
+      "Don't spend green, amber or red on anything that is not capacity, staleness or a clash. Credits, ECTS and counts stay ink-grey — a count is data, not an alert.",
+      "Don't let the twelve course hues out of the timetable, and don't assign them by selection order; the hash is what keeps a course the same colour everywhere.",
+      "Don't add a box-shadow. Nothing in this system lifts.",
+      "Don't soften a corner past 4px, or add a radius to a timetable block.",
+      "Don't add a per-component focus ring when the global outline already fires.",
+      "Don't load a font from a CDN — the service worker only caches same-origin, and both latin and latin-ext subsets are required for Turkish.",
+      "Don't clamp an over-enrolled meter at 100%, and don't render a missing quota as 0.",
+      "Don't build a filled pill for a value that has no risk attached to it.",
+      "Don't leave an explanation in a title alone, and don't let a signal fire on every row — an amber stamp or a consent note that is always on has stopped saying anything."
+    ]
+  }
+}
