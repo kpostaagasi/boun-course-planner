@@ -198,7 +198,7 @@
       onmouseleave={() => setHoveredCourse("")}
       role="list"
     >
-      {#each getSelectedCourseNames() as courseName}
+      {#each getSelectedCourseNames() as courseName (courseName)}
         <div
           class="group flex items-center px-4 py-1.5"
           onmouseenter={() => setHoveredCourse(courseName)}

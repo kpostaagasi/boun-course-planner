@@ -3,6 +3,7 @@
   import Footer from "./Footer.svelte";
   import InstructorPanel from "./InstructorPanel.svelte";
   import IconSearch from "./icons/IconSearch.svelte";
+  import IconX from "./icons/IconX.svelte";
   import IconChevronDown from "./icons/IconChevronDown.svelte";
   import {
     getSearchedCourseNames,
@@ -12,6 +13,8 @@
     getSearchQuery,
     getCurrentSemester,
     getIsDayHourFilterApplied,
+    areDescriptionsLoaded,
+    resetDayHourFilter,
   } from "./globalState.svelte";
   import { setHoveredCourse, setSearchQuery } from "./globalState.svelte";
   import { onMount } from "svelte";
@@ -95,7 +98,10 @@
   }
 
   let isLargeScreen = $state(false);
-  let isExpanded = $state(true);
+  // Collapsed by default: the fold exists precisely so 85 department chips are
+  // not the first decision of a fresh session, and shipping it open undid that
+  // on line one.
+  let isExpanded = $state(false);
 
   function loadMore() {
     if (isLoading || !hasMorePages) return;
@@ -170,7 +176,7 @@
     <form onsubmit={searchFormSubmit}>
       <input
         bind:this={input}
-        class="w-full rounded-md border border-zinc-200 bg-white py-1.5 pl-10 pr-3 text-zinc-900 placeholder-zinc-400 antialiased transition-colors focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+        class="w-full rounded-md border border-zinc-200 bg-white py-1.5 pl-10 pr-10 text-zinc-900 placeholder-zinc-400 antialiased transition-colors focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
         type="text"
         value={getSearchQuery()}
         oninput={(e) => {
@@ -185,6 +191,24 @@
         enterkeyhint="search"
         onkeyup={blurOnEnter}
       />
+      <!-- Getting back to the browse view used to mean deleting the query by
+           hand, character by character, on a phone. -->
+      {#if getSearchQuery() !== ""}
+        <button
+          type="button"
+          class="absolute top-1/2 right-1 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-600 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-300"
+          aria-label={t("search.clear")}
+          title={t("search.clear")}
+          data-testid="search-clear"
+          onclick={() => {
+            setSearchQuery("");
+            page = 1;
+            input.focus();
+          }}
+        >
+          <IconX />
+        </button>
+      {/if}
     </form>
   </div>
 
@@ -244,7 +268,7 @@
         they are set in mono. Sixty filled pills read as a wall; unfilled mono
         text at one size lets the eye scan the column of letters instead.
       -->
-      {#each getCurSemCategories() as category}
+      {#each getCurSemCategories() as category (category)}
         <button
           class="u-data mr-2.5 mb-1.5 px-0.5 text-[0.75rem] font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
           onclick={() => {
@@ -269,29 +293,90 @@
   </div>
 {/if}
 
-<div
-  class="mt-4 md:overflow-y-auto overflow-x-hidden flex flex-col md:min-h-0 shrink rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700"
-  onmouseleave={() => setHoveredCourse("")}
-  role="list"
-  bind:this={courseCatalogue}
->
-  {#each visibleCourseNames.slice(0, pageSize * page) as courseName, i}
-    <Course
-      {courseName}
-      course={getCurSemesterData()[courseName]}
-      currentSemester={getCurrentSemester()}
-      selected={getSelectedCourseNames().includes(courseName)}
-    />
-  {/each}
+{#if visibleCourseNames.length > 0}
+  <div
+    class="mt-4 md:overflow-y-auto overflow-x-hidden flex flex-col md:min-h-0 shrink rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700"
+    onmouseleave={() => setHoveredCourse("")}
+    role="list"
+    bind:this={courseCatalogue}
+  >
+    {#each visibleCourseNames.slice(0, pageSize * page) as courseName (courseName)}
+      <Course
+        {courseName}
+        course={getCurSemesterData()[courseName]}
+        currentSemester={getCurrentSemester()}
+        selected={getSelectedCourseNames().includes(courseName)}
+      />
+    {/each}
 
-  {#if hasMorePages}
-    <div role="presentation" use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
-      {#if isLoading}
-        <p class="eyebrow px-4 py-3">{t("catalogue.loading")}</p>
+    {#if hasMorePages}
+      <div role="presentation" use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
+        {#if isLoading}
+          <p class="eyebrow px-4 py-3">{t("catalogue.loading")}</p>
+        {/if}
+      </div>
+    {/if}
+  </div>
+{:else if getSearchQuery() !== "" || getIsDayHourFilterApplied()}
+  <!--
+    A search that matches nothing used to render an empty `role="list"` box:
+    no message, no way forward, and a list with no listitems on top of that.
+    The state now says what was searched and offers the two ways out — the
+    same honesty every other absence on the card already gets.
+
+    The last-resort branch of the search fetches descriptions.json before it
+    can rule a query out, so an unfinished fetch reports as searching rather
+    than as "no matches".
+  -->
+  <div
+    class="mt-4 shrink-0 rounded-lg border border-zinc-200 bg-white px-4 py-6 dark:border-zinc-700 dark:bg-zinc-800"
+    data-testid="catalogue-empty"
+  >
+    {#if getSearchQuery() !== "" && !areDescriptionsLoaded()}
+      <p class="eyebrow">{t("catalogue.emptySearching")}</p>
+    {:else}
+      <!-- Not `.eyebrow`: it uppercases, and a query is echoed verbatim or not
+           at all — the user has to recognise what they actually typed. -->
+      <p class="text-[0.9375rem] font-semibold text-zinc-900 dark:text-zinc-100">
+        {t("catalogue.empty", { query: getSearchQuery() })}
+      </p>
+      <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{t("catalogue.emptyHint")}</p>
+      {#if getIsDayHourFilterApplied()}
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          {t("catalogue.emptyFiltered")}
+        </p>
       {/if}
-    </div>
-  {/if}
-</div>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {#if getSearchQuery() !== ""}
+          <button
+            type="button"
+            class="btn-quiet"
+            data-testid="catalogue-empty-clear"
+            onclick={() => {
+              setSearchQuery("");
+              page = 1;
+            }}
+          >
+            {t("search.clear")}
+          </button>
+        {/if}
+        {#if getIsDayHourFilterApplied()}
+          <button
+            type="button"
+            class="btn-quiet"
+            data-testid="catalogue-empty-reset-filters"
+            onclick={() => {
+              resetDayHourFilter();
+              page = 1;
+            }}
+          >
+            {t("catalogue.emptyResetFilters")}
+          </button>
+        {/if}
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <div class="block md:hidden">
   <Footer />
