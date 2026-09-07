@@ -18,6 +18,7 @@
 export const dict = {
   "header.title": { en: "BOUN Course Planner", tr: "BOUN Ders Planlayıcı" },
   "search.placeholder": { en: "Search courses", tr: "Ders ara" },
+  "search.clear": { en: "Clear search", tr: "Aramayı temizle" },
   "header.semester": { en: "Semester", tr: "Dönem" },
   "filters.open": { en: "Filter Courses", tr: "Dersleri Filtrele" },
   "filters.showWithoutSchedule": {
@@ -64,6 +65,10 @@ export const dict = {
   "course.needs": { en: "Needs:", tr: "Gerekli:" },
   "course.markTaken": { en: "Mark as taken", tr: "Alındı olarak işaretle" },
   "course.markNotTaken": { en: "Unmark as taken", tr: "İşareti kaldır" },
+  "course.descriptionNone": {
+    en: "No catalogue description for this course",
+    tr: "Bu ders için katalog açıklaması yok",
+  },
   "list.courses": { en: "Courses", tr: "Dersler" },
   "list.copyLink": { en: "Copy Link", tr: "Bağlantıyı Kopyala" },
   "list.copied": { en: "Copied!", tr: "Kopyalandı!" },
@@ -153,7 +158,6 @@ export const dict = {
     tr: "Ders paletini aç (Ctrl/Cmd+K)",
   },
   "palette.unscheduled": { en: "Unscheduled", tr: "Programsız" },
-  "palette.full": { en: "Full", tr: "Dolu" },
   // Rendered as "{n} seats left", so the value comes first in both languages.
   "palette.seatsLeft": { en: "seats left", tr: "yer kaldı" },
   "palette.credits": { en: "Cr", tr: "Kr" },
@@ -239,6 +243,13 @@ export const dict = {
   "quota.scrapedTitle": {
     en: "Enrolment snapshot taken {time}. These numbers change continuously during registration.",
     tr: "Kayıt anlık görüntüsü {time} tarihinde alındı. Bu sayılar kayıt döneminde sürekli değişir.",
+  },
+  // The note-only state is the catalogue's most common quota row before
+  // registration opens, and "Consent Of Instructor" reads as a personal
+  // permission gate unless it says whose wording it is.
+  "quota.noteTitle": {
+    en: "The registration system publishes no seat allocation for this section yet, so this is the wording from its own quota cell — not a rule we inferred.",
+    tr: "Kayıt sistemi bu şube için henüz kontenjan sayısı yayınlamadı; bu metin doğrudan sistemin kendi kontenjan hücresinden geliyor — bizim çıkardığımız bir kural değil.",
   },
   // Offering-likelihood tiers from futureTerms.mjs. Deliberately hedged
   // wording: only "known" is a published fact, the rest are inference from
@@ -349,6 +360,26 @@ export const dict = {
   "catalogue.showMore": { en: "Show more", tr: "Daha fazla" },
   "catalogue.showLess": { en: "Show less", tr: "Daha az" },
   "catalogue.loading": { en: "Loading…", tr: "Yükleniyor…" },
+  "catalogue.empty": {
+    en: "No courses match {query}",
+    tr: "{query} ile eşleşen ders yok",
+  },
+  "catalogue.emptyHint": {
+    en: "Course codes are searched first, then names, instructors and catalogue descriptions.",
+    tr: "Önce ders kodları, sonra adlar, hocalar ve katalog açıklamaları aranır.",
+  },
+  "catalogue.emptyFiltered": {
+    en: "A day/hour filter is also narrowing this list.",
+    tr: "Ayrıca bir gün/saat filtresi bu listeyi daraltıyor.",
+  },
+  "catalogue.emptyResetFilters": {
+    en: "Reset time filters",
+    tr: "Saat filtrelerini sıfırla",
+  },
+  "catalogue.emptySearching": {
+    en: "Searching catalogue descriptions…",
+    tr: "Katalog açıklamaları aranıyor…",
+  },
 };
 
 /**

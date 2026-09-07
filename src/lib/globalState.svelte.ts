@@ -268,6 +268,17 @@ export function setShowCoursesWithoutSchedule(value: boolean) {
   showCoursesWithoutSchedule = value;
 }
 
+/**
+ * Put the day/hour grid and the "courses without schedule" toggle back to
+ * their defaults. The catalogue's empty state offers this: when a search
+ * returns nothing, an invisible time filter is one of the two reasons why,
+ * and the user should not have to reopen the dialog to find out.
+ */
+export function resetDayHourFilter() {
+  selectedDayHourFilter = initSelectedDayHourFilter();
+  showCoursesWithoutSchedule = true;
+}
+
 const isDayHourFilterApplied = $derived.by(() => {
   return selectedDayHourFilter.some((day) => day.some((val) => !val));
 });
@@ -501,6 +512,73 @@ export function ensureDescriptions(): Promise<void> {
 
 export function getDescriptionFor(code: string): DescriptionInfo | null {
   return descriptionData ? (descriptionData[code] ?? null) : null;
+}
+
+/**
+ * Whether `descriptions.json` has actually arrived.
+ *
+ * The card's description toggle and the catalogue's empty state both need to
+ * tell "this course has no catalogue text" from "we have not fetched the
+ * catalogue yet" — the same distinction the rest of the app makes for quota
+ * and prerequisites.
+ */
+export function areDescriptionsLoaded(): boolean {
+  return descriptionData !== null;
+}
+
+// ---- Semester dates (data/semester-dates.json) ----
+
+export type SemesterDates = {
+  start?: string | null;
+  end?: string | null;
+  holidays?: { date: string; name: string; timeType?: string; time?: string }[];
+};
+
+let semesterDatesData = $state<Record<string, SemesterDates> | null>(null);
+let semesterDatesFailed = $state(false);
+let semesterDatesLoad: Promise<void> | null = null;
+
+/**
+ * Fetch `data/semester-dates.json` once. It is ~5 KB and three consumers want
+ * it: the timetable's date strip, the calendar export, and the course card's
+ * quota-staleness rule, which needs the term's first day of classes to know
+ * whether enrolment can still be moving. Idempotent, and never rejects.
+ */
+export function loadSemesterDates(): Promise<void> {
+  semesterDatesLoad ??= (async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.BASE_URL}data/semester-dates.json`
+      );
+      if (res.ok) {
+        semesterDatesData = (await res.json()) as Record<string, SemesterDates>;
+      } else {
+        semesterDatesFailed = true;
+      }
+    } catch {
+      semesterDatesFailed = true;
+    }
+  })();
+  return semesterDatesLoad;
+}
+
+/**
+ * Dates for one term, accepting either spelling of a term key (`2026/2027-1`
+ * on the site, `2026-2027-1` in the data files). The file covers 6 of the 25
+ * published terms, so null is the normal answer for an archived term rather
+ * than a failure — see `getSemesterDatesFailed` for the real error signal.
+ */
+export function getSemesterDatesFor(term: string): SemesterDates | null {
+  if (!semesterDatesData || !term) return null;
+  return semesterDatesData[term.trim().replace(/\//g, "-")] ?? null;
+}
+
+export function getSemesterDates(): Record<string, SemesterDates> | null {
+  return semesterDatesData;
+}
+
+export function getSemesterDatesFailed(): boolean {
+  return semesterDatesFailed;
 }
 
 // ---- Live quota / enrolment (data/quota.json) ----

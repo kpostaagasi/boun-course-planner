@@ -4,8 +4,9 @@
     getHoveredCourse,
     getCurSemesterData,
     getCurrentSemester,
+    getSemesterDatesFor,
+    loadSemesterDates,
   } from "./globalState.svelte";
-  import { onMount } from "svelte";
   import { t, getLang } from "./i18n.svelte";
   import {
     DAYS,
@@ -17,19 +18,10 @@
   import IconDownload from "./icons/IconDownload.svelte";
 
   type Holiday = { date: string; name?: string; timeType?: string; time?: string };
-  type SemesterDates = { start?: string; end?: string; holidays?: Holiday[] };
 
-  let semesterDates = $state<Record<string, SemesterDates> | null>(null);
-
-  onMount(async () => {
-    try {
-      const res = await fetch(`${import.meta.env.BASE_URL}data/semester-dates.json`);
-      if (!res.ok) return;
-      semesterDates = await res.json();
-    } catch {
-      // no date data available
-    }
-  });
+  // ~5 KB, and the calendar export and the card's quota-staleness rule want the
+  // same file, so the fetch lives in globalState and dedupes across all three.
+  loadSemesterDates();
 
   type CalendarInfo = {
     start: string;
@@ -45,15 +37,15 @@
     });
   }
 
-  const calendarInfo = $derived<CalendarInfo | null>(
-    semesterDates && getCurrentSemester() && semesterDates[getCurrentSemester()]
-      ? {
-          start: semesterDates[getCurrentSemester()].start ?? "",
-          end: semesterDates[getCurrentSemester()].end ?? "",
-          holidays: semesterDates[getCurrentSemester()].holidays ?? [],
-        }
-      : null
-  );
+  const calendarInfo = $derived.by<CalendarInfo | null>(() => {
+    const dates = getSemesterDatesFor(getCurrentSemester());
+    if (!dates) return null;
+    return {
+      start: dates.start ?? "",
+      end: dates.end ?? "",
+      holidays: dates.holidays ?? [],
+    };
+  });
 
   // One pass produces the rows, the Saturday flag and the sub-column
   // allocation together; the old code walked the selection twice.

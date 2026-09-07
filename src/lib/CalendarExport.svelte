@@ -3,11 +3,13 @@
     getSelectedCourseNames,
     getCurSemesterData,
     getCurrentSemester,
+    getSemesterDates,
+    getSemesterDatesFailed,
+    loadSemesterDates,
   } from "./globalState.svelte";
   import IconDocument from "./icons/IconDocument.svelte";
   import IconX from "./icons/IconX.svelte";
   import { t as i18nT } from "./i18n.svelte";
-  import { onMount } from "svelte";
 
   // Semester data with dates and holidays loaded from JSON
   type SemesterData = {
@@ -15,7 +17,6 @@
     end: string;
     holidays?: Holiday[];
   };
-  let semesterDates: Record<string, SemesterData> = $state({});
 
   // Holidays data extracted from semester data
   type Holiday = {
@@ -25,14 +26,13 @@
     time?: string;
     endTime?: string; // For 'between' type
   };
-  let holidaysData: Record<string, Holiday[]> = $state({});
 
   // State for showing import instructions
   let showInstructions = $state(false);
 
   /**
-   * Outcome of the `semester-dates.json` fetch, tracked instead of inferred
-   * from an empty `semesterDates`.
+   * Outcome of the `semester-dates.json` fetch, reported from the loader's own
+   * failure flag rather than inferred from an empty map.
    *
    * The file covers 6 of the 25 published terms, so "no entry for this term" is
    * the normal case and must not be reported as a failure. A fetch that really
@@ -40,35 +40,26 @@
    * behind the misleading "select courses" hint with the only explanation going
    * to `console.error`.
    */
-  let datesStatus = $state<"loading" | "ready" | "failed">("loading");
+  const datesStatus = $derived<"loading" | "ready" | "failed">(
+    getSemesterDatesFailed() ? "failed" : getSemesterDates() ? "ready" : "loading"
+  );
 
-  // Load semester dates and holidays from JSON file
-  onMount(async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.BASE_URL}data/semester-dates.json`
-      );
-      if (res.ok) {
-        const data: Record<string, SemesterData> = await res.json();
-        semesterDates = data;
+  // One shared fetch for the whole app: the timetable's date strip and the
+  // course card's quota-staleness rule read the same file. Cast at the
+  // boundary because this component needs the stricter holiday shape
+  // (`timeType` is a closed union here, not a bare string).
+  loadSemesterDates();
 
-        // Extract holidays from semester data
-        Object.entries(data).forEach(
-          ([semester, info]: [string, SemesterData]) => {
-            if (info.holidays) {
-              holidaysData[semester] = info.holidays;
-            }
-          }
-        );
-        datesStatus = "ready";
-      } else {
-        datesStatus = "failed";
-        console.error("Failed to load semester dates:", res.statusText);
-      }
-    } catch (error) {
-      datesStatus = "failed";
-      console.error("Error loading semester dates:", error);
+  const semesterDates = $derived(
+    (getSemesterDates() ?? {}) as Record<string, SemesterData>
+  );
+
+  const holidaysData = $derived.by(() => {
+    const byTerm: Record<string, Holiday[]> = {};
+    for (const [semester, info] of Object.entries(semesterDates)) {
+      if (info.holidays) byTerm[semester] = info.holidays;
     }
+    return byTerm;
   });
 
   // Day mapping for ICS format

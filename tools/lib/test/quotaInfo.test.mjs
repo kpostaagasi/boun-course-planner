@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { quotaAge, quotaDisplay } from "../../../src/lib/quotaInfo.mjs";
+import { quotaAge, quotaDisplay, quotaIsStale } from "../../../src/lib/quotaInfo.mjs";
 
 test("no record at all is unknown, and every number stays null", () => {
   for (const input of [null, undefined, {}]) {
@@ -159,4 +159,45 @@ test("an undatable scrape is null, so the card cannot imply the numbers are live
     value: 0,
     minutes: 0,
   });
+});
+
+test("staleness is judged against the registration window, not the clock alone", () => {
+  const classesStart = "2026-09-21";
+  const dayOld = (nowIso) =>
+    new Date(Date.parse(nowIso) - 25 * 60 * 60 * 1000).toISOString();
+
+  // Registration week: 25 hours is genuinely stale, seats move within minutes.
+  const during = Date.parse("2026-09-15T12:00:00.000Z");
+  assert.equal(
+    quotaIsStale(dayOld("2026-09-15T12:00:00.000Z"), classesStart, during),
+    true,
+  );
+
+  // Four months out nothing is moving, so the same 25 hours is not stale —
+  // this is the case that used to paint every row amber for months.
+  const offSeason = Date.parse("2026-05-15T12:00:00.000Z");
+  assert.equal(
+    quotaIsStale(dayOld("2026-05-15T12:00:00.000Z"), classesStart, offSeason),
+    false,
+  );
+
+  // Off-season still flags a pipeline that stopped: the scrape runs daily.
+  const eightDaysOld = new Date(offSeason - 8 * 24 * 60 * 60 * 1000).toISOString();
+  assert.equal(quotaIsStale(eightDaysOld, classesStart, offSeason), true);
+
+  // Window edges: 21 days before classes is open, 22 is not.
+  assert.equal(
+    quotaIsStale(dayOld("2026-08-31T12:00:00.000Z"), classesStart, Date.parse("2026-08-31T12:00:00.000Z")),
+    true,
+  );
+  assert.equal(
+    quotaIsStale(dayOld("2026-08-29T12:00:00.000Z"), classesStart, Date.parse("2026-08-29T12:00:00.000Z")),
+    false,
+  );
+
+  // No calendar entry for the term: fall back to the flat 24 hours.
+  assert.equal(quotaIsStale(dayOld("2026-05-15T12:00:00.000Z"), null, offSeason), true);
+
+  // An undatable snapshot is not "stale", it is undatable.
+  assert.equal(quotaIsStale(undefined, classesStart, during), false);
 });

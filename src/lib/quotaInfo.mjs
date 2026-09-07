@@ -203,3 +203,56 @@ export function quotaAge(scrapedAt, now = Date.now()) {
   if (hours < 24) return { unit: "hour", value: hours, minutes };
   return { unit: "day", value: Math.floor(hours / 24), minutes };
 }
+
+/**
+ * Days either side of the first day of classes in which enrolment can still
+ * move: registration opens roughly three weeks before classes and add-drop
+ * closes roughly two weeks after them.
+ */
+const REGISTRATION_OPENS_DAYS_BEFORE = 21;
+const ADD_DROP_CLOSES_DAYS_AFTER = 14;
+
+/** A snapshot older than this is stale while registration is open. */
+const FRESH_WHILE_MOVING_MINUTES = 24 * 60;
+/** Outside that window the daily scrape is the only thing that can go wrong. */
+const FRESH_WHILE_FROZEN_MINUTES = 7 * 24 * 60;
+
+/**
+ * Should this enrolment snapshot be marked stale?
+ *
+ * The card colours the "as of" stamp amber to mean one specific thing: the
+ * number next to it may already have moved. Enrolment only moves while
+ * registration or add-drop is open, which is a window around the term's first
+ * day of classes — so a flat 24-hour threshold fired on every row for months
+ * at a stretch, and a signal that is always on is a signal nobody reads by the
+ * week it matters.
+ *
+ * Inside the window the threshold stays 24 hours. Outside it, nothing is
+ * moving, so a day-old snapshot is not stale; what would be worth flagging is
+ * the daily scrape having stopped, hence a week.
+ *
+ * With no calendar entry for the term — the file covers 6 of 25 published
+ * terms — there is no window to place, so the original 24-hour rule stands.
+ *
+ * @param {string | null | undefined} scrapedAt ISO timestamp of the snapshot
+ * @param {string | null | undefined} semesterStart first day of classes, `YYYY-MM-DD`
+ * @param {number} [now] epoch millis, defaults to `Date.now()`
+ * @returns {boolean}
+ */
+export function quotaIsStale(scrapedAt, semesterStart, now = Date.now()) {
+  const age = quotaAge(scrapedAt, now);
+  if (!age) return false;
+
+  const start = typeof semesterStart === "string" ? Date.parse(semesterStart) : NaN;
+  if (Number.isNaN(start)) return age.minutes >= FRESH_WHILE_MOVING_MINUTES;
+
+  const daysUntilClasses = (start - now) / 86_400_000;
+  const enrolmentCanMove =
+    daysUntilClasses <= REGISTRATION_OPENS_DAYS_BEFORE &&
+    daysUntilClasses >= -ADD_DROP_CLOSES_DAYS_AFTER;
+
+  return (
+    age.minutes >=
+    (enrolmentCanMove ? FRESH_WHILE_MOVING_MINUTES : FRESH_WHILE_FROZEN_MINUTES)
+  );
+}

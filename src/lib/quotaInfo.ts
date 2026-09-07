@@ -1,4 +1,4 @@
-export { quotaDisplay, quotaAge } from "./quotaInfo.mjs";
+export { quotaDisplay, quotaAge, quotaIsStale } from "./quotaInfo.mjs";
 
 /** One stored departmental- or class-quota row of `public/data/quota.json`. */
 export type QuotaRow = {

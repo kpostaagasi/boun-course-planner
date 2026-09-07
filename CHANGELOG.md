@@ -87,6 +87,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the offline service worker.
 - **Initial-payload budget gate.** `npm run payload` observes what the app
   actually fetches on first load and fails above 180 KB gzipped.
+- **Catalogue empty state.** A search that matches nothing now names the query,
+  states the search order (code → name → instructor → description) and offers
+  the two ways out — clear the query, reset the time filter — instead of
+  rendering an empty box. While the description fallback is still fetching it
+  reports as searching rather than as "no matches".
+- **Tap-to-read explanations on the course card.** The eligibility mark, the
+  "prereqs unchecked" mark, the enrolment snapshot stamp and the quota note are
+  disclosure buttons that write their sentence into one annotation slot on the
+  card, so the explanations reach touch and screen-reader users who never see a
+  `title` tooltip.
+- **Clear button in the search field**, so getting back to the browse view no
+  longer means deleting the query by hand.
 
 ### Changed
 
@@ -124,6 +136,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   combination exists".
 - Logic modules follow the `.mjs` + typed `.ts` re-export convention
   throughout; `solver.ts` was the last holdout and had no tests.
+- **Quota staleness is judged against the registration window**, not a flat 24
+  hours: enrolment only moves in the weeks around the first day of classes, so
+  the amber "as of" stamp used to fire on every row for months at a stretch and
+  meant nothing by the week it mattered. Off-season the threshold is a week,
+  which still catches a scrape that stopped (`quotaIsStale`).
+- **The quota note says whose wording it is.** "Consent Of Instructor" is on
+  99.4% of this term's sections before registration opens, mandatory first-year
+  courses included; read raw it says "email this professor" rather than "no
+  quota published yet".
+- **Card actions are 44 px touch targets** in a 2×2 block below `sm`, relaxing
+  to a 36 px row above it. Mark-as-taken and report-bad-data were 10×16 and
+  14×16 CSS px on a phone and had no accessible name.
+- **"Taken" is cobalt in both places it appears.** The manual toggle rendered
+  the same fact in scarcity-green, which is the ramp reserved for seats; the
+  report-issue hover moved off red for the same reason. The bare `✓` glyph
+  became a drawn icon (`IconCheck`).
+- **The description toggle is reachable while browsing.** It only appeared once
+  `descriptions.json` had been fetched, and the only thing that fetched it was
+  the zero-match search fallback; the first click now loads the catalogue and a
+  course with no entry says so.
+- **The department chip rail ships collapsed.** The fold exists so 84 chips are
+  not the first decision of a session; it was defaulting to open.
+- `semester-dates.json` is fetched once by `globalState` instead of separately
+  by the timetable and the calendar export.
 
 ### Fixed
 
@@ -148,6 +184,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its English slot.
 - Calendar export explains itself when term dates cannot be loaded instead of
   leaving a dead button.
+- Catalogue and selected-course rows are keyed by course, so an expanded
+  description or prerequisite tree no longer follows the list position onto an
+  unrelated course after a new search.
+- The command palette said "Full" where the card said "FULL" for one fact.
 
 ### Removed
 

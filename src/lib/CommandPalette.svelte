@@ -91,7 +91,9 @@
   function seatText(entry: PaletteEntry): string {
     const quota = entry.quota;
     if (quota.status === "unknown") return "";
-    if (quota.status === "full") return t("palette.full");
+    // Same fact as the card's badge, so the same string: it was title-case
+    // here and all-caps there for one state.
+    if (quota.status === "full") return t("quota.full");
     return `${quota.left} ${t("palette.seatsLeft")}`;
   }
 
