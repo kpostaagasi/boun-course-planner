@@ -5,6 +5,7 @@
   import IconPlus from "./icons/IconPlus.svelte";
   import IconChevronDown from "./icons/IconChevronDown.svelte";
   import IconWarning from "./icons/IconWarning.svelte";
+  import IconCheck from "./icons/IconCheck.svelte";
   import {
     getSelectedCourseNames,
     getCurSemesterData,
@@ -15,6 +16,10 @@
     getPrereqsFor,
     getPrereqsAll,
     getDescriptionFor,
+    areDescriptionsLoaded,
+    ensureDescriptions,
+    getSemesterDatesFor,
+    loadSemesterDates,
     getCompletedCourseSet,
     getOfferings,
     getQuotaFor,
@@ -27,7 +32,7 @@
   import { getEligibility } from "./eligibility";
   import { baseCode, isPlaceholderInstructor } from "./courseKey";
   import { conflicts as slotsOverlap } from "./solver";
-  import { quotaAge, quotaDisplay } from "./quotaInfo";
+  import { quotaDisplay, quotaIsStale } from "./quotaInfo";
   import { examConflictFor, type ExamSection } from "./examConflict";
   import { termHistory } from "./termHistory";
   import { describeSchedule, uniqueRooms, DAY_NAMES } from "./paletteSearch";
@@ -39,6 +44,10 @@
   // and keeps it off the first-paint critical path. See `loadQuota` for the
   // payload-budget measurements behind that choice.
   loadQuota();
+  // The term's first day of classes decides whether enrolment can still be
+  // moving, which is what the staleness stamp below actually claims. Same
+  // dedup story as loadQuota: one fetch for the whole app.
+  loadSemesterDates();
 
   /** Course identity, e.g. `"AD251.01 P.S. 1"` -> `"AD251"`. Derived once. */
   const base = $derived(baseCode(course.code));
@@ -127,6 +136,44 @@
 
   let descriptionExpanded = $state(false);
   let treeExpanded = $state(false);
+  let descriptionLoading = $state(false);
+
+  /**
+   * `descriptions.json` is ~244 KB gzipped and is not in the initial payload,
+   * so before it arrives a card cannot know whether this course has catalogue
+   * text. Offering the toggle anyway — and fetching on the first click — is
+   * what makes the feature reachable at all: the only other trigger was the
+   * search's zero-match fallback, so ordinary browsing never revealed it.
+   */
+  const descriptionsLoaded = $derived(areDescriptionsLoaded());
+  const canShowDescription = $derived(
+    !descriptionsLoaded || !!descriptionInfo?.description || descriptionExpanded,
+  );
+
+  async function toggleDescription() {
+    if (descriptionExpanded) {
+      descriptionExpanded = false;
+      return;
+    }
+    if (!areDescriptionsLoaded()) {
+      descriptionLoading = true;
+      await ensureDescriptions();
+      descriptionLoading = false;
+    }
+    descriptionExpanded = true;
+  }
+
+  /**
+   * The card's explanations used to live only in `title` attributes, which
+   * never fire on touch — the surface PRODUCT.md calls a primary case — and are
+   * skipped by screen-reader navigation. Each mark is now a real disclosure
+   * button writing its sentence here, and the sentence renders as text.
+   */
+  let hint = $state("");
+
+  function toggleHint(text: string) {
+    hint = hint === text ? "" : text;
+  }
 
   /** Selected sections this one shares a day+hour slot with. */
   const conflicts = $derived.by(() => {
@@ -150,8 +197,16 @@
   // an "unknown" row on all 3140 cards would be noise rather than honesty.
   const quotaScrapedAt = $derived(getQuotaScrapedAt());
   const quota = $derived(quotaDisplay(getQuotaFor(courseName)));
-  // Only used for emphasis, at day granularity, so it does not need to tick.
-  const quotaStale = $derived((quotaAge(quotaScrapedAt)?.minutes ?? 0) >= 24 * 60);
+  /**
+   * Amber on the "as of" stamp claims one thing: this number may already have
+   * moved. Enrolment only moves while registration or add-drop is open, so the
+   * threshold is judged against the term's first day of classes rather than
+   * against a flat 24 hours — which fired on every row, all year, and taught
+   * the reader to ignore the one colour that matters in registration week.
+   */
+  const quotaStale = $derived(
+    quotaIsStale(quotaScrapedAt, getSemesterDatesFor(currentSemester)?.start ?? null),
+  );
   /**
    * The scrape time, shown verbatim rather than as "N minutes ago": a relative
    * age computed once at render would silently freeze in a long-lived tab, and
@@ -231,22 +286,33 @@
             >{/if}
         </span>
         {#if eligibility.status === "taken"}
-          <span
-            class="u-data text-[0.6875rem] font-semibold text-blue-600 dark:text-blue-300"
-            title={t("course.eligibleTitle")}>✓ {t("course.taken")}</span
+          <button
+            type="button"
+            class="u-data inline-flex min-h-6 cursor-pointer items-center gap-1 text-[0.6875rem] font-semibold text-blue-600 dark:text-blue-300"
+            title={t("course.eligibleTitle")}
+            aria-expanded={hint === t("course.eligibleTitle")}
+            onclick={() => toggleHint(t("course.eligibleTitle"))}
           >
+            <IconCheck />{t("course.taken")}
+          </button>
         {:else if eligibility.status === "eligible"}
           <!--
             "Eligible" is the default state of nearly every row, so spelling it
             out on all of them was noise, and a decorative green broke the rule
             that saturated colour means scarcity. The signal survives as a mark
-            with the wording moved into the accessible name.
+            with the wording in the accessible name — and as a disclosure,
+            because a `title` alone never reaches a touch or screen-reader user.
           -->
-          <span
-            class="text-blue-500/70 dark:text-blue-300/70 text-[0.625rem] leading-none"
+          <button
+            type="button"
+            class="inline-flex min-h-6 cursor-pointer items-center text-blue-500/70 dark:text-blue-300/70"
             title={t("course.eligibleTitle")}
-            aria-label={t("course.eligible")}>●</span
+            aria-label={t("course.eligible")}
+            aria-expanded={hint === t("course.eligibleTitle")}
+            onclick={() => toggleHint(t("course.eligibleTitle"))}
           >
+            <span class="inline-block size-1.5 rounded-full bg-current"></span>
+          </button>
         {:else if eligibility.status === "missing-prereq"}
           <span
             class="u-data text-[0.6875rem] text-amber-500 dark:text-amber-300"
@@ -263,11 +329,16 @@
             made an unverified course look identical to a checked one, which is how
             a card could imply eligibility it had never established.
           -->
-          <span
-            class="text-[0.6875rem] italic text-zinc-600 dark:text-zinc-400"
+          <button
+            type="button"
+            class="inline-flex min-h-6 cursor-pointer items-center text-[0.6875rem] italic text-zinc-600 dark:text-zinc-400"
             data-testid="course-prereq-unknown"
-            title={t("course.prereqUnknownTitle")}>? {t("course.prereqUnknown")}</span
+            title={t("course.prereqUnknownTitle")}
+            aria-expanded={hint === t("course.prereqUnknownTitle")}
+            onclick={() => toggleHint(t("course.prereqUnknownTitle"))}
           >
+            ? {t("course.prereqUnknown")}
+          </button>
         {/if}
       </span>
     </div>
@@ -275,7 +346,7 @@
       {#if instructorSearchable}
         <button
           type="button"
-          class="text-left cursor-pointer text-zinc-700 dark:text-zinc-200 hover:text-blue-600 dark:hover:text-blue-300 hover:underline decoration-1 underline-offset-2"
+          class="min-h-6 py-0.5 text-left cursor-pointer text-zinc-700 dark:text-zinc-200 hover:text-blue-600 dark:hover:text-blue-300 hover:underline decoration-1 underline-offset-2"
           data-testid="course-instructor"
           title={t("course.searchInstructor")}
           onclick={() => setSearchQuery(course.instructor)}
@@ -333,9 +404,40 @@
           {#if quota.cap !== null}
             <span class="text-xs">{t("quota.capacity", { cap: quota.cap })}</span>
           {/if}
+          {#if quota.notes.length > 0}
+            <!--
+              A handful of sections (POR101.01, POR201.01) mix a numeric row
+              with a consent row. The numbers win the display, but dropping the
+              note lost the registration rule attached to the same section.
+            -->
+            <button
+              type="button"
+              class="inline-flex min-h-6 cursor-pointer items-center text-xs"
+              title={t("quota.noteTitle")}
+              aria-expanded={hint === t("quota.noteTitle")}
+              onclick={() => toggleHint(t("quota.noteTitle"))}
+            >
+              {quota.notes.join(" · ")}
+            </button>
+          {/if}
         {:else if quota.kind === "note-only"}
-          <!-- No numeric allocation: the verbatim cell IS the registration rule. -->
-          <span data-testid="course-quota-state">{quota.notes.join(" · ")}</span>
+          <!--
+            No numeric allocation: the verbatim cell IS the registration rule.
+            It is on 99.4% of the current term's sections before registration
+            opens, mandatory first-year courses included, so it says whose
+            wording it is — read raw, "Consent Of Instructor" on Calculus I
+            reads as "email this professor" rather than "no quota published yet".
+          -->
+          <button
+            type="button"
+            class="inline-flex min-h-6 cursor-pointer items-center text-left"
+            data-testid="course-quota-state"
+            title={t("quota.noteTitle")}
+            aria-expanded={hint === t("quota.noteTitle")}
+            onclick={() => toggleHint(t("quota.noteTitle"))}
+          >
+            {quota.notes.join(" · ")}
+          </button>
           {#if quota.cap !== null}
             <span class="text-xs">{t("quota.capacity", { cap: quota.cap })}</span>
           {/if}
@@ -353,14 +455,17 @@
         {#if quota.surnameRestricted}
           <span class="text-xs">{t("quota.surname")}</span>
         {/if}
-        <span
-          class="text-xs {quotaStale
+        <button
+          type="button"
+          class="inline-flex min-h-6 cursor-pointer items-center text-xs {quotaStale
             ? 'text-amber-600 dark:text-amber-400'
             : 'text-zinc-600 dark:text-zinc-400'}"
           title={t("quota.scrapedTitle", { time: quotaClock })}
+          aria-expanded={hint === t("quota.scrapedTitle", { time: quotaClock })}
+          onclick={() => toggleHint(t("quota.scrapedTitle", { time: quotaClock }))}
         >
           {t("quota.asOf", { time: quotaClock })}
-        </span>
+        </button>
       </div>
       <!--
         The occupancy meter. The one place this design is allowed to be loud,
@@ -486,9 +591,10 @@
     {#if prereqInfo && prereqInfo.prereqs.length > 0}
       <button
         type="button"
-        class="text-xs cursor-pointer {conflicts.length > 0
+        class="min-h-6 py-0.5 text-xs cursor-pointer {conflicts.length > 0
           ? 'text-zinc-600 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300'
-          : 'text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
+          : 'text-zinc-600 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-300'}"
+        aria-expanded={treeExpanded}
         onclick={() => (treeExpanded = !treeExpanded)}
       >
         {treeExpanded ? t("course.hideTree") : t("course.showTree")}
@@ -503,49 +609,97 @@
         />
       {/if}
     {/if}
-    {#if descriptionInfo?.description}
+    {#if canShowDescription}
       {#if descriptionExpanded}
         <div
           class="mt-1 text-sm whitespace-pre-line {conflicts.length > 0
             ? 'text-zinc-600 dark:text-zinc-400'
             : 'text-zinc-600 dark:text-zinc-400'}"
         >
-          {descriptionInfo.description}
-          {#if descriptionInfo.prerequisite}
-            <div class="mt-1">{t("course.catalogPrerequisite")} {descriptionInfo.prerequisite}</div>
+          {#if descriptionInfo?.description}
+            {descriptionInfo.description}
+            {#if descriptionInfo.prerequisite}
+              <div class="mt-1">
+                {t("course.catalogPrerequisite")} {descriptionInfo.prerequisite}
+              </div>
+            {/if}
+          {:else}
+            <!-- The catalogue is loaded and has nothing for this code: say so,
+                 rather than collapsing the control and leaving a dead tap. -->
+            <span class="italic" data-testid="course-description-none"
+              >{t("course.descriptionNone")}</span
+            >
           {/if}
         </div>
       {/if}
       <button
         type="button"
-        class="text-xs cursor-pointer {conflicts.length > 0
+        class="min-h-6 py-0.5 text-xs cursor-pointer {conflicts.length > 0
           ? 'text-zinc-600 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300'
-          : 'text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}"
-        onclick={() => (descriptionExpanded = !descriptionExpanded)}
+          : 'text-zinc-600 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-300'}"
+        data-testid="course-description-toggle"
+        aria-expanded={descriptionExpanded}
+        disabled={descriptionLoading}
+        onclick={toggleDescription}
       >
-        {descriptionExpanded ? t("course.hideDescription") : t("course.showDescription")}
-        <span class="inline-block {descriptionExpanded ? 'rotate-180' : ''}"><IconChevronDown /></span>
+        {#if descriptionLoading}
+          {t("catalogue.loading")}
+        {:else}
+          {descriptionExpanded ? t("course.hideDescription") : t("course.showDescription")}
+          <span class="inline-block {descriptionExpanded ? 'rotate-180' : ''}"
+            ><IconChevronDown /></span
+          >
+        {/if}
       </button>
     {/if}
+    {#if hint}
+      <!--
+        One annotation slot per card, always in the same place: the marks above
+        are disclosures, and their sentence has to land somewhere a touch user
+        can read it. Hairline, not a tooltip — nothing in this system floats.
+      -->
+      <p
+        class="mt-1.5 border-t border-zinc-100 pt-1.5 text-xs text-zinc-600 dark:border-zinc-700/60 dark:text-zinc-400"
+        data-testid="course-hint"
+      >
+        {hint}
+      </p>
+    {/if}
   </div>
+  <!--
+    Four controls that repeat on every row of a thousands-of-section catalogue,
+    on the form factor PRODUCT.md names for "decisions in seconds on whatever
+    device is at hand". They were 10x16 and 14x16 CSS px on a 390 px viewport;
+    every one is now a 44 px touch target that relaxes to the denser desktop
+    size above `sm`, and the two that had no accessible name have one. Four
+    stacked 44 px targets would have made every phone row ~190 px tall, so on
+    touch they sit in a 2x2 block instead of a column.
+  -->
   <div class="flex flex-col items-end shrink-0">
-    <div class="flex flex-col-reverse sm:flex-row">
+    <div class="grid grid-cols-2 place-items-center gap-1 sm:flex sm:flex-row sm:items-center sm:gap-0">
       <button
         type="button"
+        aria-label={isCompleted(base) ? t("course.markNotTaken") : t("course.markTaken")}
+        aria-pressed={isCompleted(base)}
         title={isCompleted(base) ? t("course.markNotTaken") : t("course.markTaken")}
-        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-xs cursor-pointer {isCompleted(base)
-          ? 'text-green-600 dark:text-green-400'
-          : 'text-zinc-600 hover:text-green-600 dark:text-zinc-400 dark:hover:text-green-400'}"
+        class="inline-flex size-11 cursor-pointer items-center justify-center rounded-md sm:mr-2 sm:size-9 {isCompleted(
+          base,
+        )
+          ? 'text-blue-600 dark:text-blue-300'
+          : 'text-zinc-600 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-300'}"
+        data-testid="course-mark-taken"
         onclick={() => toggleCompleted(base)}
       >
-        ✓
+        <IconCheck />
       </button>
       <a
         href={reportIssueUrl}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={t("report.tooltip")}
         title={t("report.tooltip")}
-        class="self-center mr-0 mt-2 sm:mr-2 sm:mt-0 text-zinc-600 hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-500 text-xs"
+        class="inline-flex size-11 items-center justify-center rounded-md text-zinc-600 hover:text-blue-600 sm:mr-2 sm:size-9 dark:text-zinc-400 dark:hover:text-blue-300"
+        data-testid="course-report"
       >
         <IconWarning />
       </a>
@@ -555,7 +709,7 @@
         rel="noopener noreferrer"
         aria-label={t("course.syllabusLink")}
         title={t("course.syllabusLink")}
-        class="block mr-0 mt-2 sm:mr-2 sm:mt-0 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-400 dark:hover:text-blue-200 p-2 text-center"
+        class="inline-flex size-11 items-center justify-center rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800 sm:mr-2 sm:size-9 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800 dark:hover:text-blue-200"
       >
         <IconDocument />
       </a>
@@ -564,7 +718,7 @@
           type="button"
           aria-label={t("course.removeSection")}
           title={t("course.removeSection")}
-          class="rounded-md bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-400 dark:hover:text-red-200 p-2 text-center cursor-pointer"
+          class="inline-flex size-11 cursor-pointer items-center justify-center rounded-md bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 sm:size-9 dark:bg-red-900 dark:text-red-400 dark:hover:bg-red-800 dark:hover:text-red-200"
           onclick={() => delCourse(courseName)}
         >
           <IconMinus />
@@ -574,7 +728,7 @@
           type="button"
           aria-label={t("course.addSection")}
           title={t("course.addSection")}
-          class="rounded-md bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-800 dark:bg-green-900 dark:hover:bg-green-800 dark:text-green-400 dark:hover:text-green-200 p-2 text-center cursor-pointer"
+          class="inline-flex size-11 cursor-pointer items-center justify-center rounded-md bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-800 sm:size-9 dark:bg-green-900 dark:text-green-400 dark:hover:bg-green-800 dark:hover:text-green-200"
           onclick={() => addCourse(courseName)}
         >
           <IconPlus />
