@@ -49,6 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tests.** `npm test` runs `node --test tools/lib/test/*.test.mjs` covering
   the scraper parser, semester policy, calendar parsing, eligibility, term
   ordering, palette search and prerequisite graph logic.
+- **CI workflow.** `.github/workflows/ci.yml` runs type-checking, unit tests,
+  the production build, the initial-payload budget and the full Playwright
+  suite on every pull request and on `main` after a merge. Until now no
+  workflow ran on a pull request at all: the first real execution of a change
+  was the deploy that `update-data.yml` performs on push to main, by which
+  point it was already live.
 - **Pipeline watchdog** workflow: opens an issue if the daily update has had
   no successful run for over a week. Failed runs also open/comment on an
   `automation-failure` issue, and a post-deploy smoke test fetches the index

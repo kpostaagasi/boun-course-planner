@@ -1,0 +1,120 @@
+name: CI
+
+# Verification gate for changes to the app itself.
+#
+# The other five workflows in this directory all exist to move *data*: they
+# scrape registration.boun.edu.tr, commit what they find, and deploy. None of
+# them runs on a pull request, so until this file existed a branch could change
+# every component in src/ and arrive at `main` with nothing having checked it —
+# the first real execution of the code was the deploy that `update-data.yml`
+# runs on push to main, by which point it is already live.
+#
+# So this runs the four gates the project actually keeps, on every pull request
+# and on `main` after a merge:
+#
+#   npm run check     svelte-check + tsc over the app and the Node tooling
+#   npm test          node --test over the pure logic in src/lib/*.mjs
+#   npm run build     the production bundle, which type-checking alone can miss
+#   npm run payload   the observed initial-load budget (fails over 180 KB gz)
+#   npm run test:e2e  Playwright: catalogue, timetable, quota, a11y, PWA
+#
+# `playwright.config.ts` keys its CI behaviour off `GITHUB_ACTIONS`, so here it
+# starts its own dev and preview servers rather than reusing one, refuses a
+# stray `test.only`, and pins itself to two workers.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Unlike the scrape workflows, superseding a run is exactly what we want: only
+# the head of a branch needs to be green, and a push while CI is running has
+# already made the earlier result irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Cheap and fast, and where most failures land. Split from the browser job so
+  # a type error reports in under a minute instead of queueing behind a browser
+  # download.
+  checks:
+    name: Types, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  browser:
+    name: Payload budget and e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Chromium is ~300 MB across the browser, the headless shell and ffmpeg,
+      # and the version is pinned by @playwright/test in package-lock.json — so
+      # the lockfile hash is exactly the right cache key. The OS packages the
+      # browser links against are not part of the cache, hence the separate
+      # `install-deps` on a hit.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # Before the e2e suite: it takes ~20s, and a payload regression is the
+      # one failure here that is invisible in every other gate.
+      - name: Initial-payload budget
+        run: npm run payload
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      # `trace: "retain-on-failure"` writes a trace per failed test. Without
+      # this, diagnosing a CI-only failure means re-running it locally and
+      # hoping it reproduces.
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
