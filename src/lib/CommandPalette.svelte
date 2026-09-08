@@ -217,7 +217,7 @@
 
 {#if open}
   <div
-    class="fixed inset-0 z-50 bg-black/40 flex items-start justify-center pt-[10vh]"
+    class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-4 pt-[10vh] backdrop-blur-[2px]"
     onclick={onBackdropClick}
     role="presentation"
   >
@@ -227,7 +227,7 @@
       bind:this={dialogEl}
       tabindex="-1"
       onkeydown={onDialogKeydown}
-      class="w-full max-w-2xl mx-4 rounded-lg border-2 border-zinc-900 bg-white focus:outline-none dark:border-zinc-300 dark:bg-zinc-800 overflow-hidden"
+      class="w-full max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
       role="dialog"
       aria-modal="true"
       aria-label={t("palette.title")}
@@ -236,7 +236,7 @@
       <input
         bind:value={query}
         oninput={() => (activeIndex = 0)}
-        class="w-full border-b border-zinc-200 bg-transparent p-3 text-lg text-zinc-900 placeholder-zinc-400 focus:outline-none dark:border-zinc-700 dark:text-white dark:placeholder-zinc-500"
+        class="w-full border-b border-zinc-100 bg-transparent px-4 py-3.5 text-base text-zinc-900 placeholder-zinc-400 focus:outline-none dark:border-zinc-700/60 dark:text-white dark:placeholder-zinc-500"
         placeholder={t("palette.placeholder")}
         role="combobox"
         aria-expanded={results.length > 0}
@@ -259,7 +259,7 @@
                  together and in full, so the header labels a contiguous run. -->
             <li
               role="presentation"
-              class="sticky top-0 flex items-baseline gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900"
+              class="sticky top-0 flex items-baseline gap-2 bg-zinc-50 px-4 py-1.5 dark:bg-zinc-900"
             >
               <span class="u-data shrink-0 text-sm font-semibold text-zinc-900 dark:text-white"
                 >{group.code}</span
@@ -269,7 +269,7 @@
               >
               {#if group.sections.length > 1}
                 <span
-                  class="eyebrow ml-auto shrink-0"
+                  class="ml-auto shrink-0 text-[0.6875rem] text-zinc-500 dark:text-zinc-400"
                   >{group.sections.length} {t("palette.sections")}</span
                 >
               {/if}
@@ -286,8 +286,8 @@
                 data-section-key={entry.courseName}
                 data-scheduled={entry.scheduled}
                 data-active={idx === active}
-                class="px-3 py-2 cursor-pointer transition-colors {idx === active
-                  ? 'bg-blue-50 dark:bg-blue-900/50'
+                class="cursor-pointer px-4 py-2.5 transition-colors {idx === active
+                  ? 'bg-blue-50 dark:bg-blue-900/40'
                   : ''}"
                 onmouseenter={() => (activeIndex = idx)}
                 onclick={() => pick(entry)}
@@ -341,9 +341,9 @@
           {/each}
         </ul>
       {:else if query.trim()}
-        <div class="p-3 text-sm text-zinc-600 dark:text-zinc-400">{t("palette.noResults")}</div>
+        <div class="px-4 py-6 text-center text-sm text-zinc-600 dark:text-zinc-400">{t("palette.noResults")}</div>
       {/if}
-      <div class="border-t border-zinc-200 px-3 py-1.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+      <div class="border-t border-zinc-100 px-4 py-2 text-xs text-zinc-500 dark:border-zinc-700/60 dark:text-zinc-400">
         <span class="inline-block rotate-180"><IconChevronDown /></span><IconChevronDown />
         {t("palette.navigate")} · ⏎ {t("palette.add")} · Esc {t("palette.close")}
       </div>
@@ -354,7 +354,7 @@
 <!-- Floating hint button so mobile users can reach the palette too -->
 <button
   type="button"
-  class="u-data fixed bottom-4 right-4 z-40 h-10 w-10 rounded-md border border-zinc-300 bg-white text-[0.6875rem] font-semibold text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
+  class="u-data fixed right-4 bottom-4 z-40 h-11 w-11 cursor-pointer rounded-xl border border-zinc-200 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-md transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
   title={t("palette.openTitle")}
   aria-label={t("palette.openTitle")}
   onclick={openPalette}

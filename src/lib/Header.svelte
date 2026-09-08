@@ -1,53 +1,50 @@
 <script>
   import SemesterSelect from "./SemesterSelect.svelte";
   import { t, getLang, setLang } from "./i18n.svelte";
+
+  /** The two UI languages, in toggle order. @type {("en" | "tr")[]} */
+  const LANGS = ["en", "tr"];
 </script>
 
 <!--
-  The masthead: the only place the design states its own name, set like a
-  newspaper letterhead — ink on paper, closed by an Oxford rule (thick over
-  thin). The semester selector sits at the far end as the edition number.
+  The top bar states the app's name, the term being browsed and the language,
+  and then stops. It is a single hairline over the page — no rules, no tint, no
+  second row — because everything a student came here to do happens below it.
 -->
-<div data-testid="app-header" class="shrink-0 grow-0 bg-white dark:bg-black">
-  <div
-    class="flex h-11 items-center gap-3 border-b-2 border-zinc-900 px-3 text-zinc-900 dark:border-zinc-200 dark:text-zinc-100"
-  >
-    <h1 class="text-[0.9375rem] font-extrabold tracking-tight">
+<header
+  data-testid="app-header"
+  class="shrink-0 grow-0 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+>
+  <div class="mx-auto flex min-h-14 max-w-[110rem] items-center gap-2 px-3 sm:gap-3 sm:px-5">
+    <h1
+      class="min-w-0 truncate text-[0.9375rem] font-semibold text-zinc-900 sm:text-base dark:text-zinc-50"
+    >
       {t("header.title")}
     </h1>
 
-    <!--
-      A two-state toggle, not two buttons: the current language is the filled
-      one. Set in mono because it reads as a switch position, not as prose.
-    -->
-    <div
-      class="u-data flex items-center overflow-hidden rounded-sm border border-zinc-300 dark:border-zinc-600"
-    >
-      <button
-        type="button"
-        class="cursor-pointer px-1.5 py-0.5 text-[0.6875rem] font-semibold transition-colors {getLang() ===
-        'en'
-          ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-          : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}"
-        onclick={() => setLang("en")}>EN</button
-      >
-      <button
-        type="button"
-        class="cursor-pointer px-1.5 py-0.5 text-[0.6875rem] font-semibold transition-colors {getLang() ===
-        'tr'
-          ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-          : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}"
-        onclick={() => setLang("tr")}>TR</button
-      >
-    </div>
-
-    <div class="ml-auto">
+    <div class="ml-auto flex shrink-0 items-center gap-2">
       <SemesterSelect />
+
+      <!--
+        A segmented control, not two buttons: the current language is the
+        raised position. `aria-pressed` carries the state to assistive tech
+        and is what the e2e helper waits on, so the styling can change freely.
+      -->
+      <div
+        class="flex items-center gap-0.5 rounded-lg bg-zinc-100 p-0.5 dark:bg-zinc-800"
+      >
+        {#each LANGS as code (code)}
+          <button
+            type="button"
+            aria-pressed={getLang() === code}
+            class="cursor-pointer rounded-md px-1.5 py-1 text-xs font-semibold transition-colors sm:px-2 {getLang() ===
+            code
+              ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-700 dark:text-white'
+              : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}"
+            onclick={() => setLang(code)}>{code.toUpperCase()}</button
+          >
+        {/each}
+      </div>
     </div>
   </div>
-  <!-- The thin half of the Oxford rule: 2px of paper, then a hairline. -->
-  <div
-    class="h-[3px] border-b border-zinc-900 dark:border-zinc-200"
-    aria-hidden="true"
-  ></div>
-</div>
+</header>

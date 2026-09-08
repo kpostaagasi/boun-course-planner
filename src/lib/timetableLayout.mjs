@@ -55,12 +55,12 @@ export function slotToHour(slot) {
  * `fill`/`ink`/`accent` are the light-mode sRGB values of exactly those
  * classes — canvas needs concrete colours. Keeping them in one object is what
  * stops the PNG from drifting away from the DOM. The hexes are the *rendered*
- * values: red, amber and blue are remapped in `app.css` (scarcity ramps and
- * the cobalt interaction ink), so their entries carry the remapped colours,
- * not the stock Tailwind ones.
+ * values: red, amber and blue are remapped in `app.css` (the scarcity ramp and
+ * the accent), so their entries carry the remapped colours, not the stock
+ * Tailwind ones.
  *
- * The editorial block is a ledger line: near-white `-50` fill, a firm `-600`
- * ink rule on the left, `-800` ink text. Colour identifies, the rule asserts.
+ * A block is a near-white `-50` fill with a `-600` rule down its leading edge
+ * and `-800` text. The hue identifies the course; the rule anchors it.
  *
  * @typedef {object} PaletteEntry
  * @property {string} family Tailwind colour family, ties the classes to the hexes
@@ -74,15 +74,15 @@ export function slotToHour(slot) {
 
 /** @type {readonly PaletteEntry[]} */
 export const PALETTE = [
-  { family: "red", bg: "bg-red-50 dark:bg-red-500/20", text: "text-red-800 dark:text-red-200", border: "border-red-600 dark:border-red-400/80", fill: "#fbefee", ink: "#5c1d18", accent: "#942e26" },
+  { family: "red", bg: "bg-red-50 dark:bg-red-500/20", text: "text-red-800 dark:text-red-200", border: "border-red-600 dark:border-red-400/80", fill: "#fdf1f0", ink: "#60211c", accent: "#99342c" },
   { family: "orange", bg: "bg-orange-50 dark:bg-orange-500/20", text: "text-orange-800 dark:text-orange-200", border: "border-orange-600 dark:border-orange-400/80", fill: "#fff7ed", ink: "#9f2d00", accent: "#f54900" },
-  { family: "amber", bg: "bg-amber-50 dark:bg-amber-500/20", text: "text-amber-800 dark:text-amber-200", border: "border-amber-600 dark:border-amber-400/80", fill: "#fbf4e6", ink: "#52350f", accent: "#855717" },
+  { family: "amber", bg: "bg-amber-50 dark:bg-amber-500/20", text: "text-amber-800 dark:text-amber-200", border: "border-amber-600 dark:border-amber-400/80", fill: "#fdf5e7", ink: "#53370f", accent: "#855918" },
   { family: "yellow", bg: "bg-yellow-50 dark:bg-yellow-500/20", text: "text-yellow-800 dark:text-yellow-200", border: "border-yellow-600 dark:border-yellow-400/80", fill: "#fefce8", ink: "#894b00", accent: "#d08700" },
   { family: "lime", bg: "bg-lime-50 dark:bg-lime-500/20", text: "text-lime-800 dark:text-lime-200", border: "border-lime-600 dark:border-lime-400/80", fill: "#f7fee7", ink: "#3c6300", accent: "#5ea500" },
   { family: "emerald", bg: "bg-emerald-50 dark:bg-emerald-500/20", text: "text-emerald-800 dark:text-emerald-200", border: "border-emerald-600 dark:border-emerald-400/80", fill: "#ecfdf5", ink: "#006045", accent: "#009966" },
   { family: "teal", bg: "bg-teal-50 dark:bg-teal-500/20", text: "text-teal-800 dark:text-teal-200", border: "border-teal-600 dark:border-teal-400/80", fill: "#f0fdfa", ink: "#005f5a", accent: "#009689" },
   { family: "sky", bg: "bg-sky-50 dark:bg-sky-500/20", text: "text-sky-800 dark:text-sky-200", border: "border-sky-600 dark:border-sky-400/80", fill: "#f0f9ff", ink: "#00598a", accent: "#0084d1" },
-  { family: "blue", bg: "bg-blue-50 dark:bg-blue-500/20", text: "text-blue-800 dark:text-blue-200", border: "border-blue-600 dark:border-blue-400/80", fill: "#eef2fd", ink: "#19307e", accent: "#2447c9" },
+  { family: "blue", bg: "bg-blue-50 dark:bg-blue-500/20", text: "text-blue-800 dark:text-blue-200", border: "border-blue-600 dark:border-blue-400/80", fill: "#eff4ff", ink: "#1e40af", accent: "#2563eb" },
   { family: "indigo", bg: "bg-indigo-50 dark:bg-indigo-500/20", text: "text-indigo-800 dark:text-indigo-200", border: "border-indigo-600 dark:border-indigo-400/80", fill: "#eef2ff", ink: "#372aac", accent: "#4f39f6" },
   { family: "fuchsia", bg: "bg-fuchsia-50 dark:bg-fuchsia-500/20", text: "text-fuchsia-800 dark:text-fuchsia-200", border: "border-fuchsia-600 dark:border-fuchsia-400/80", fill: "#fdf4ff", ink: "#8a0194", accent: "#c800de" },
   { family: "pink", bg: "bg-pink-50 dark:bg-pink-500/20", text: "text-pink-800 dark:text-pink-200", border: "border-pink-600 dark:border-pink-400/80", fill: "#fdf2f8", ink: "#a3004c", accent: "#e60076" },

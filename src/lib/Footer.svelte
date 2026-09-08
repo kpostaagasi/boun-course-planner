@@ -23,22 +23,22 @@
   });
 </script>
 
-<div class="py-3 text-center text-zinc-600 dark:text-zinc-400">
-  <p class="text-sm">{t("footer.goodLuck")}</p>
-  <small class="text-xs">
+<footer class="px-2 py-5 text-center text-zinc-500 dark:text-zinc-400">
+  <p class="text-[0.8125rem] text-zinc-600 dark:text-zinc-300">{t("footer.goodLuck")}</p>
+  <p class="mt-1.5 text-xs">
     {t("footer.disclaimerPre")}
     <a
-      class="underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 hover:decoration-blue-400 dark:decoration-zinc-600 dark:hover:text-blue-300"
+      class="underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 dark:decoration-zinc-600 dark:hover:text-blue-300"
       href="https://registration.boun.edu.tr"
       target="_blank"
-      rel="noopener noreferrer"
-      >{t("footer.registration")}</a
+      rel="noopener noreferrer">{t("footer.registration")}</a
     >
     {t("footer.disclaimerPost")}
-  </small>
+  </p>
   {#if updatedAt}
-    <small class="u-data block text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
-      >{t("footer.dataUpdated")} {new Date(updatedAt).toLocaleString()}</small
-    >
+    <p class="u-data mt-1 text-[0.6875rem]">
+      {t("footer.dataUpdated")}
+      {new Date(updatedAt).toLocaleString()}
+    </p>
   {/if}
-</div>
+</footer>

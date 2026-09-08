@@ -173,20 +173,20 @@
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = "#18181b";
+    ctx.fillStyle = "#161619";
     ctx.font = `700 18px ${SANS}`;
     ctx.textAlign = "left";
     ctx.fillText(t("header.title"), pad, pad + 18);
-    ctx.fillStyle = "#71717a";
+    ctx.fillStyle = "#74747e";
     ctx.font = `500 13px ${SANS}`;
     ctx.fillText(getCurrentSemester(), pad, pad + 38);
 
     const x0 = pad;
     const y0 = pad + titleH;
 
-    ctx.fillStyle = "#f4f4f5";
+    ctx.fillStyle = "#f4f4f6";
     ctx.fillRect(x0, y0, gridW, headH);
-    ctx.fillStyle = "#3f3f46";
+    ctx.fillStyle = "#45454d";
     ctx.font = `700 12px ${SANS}`;
     ctx.textAlign = "center";
     days.forEach((dayIdx, i) => {
@@ -203,7 +203,7 @@
         ctx.fillStyle = "#fafafa";
         ctx.fillRect(x0, y, gridW, rowH);
       }
-      ctx.fillStyle = "#52525b";
+      ctx.fillStyle = "#5c5c66";
       ctx.font = `600 11px ${SANS}`;
       ctx.textAlign = "right";
       ctx.fillText(
@@ -217,14 +217,14 @@
         if (cell.length === 0) return;
         const cx = x0 + gutterW + i * dayW;
         if (cell.length > 1) {
-          ctx.fillStyle = "#fee2e2";
+          ctx.fillStyle = "#f9dcda";
           ctx.fillRect(cx, y, dayW, rowH);
           // Outline the clash region, not each row of it, so a multi-hour
           // block is not sliced by red lines at every hour boundary.
           const above = r > 0 && layout.rows[r - 1].cells[dayIdx].length > 1;
           const below =
             r < layout.rows.length - 1 && layout.rows[r + 1].cells[dayIdx].length > 1;
-          ctx.strokeStyle = "#ef4444";
+          ctx.strokeStyle = "#b9433a";
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(cx + 0.5, y);
@@ -263,7 +263,7 @@
       });
     });
 
-    ctx.strokeStyle = "#e4e4e7";
+    ctx.strokeStyle = "#e7e7ea";
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let r = 0; r <= layout.rows.length; r++) {
@@ -282,7 +282,7 @@
     ctx.lineTo(x0 + gridW, y0 + 0.5);
     ctx.stroke();
 
-    ctx.fillStyle = "#a1a1aa";
+    ctx.fillStyle = "#9c9ca5";
     ctx.font = `400 10px ${SANS}`;
     ctx.textAlign = "left";
     ctx.fillText(
@@ -315,7 +315,9 @@
   }
 </script>
 
-<div class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-xs">
+<!-- The strip above the grid: when the term runs, and the one way to take the
+     grid with you. -->
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pb-2 text-xs">
   {#if calendarInfo}
     <span class="text-zinc-600 dark:text-zinc-400">
       {t("timetable.semesterStart")}: {formatDate(calendarInfo.start)}
@@ -327,7 +329,7 @@
   <button
     type="button"
     data-testid="timetable-export-png"
-    class="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-300 px-2 py-1 text-[0.8125rem] font-medium text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300"
+    class="btn-quiet ml-auto shrink-0"
     onclick={downloadPng}
     disabled={!canExportPng}
     title={canExportPng ? t("timetable.exportPng") : t("timetable.exportPngEmpty")}
@@ -338,19 +340,19 @@
 </div>
 <div
   data-testid="timetable-scroll"
-  class="bg-white dark:bg-zinc-800 dark:text-white border border-zinc-200 dark:border-zinc-700 rounded-lg w-full shrink-0 overflow-x-auto"
+  class="card w-full shrink-0 overflow-x-auto dark:text-white"
 >
   <table
-    class="table-fixed text-center w-full min-w-[32rem] text-sm lg:text-base antialiased tracking-tight sm:tracking-normal"
+    class="w-full min-w-[32rem] table-fixed text-center text-sm antialiased lg:text-base"
   >
     <thead>
       <tr>
         <th
-          class="sticky left-0 z-40 w-14 border-r border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          class="sticky left-0 z-40 w-14 border-r border-b border-zinc-100 bg-white dark:border-zinc-700/60 dark:bg-zinc-800"
         ></th>
         {#each DAYS as day, dayIdx}
           <th
-            class="eyebrow w-20 border-b border-zinc-200 pb-1.5 pt-2 dark:border-zinc-700 {day ==
+            class="eyebrow w-20 border-b border-zinc-100 pt-2.5 pb-2 dark:border-zinc-700/60 {day ==
               'St' && !courseOnSaturday
               ? 'hidden'
               : ''}"
@@ -361,56 +363,57 @@
       </tr>
     </thead>
     <tbody>
-    {#each layout.rows as row, i}
-      <tr>
-        <!--
-          The hour spine. Time is the organising principle of the entire product,
-          but this column used to be a 16px gutter holding a bare "9". Mono and
-          right-aligned so the hours stack into an axis, with the minutes dropped
-          to a lighter mark because they are always :00 and never the thing being
-          read.
-        -->
-        <th
-          class="spine sticky left-0 z-30 w-14 border-r border-zinc-200 bg-white px-2 align-top dark:border-zinc-700 dark:bg-zinc-800 {i ===
-          0
-            ? ''
-            : 'row-rule'}"
-        >
-          <span class="inline-block pt-1.5"
-            >{String(row.hour).padStart(2, "0")}<span class="spine-min" aria-hidden="true">:00</span></span
+      {#each layout.rows as row, i}
+        <tr>
+          <!--
+            The hour spine. Time is the organising principle of the entire
+            product, but this column used to be a 16px gutter holding a bare
+            "9". Mono and right-aligned so the hours stack into an axis.
+          -->
+          <th
+            class="spine sticky left-0 z-30 w-14 border-r border-zinc-100 bg-white px-2 align-top dark:border-zinc-700/60 dark:bg-zinc-800 {i ===
+            0
+              ? ''
+              : 'row-rule'}"
           >
-        </th>
-        {#each DAYS as day, dayIdx}
-          {@const cell = row.cells[dayIdx]}
-          {@const conflict = cell.length > 1}
-          <td
-            title={conflict ? t("course.conflict") : undefined}
-            aria-label={conflict ? t("course.conflict") : undefined}
-            class="relative h-9 p-0 align-top {i === 0 ? '' : 'row-rule'} {day == 'St' &&
-            !courseOnSaturday
-              ? 'hidden'
-              : ''} {conflict
-              ? 'bg-red-100 ring-2 ring-red-500 ring-inset dark:bg-red-500/15 dark:ring-red-400'
-              : ''}"
-            >{#each cell as occ}{@const color = PALETTE[occ.color]}<div
-                data-testid="tt-box"
-                data-course={occ.course}
-                data-hour={row.hour}
-                data-day={day}
-                title={occ.course}
-                style={boxStyle(occ)}
-                class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1 text-left leading-[1.15] text-[10px] sm:text-xs {color.bg} {color.text} {color.border}
+            <span class="inline-block pt-2"
+              >{String(row.hour).padStart(2, "0")}<span
+                class="spine-min"
+                aria-hidden="true">:00</span
+              ></span
+            >
+          </th>
+          {#each DAYS as day, dayIdx}
+            {@const cell = row.cells[dayIdx]}
+            {@const conflict = cell.length > 1}
+            <td
+              title={conflict ? t("course.conflict") : undefined}
+              aria-label={conflict ? t("course.conflict") : undefined}
+              class="relative h-9 p-0 align-top {i === 0 ? '' : 'row-rule'} {day == 'St' &&
+              !courseOnSaturday
+                ? 'hidden'
+                : ''} {conflict
+                ? 'bg-red-100 ring-2 ring-red-500 ring-inset dark:bg-red-500/15 dark:ring-red-400'
+                : ''}"
+              >{#each cell as occ}{@const color = PALETTE[occ.color]}<div
+                  data-testid="tt-box"
+                  data-course={occ.course}
+                  data-hour={row.hour}
+                  data-day={day}
+                  title={occ.course}
+                  style={boxStyle(occ)}
+                  class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1.5 text-left text-[10px] leading-[1.15] sm:text-xs {color.bg} {color.text} {color.border}
                   {occ.course == hoveredCourse && !selectedCourses.includes(occ.course)
-                  ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
-                  : occ.course == hoveredCourse
-                  ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
-                  : ''}"
-              >{#if occ.isFirst}{occ.course}{/if}</div
-              >{/each}</td
-          >
-        {/each}
-      </tr>
-    {/each}
+                    ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
+                    : occ.course == hoveredCourse
+                      ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
+                      : ''}"
+                >{#if occ.isFirst}{occ.course}{/if}</div
+                >{/each}</td
+            >
+          {/each}
+        </tr>
+      {/each}
     </tbody>
   </table>
 </div>

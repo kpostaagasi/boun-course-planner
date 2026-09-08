@@ -329,18 +329,17 @@
   }
 </script>
 
-<div
-  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-  data-testid="roadmap-panel"
->
-  <div class="flex items-baseline border-b border-zinc-200 px-4 py-2.5 dark:border-zinc-700">
-    <span class="text-[0.9375rem] font-semibold">{t("roadmap.title")}</span>
+<!-- Rendered inside the plan panel, so it is a flush section rather than a
+     second card: one border around the whole thing, not two. -->
+<div class="shrink-0" data-testid="roadmap-panel">
+  <div class="flex items-baseline px-4 py-2.5">
+    <span class="eyebrow">{t("roadmap.title")}</span>
     <button type="button" class="btn-quiet ml-auto" onclick={clearRoadmap}>
       {t("roadmap.clear")}
     </button>
   </div>
 
-  <div class="flex gap-3 overflow-x-auto p-3">
+  <div class="flex gap-3 overflow-x-auto px-3 pb-3">
     {#if termsLoading}
       <div class="text-zinc-600 text-sm px-2 py-6">…</div>
     {:else if terms.length === 0}
@@ -352,7 +351,7 @@
         {@const inferred = isInferred(info)}
         {@const note = statusNote(info)}
         <div
-          class="flex w-64 min-w-[16rem] shrink-0 flex-col rounded-lg border bg-white dark:bg-zinc-800 {inferred
+          class="flex w-64 min-w-[16rem] shrink-0 flex-col rounded-xl border bg-white dark:bg-zinc-800 {inferred
             ? 'border-dashed border-amber-400/70 dark:border-amber-300/50'
             : 'border-zinc-200 dark:border-zinc-700'}"
           data-testid="roadmap-term-card"
@@ -360,7 +359,7 @@
           data-status={info.status}
           data-predicted={String(inferred)}
         >
-          <div class="rounded-t-lg border-b border-zinc-100 px-3 py-2 dark:border-zinc-700/60">
+          <div class="rounded-t-xl border-b border-zinc-100 px-3 py-2 dark:border-zinc-700/60">
             <div class="flex items-baseline gap-1">
               <span class="u-data text-sm font-semibold">{termDisplay(info.term)}</span>
               {#if inferred}
@@ -385,7 +384,7 @@
             {:else}
               {#each rows as row (row.code)}
                 <div
-                  class="py-1 px-2 flex items-center gap-1"
+                  class="flex items-center gap-1 px-2 py-1.5"
                   data-testid="roadmap-row"
                   data-code={row.code}
                   data-prereq-ok={String(row.ok)}
@@ -393,7 +392,7 @@
                   <button
                     type="button"
                     aria-label={row.code}
-                    class="shrink-0 cursor-pointer text-zinc-600 transition-colors hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400"
+                    class="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300"
                     onclick={() => removeFromRoadmap(info.term, row.code)}
                   >
                     <IconX />
@@ -403,7 +402,7 @@
                   </span>
                   {#if row.offering}
                     <span
-                      class="u-data shrink-0 rounded-sm border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
+                      class="u-data shrink-0 rounded-full border px-1.5 text-[0.625rem] {CONFIDENCE_CLASS[
                         row.offering.confidence
                       ]}"
                       data-testid="roadmap-confidence"
@@ -444,7 +443,7 @@
           <div class="relative border-t border-zinc-100 px-2 py-2 dark:border-zinc-700/60">
             <input
               type="text"
-              class="w-full rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs outline-none transition-colors placeholder:text-zinc-400 focus:border-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:focus:border-blue-400 dark:placeholder:text-zinc-500"
+              class="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs outline-none transition-colors placeholder:text-zinc-400 focus:border-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:focus:border-blue-400 dark:placeholder:text-zinc-500"
               placeholder={t("roadmap.addCourse")}
               data-testid="roadmap-add"
               bind:value={addQuery[info.term]}
@@ -455,11 +454,11 @@
             {#if openDropdown === info.term}
               {@const found = suggestions(info.term)}
               {#if found.length > 0}
-                <div class="absolute left-2 right-2 bottom-full mb-1 z-10 max-h-56 overflow-y-auto rounded-md border border-zinc-900 bg-white divide-y divide-zinc-100 dark:border-zinc-400 dark:bg-zinc-800 dark:divide-zinc-700">
+                <div class="absolute left-2 right-2 bottom-full mb-1 z-10 max-h-56 overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg divide-y divide-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:divide-zinc-700">
                   {#each found as s (s.code)}
                     <button
                       type="button"
-                      class="block w-full cursor-pointer px-2 py-1 text-left text-xs transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/40"
+                      class="block w-full cursor-pointer px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/40"
                       data-testid="roadmap-suggestion"
                       data-code={s.code}
                       data-confidence={s.confidence}
@@ -469,7 +468,7 @@
                       <span class="u-data font-semibold">{s.code}</span>
                       {#if s.name}<span class="ml-1 text-zinc-600 dark:text-zinc-400">{s.name}</span>{/if}
                       {#if s.confidence}<span
-                          class="u-data ml-1 rounded-sm border px-1 text-[0.625rem] {CONFIDENCE_CLASS[
+                          class="u-data ml-1 rounded-full border px-1.5 text-[0.625rem] {CONFIDENCE_CLASS[
                             s.confidence
                           ]}">{t(`roadmap.conf.${s.confidence}`)}</span
                         >{/if}
