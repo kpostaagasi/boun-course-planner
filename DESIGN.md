@@ -341,7 +341,8 @@ panel) beside a 7/12 pane (search, filters, catalogue), each scrolling
 independently. The whole thing is capped at `110rem` and centred, so a 32"
 monitor gets whitespace rather than a stretched course row. Below `md` the same
 order stacks into a single scrolling column — timetable first, catalogue below —
-and the floating ⌘K button becomes the primary way into search.
+and the search field, with the palette and filter buttons beside it, sits
+below them.
 
 The top bar is a single hairline over the page: title left, term and EN/TR right,
 nothing else. Panes are separated by a `1rem` gutter and panels within a pane by
@@ -364,8 +365,8 @@ the occupancy meter caps at `11rem`.
 ## Elevation & Depth
 
 Almost flat. Four shadow tokens exist and three of them are nearly invisible:
-`xs` on resting cards and the search field, `md` on the floating ⌘K button, `lg`
-on the two overlays. Everything else
+`xs` on resting cards, the search field and the two buttons beside it, `lg` on
+the two overlays. Everything else
 separates with a hairline, a tonal step (surface → Neutral 50 on hover; Neutral
 800 → 900 for nested dark surfaces) or plain whitespace.
 
@@ -376,7 +377,8 @@ One box-shadow is not elevation at all:
 ### Named Rules
 
 **The Quiet Elevation Rule.** A shadow says "this floats above the page", and in
-this app only three things do: the palette, the filter dialog and the ⌘K button.
+this app only two things do: the palette and the filter dialog. Nothing else is
+`fixed`, and nothing floats over the catalogue at all — see the Don'ts.
 A resting panel gets `xs` or nothing. New shadow tokens are not part of this
 system.
 
@@ -409,7 +411,7 @@ Three, and no more:
 - **Text (`.btn-text`):** no box at all until hover, when it takes the accent. Disclosures only — `Details`, `Show description`, `Show more`, `How to import?`.
 - **Row action:** the single 44×44 control on the right of a catalogue row. Solid accent with a `+` when the section is not selected; Neutral 100 with a `−`, going Scarcity Full on hover, when it is. It is the only always-visible action on a card.
 - **Focus:** every control inherits one global treatment — a 2px Accent 500 outline at 2px offset. Do not add per-component focus rings; the two that exist (the search input and the semester select) are the exceptions, not the pattern.
-- **Touch:** every icon control is at least a 44×44 target; inline text controls get `min-h-6`.
+- **Touch:** every icon control is at least a 44×44 target. `.btn-text` carries a 24px `min-height` itself, so an inline text control cannot ship under the floor by forgetting a utility class — which is how three of them shipped at 18px. An inline link inside a sentence is the one exception: it cannot become a 24px block without breaking the paragraph, so it gets vertical padding instead, which grows the hit box without touching the line.
 
 ### Chips
 
@@ -496,6 +498,7 @@ with the caret.
 - **Don't** introduce a second accent hue into the chrome. One accent, one meaning.
 - **Don't** spend green, amber or red on anything that is not capacity, staleness or a clash. Credits, ECTS and counts stay neutral — a count is data, not an alert.
 - **Don't** add a second always-visible action to a catalogue row. One row, one button; the rest go under `Details`.
-- **Don't** reach for a shadow to separate two resting surfaces. Only the palette, the filter dialog and the ⌘K button float.
+- **Don't** reach for a shadow to separate two resting surfaces. Only the palette and the filter dialog float.
+- **Don't** put a `fixed` control over a scrolling list of controls. Which row sits beneath it depends on the scroll offset, so it will cover a different one at every position and no padding or repositioning fixes that. The palette shortcut used to be a corner button and covered 67% of a row's Add button at 360px, 48% on the desktop, swallowing the tap; it is docked beside the search field now.
 - **Don't** float a control over the content it is describing — the department fold's toggle sits beside the chips precisely because it used to cover them.
 - **Don't** use a `title` tooltip as the only copy of something a touch user needs; put it in the text, or under `Details`.

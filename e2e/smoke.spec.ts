@@ -1,7 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   PAGE_SIZE,
   appTitle,
+  catalogue,
   courseRows,
   gotoFresh,
   loadCourseRows,
@@ -128,6 +129,90 @@ test("loads a different term's catalogue", async ({ page }) => {
 
   await expect(semesterSelect(page)).toHaveValue(terms[1]);
   await expect(courseRows(page)).toHaveCount(PAGE_SIZE);
+});
+
+/**
+ * Nothing may float over the catalogue and swallow a row's taps.
+ *
+ * A `fixed` shortcut button used to sit in the bottom-right corner — the same
+ * corner where every row keeps its Add button. Measured on the deployed site it
+ * covered 67% of one at 360px and 48% on the desktop, and `elementFromPoint` at
+ * the Add button's centre returned the floating button, so the tap never
+ * reached the row. Padding and repositioning cannot fix that class of bug: a
+ * fixed overlay above a scrolling list collides with whichever row happens to
+ * be beneath it, so the assertion is about obstruction, not about geometry.
+ */
+async function expectRowControlsUnobstructed(page: Page): Promise<void> {
+  await catalogue(page).scrollIntoViewIfNeeded();
+  // Which row sits under a given screen position depends on the scroll offset,
+  // so one position proves very little: the original bug reproduced reliably on
+  // the desktop and only sometimes on a phone. Sample a spread of offsets — the
+  // window scrolls on a phone, the catalogue's own container on the desktop.
+  const obstructed: string[] = [];
+  for (const step of [0, 120, 260, 400, 560]) {
+    await page.evaluate((offset: number) => {
+      window.scrollTo(0, offset);
+      const list = document.querySelector('[data-testid="catalogue"]');
+      if (list) list.scrollTop = offset;
+    }, step);
+    obstructed.push(
+      ...(await page.evaluate(() => {
+        const out: string[] = [];
+        const controls = document.querySelectorAll(
+          '[data-testid="course-add"],[data-testid="course-remove"],[data-testid="course-details-toggle"]',
+        );
+        // The catalogue scrolls inside its own box on the desktop, so a row can
+        // be out of sight while its rect still falls inside the viewport. A
+        // control counts as reachable only where both agree.
+        const box = document.querySelector('[data-testid="catalogue"]')?.getBoundingClientRect();
+        for (const el of controls) {
+          const r = el.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          if (cy < 0 || cy > window.innerHeight) continue;
+          if (box && (cy < box.top || cy > box.bottom)) continue;
+          const hit = document.elementFromPoint(cx, cy);
+          if (!(hit === el || el.contains(hit))) {
+            out.push(
+              `${(el as HTMLElement).dataset.testid} covered by ${hit?.textContent?.trim().slice(0, 12)}`,
+            );
+          }
+        }
+        return out;
+      })),
+    );
+  }
+  expect(obstructed, "every visible row control receives its own tap").toEqual([]);
+}
+
+test("nothing floats over the catalogue's row controls", async ({ page }) => {
+  await gotoFresh(page);
+  await expectRowControlsUnobstructed(page);
+});
+
+test("nothing floats over the catalogue's row controls @mobile", async ({ page }) => {
+  await gotoFresh(page);
+  // Narrower than the phone project's default: the row action column and the
+  // old overlay only met once the viewport got tight.
+  await page.setViewportSize({ width: 360, height: 640 });
+  await expectRowControlsUnobstructed(page);
+});
+
+/**
+ * `.btn-text` is the smallest control in the app at 12px, and the 24px floor
+ * used to live in DESIGN.md prose rather than in the class, so callers that
+ * forgot it shipped at 18px. The floor is now a property of the class; this
+ * checks the rendered result rather than the stylesheet.
+ */
+test("inline text controls keep a 24px target @mobile", async ({ page }) => {
+  await gotoFresh(page);
+  const undersized = await page.evaluate(() =>
+    [...document.querySelectorAll(".btn-text")]
+      .map((el) => ({ label: el.textContent?.trim().slice(0, 20) ?? "", h: el.getBoundingClientRect().height }))
+      .filter((c) => c.h > 0 && c.h < 24)
+      .map((c) => `${c.label} ${Math.round(c.h)}px`),
+  );
+  expect(undersized).toEqual([]);
 });
 
 test("renders the catalogue on a phone viewport @mobile", async ({ page }) => {

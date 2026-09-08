@@ -1,4 +1,21 @@
+<script module lang="ts">
+  /**
+   * Open the palette from elsewhere in the app.
+   *
+   * The app renders exactly one <CommandPalette>, in App.svelte, so a single
+   * module-level slot is enough and the trigger does not have to be threaded
+   * through every component between it and here. Registered on mount and
+   * cleared on destroy, so it is never a stale reference to a dead instance.
+   */
+  let requestOpen: (() => void) | null = null;
+
+  export function openCommandPalette(): void {
+    requestOpen?.();
+  }
+</script>
+
 <script lang="ts">
+  import { onMount } from "svelte";
   import {
     getCurSemesterData,
     addCourse,
@@ -202,6 +219,13 @@
     }
   }
 
+  onMount(() => {
+    requestOpen = openPalette;
+    return () => {
+      requestOpen = null;
+    };
+  });
+
   $effect(() => {
     // Keep the highlighted result in view during keyboard navigation. Queried
     // by marker instead of by child index: the list also holds group headers.
@@ -350,12 +374,3 @@
     </div>
   </div>
 {/if}
-
-<!-- Floating hint button so mobile users can reach the palette too -->
-<button
-  type="button"
-  class="u-data fixed right-4 bottom-4 z-40 h-11 w-11 cursor-pointer rounded-xl border border-zinc-200 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-md transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
-  title={t("palette.openTitle")}
-  aria-label={t("palette.openTitle")}
-  onclick={openPalette}
->⌘K</button>

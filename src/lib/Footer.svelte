@@ -28,7 +28,7 @@
   <p class="mt-1.5 text-xs">
     {t("footer.disclaimerPre")}
     <a
-      class="underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 dark:decoration-zinc-600 dark:hover:text-blue-300"
+      class="py-[0.3125rem] underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 dark:decoration-zinc-600 dark:hover:text-blue-300"
       href="https://registration.boun.edu.tr"
       target="_blank"
       rel="noopener noreferrer">{t("footer.registration")}</a
