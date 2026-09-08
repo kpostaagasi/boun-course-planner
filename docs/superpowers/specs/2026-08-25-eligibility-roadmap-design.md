@@ -3,6 +3,11 @@
 **Date:** 2026-08-25
 **Status:** Approved (user selected: simple badges + row ✓ toggle for A; roadmap panel + semester-data course picker for B)
 
+> **Superseded in part:** Feature B, the roadmap panel, shipped and was later
+> removed — it presented inference about unpublished terms as a plan, which no
+> other surface in the app does. Feature A (eligibility) is untouched and still
+> ships. Kept as the historical record of what was designed.
+
 ## Feature A: "Which courses can I take?" eligibility badges
 
 ### Purpose

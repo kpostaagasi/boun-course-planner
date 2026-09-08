@@ -12,8 +12,7 @@ Boğaziçi University students building a course schedule. Two peak moments are
 weighted equally and both must be fully served:
 
 1. **Calm planning**, before registration opens — comparing sections,
-   checking prerequisites, laying out a multi-term roadmap, judging credit
-   and ECTS load.
+   checking prerequisites, judging credit and ECTS load.
 2. **Registration week / add-drop**, under time pressure — quotas moving
    continuously, sections filling, decisions made in seconds on whatever
    device is at hand.
@@ -34,8 +33,8 @@ quota-aware schedule they can act on in the registration system.
 Framed first against the **official registration system**
 (registration.boun.edu.tr): the app never replaces it as source of truth, it
 makes its data usable — conflict detection, timetable view, prerequisite
-chains, quota with snapshot time, cross-term roadmap. It must also beat
-other third-party BOUN planners (freshness, prerequisites, quota, roadmap)
+chains, quota with snapshot time. It must also beat
+other third-party BOUN planners (freshness, prerequisites, quota)
 and the manual fallback students otherwise use: spreadsheets, notes and
 group-chat screenshots.
 
@@ -55,8 +54,8 @@ history.
   summer term with a much smaller catalogue.
 - Semester start/end dates and official holidays come from the academic
   calendar and drive `.ics` / Google Calendar export.
-- Course selections, completed courses and the roadmap live in
-  `localStorage`; share links encode the selected sections in the URL.
+- Course selections and completed courses live in `localStorage`; share
+  links encode the selected sections in the URL.
 - Usage is bilingual (Turkish campus, English-language instruction) and
   frequently mobile, sometimes on poor connectivity.
 
@@ -66,8 +65,7 @@ Confirmed capabilities (see README for the full list): catalogue search
 (code → name → instructor → description) with day/hour/category filters,
 Cmd/Ctrl+K command palette, conflict-free section solver, prerequisite tree
 with transitive chain, Taken/Eligible/"Needs: …" state from completed
-courses, multi-semester roadmap with cross-term prerequisite checks,
-offering and instructor history across archived terms, live quota and
+courses, offering and instructor history across archived terms, live quota and
 enrolment with restrictions, final-exam dates with conflict warning, `.ics`
 and Google Calendar export, timetable PNG, share links, EN/TR, dark mode,
 freshness indicator, report-bad-data.
@@ -115,7 +113,7 @@ tracked by `tools/measure-payload.mjs`.
 - Live pipeline: `.github/workflows/update-data.yml` (daily 05:00 UTC) and
   the scrapers under `tools/`.
 - Playwright e2e suite in `e2e/` (smoke, timetable, courselist, palette,
-  quota, roadmap, instructor, urlstate, pwa, a11y) and unit tests in
+  quota, instructor, urlstate, pwa, a11y) and unit tests in
   `tools/lib/test/`.
 - No testimonials, user counts, install numbers, endorsements, ratings or
   university approval exist. Future work must not fabricate any of these,

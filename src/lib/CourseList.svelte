@@ -14,7 +14,6 @@
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
   import { t } from "./i18n.svelte";
-  import Roadmap from "./Roadmap.svelte";
 
   const courseCount = $derived(
     getSelectedCourseNames().filter(
@@ -49,7 +48,6 @@
   });
 
   let copiedLink = $state(false);
-  let showRoadmap = $state(false);
 
   function copyShareLink() {
     // urlState.mjs owns the `?d=`/`?c=` wire format; hand-rolling it here is
@@ -170,74 +168,59 @@
     <h2 class="text-[0.9375rem] font-semibold">{t("list.courses")}</h2>
     <!-- A count is data, not an alert: quiet, not a coloured pill. -->
     <span class="u-data text-xs text-zinc-500 dark:text-zinc-400">{courseCount}</span>
-    <div class="ml-auto flex items-center gap-2">
-      {#if getSelectedCourseNames().length > 0}
-        <button
-          type="button"
-          class="btn-quiet"
-          onclick={copyShareLink}
-          data-testid="copy-share-link"
-        >
-          {copiedLink ? t("list.copied") : t("list.copyLink")}
-        </button>
-      {/if}
+    {#if getSelectedCourseNames().length > 0}
       <button
         type="button"
-        class="btn-quiet"
-        aria-pressed={showRoadmap}
-        onclick={() => (showRoadmap = !showRoadmap)}
-        data-testid="roadmap-toggle"
+        class="btn-quiet ml-auto"
+        onclick={copyShareLink}
+        data-testid="copy-share-link"
       >
-        {t("roadmap.title")}
+        {copiedLink ? t("list.copied") : t("list.copyLink")}
       </button>
-    </div>
-  </div>
-  {#if showRoadmap}
-    <Roadmap />
-  {:else}
-    <!-- The empty state lives OUTSIDE the role=list container: a list may only
-         contain listitems (axe: aria-required-children, critical). -->
-    {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
-      <div
-        class="divide-y divide-zinc-100 dark:divide-zinc-700/60"
-        onmouseleave={() => setHoveredCourse("")}
-        role="list"
-      >
-        {#each getSelectedCourseNames() as courseName (courseName)}
-          <div
-            class="flex items-center gap-2 px-4 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
-            onmouseenter={() => setHoveredCourse(courseName)}
-            role="listitem"
-          >
-            <button
-              type="button"
-              aria-label="{t('course.removeSection')}: {courseName}"
-              title={t("course.removeSection")}
-              class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300"
-              onclick={() => {
-                delCourse(courseName);
-                resetHoveredCourse();
-              }}
-            >
-              <IconX />
-            </button><span class="u-data text-sm font-medium">{courseName}</span>
-            {#if "credits" in getCurSemesterData()[courseName]}
-              <!-- Credits are data, not a status: no green pill. Green means seats. -->
-              <span class="u-data ml-auto text-xs text-zinc-500 dark:text-zinc-400"
-                >{getCurSemesterData()[courseName].credits} cr</span
-              >
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {:else}
-      <div
-        class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400"
-        data-testid="courses-empty"
-      >
-        {t("list.empty")}
-      </div>
     {/if}
+  </div>
+  <!-- The empty state lives OUTSIDE the role=list container: a list may only
+       contain listitems (axe: aria-required-children, critical). -->
+  {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
+    <div
+      class="divide-y divide-zinc-100 dark:divide-zinc-700/60"
+      onmouseleave={() => setHoveredCourse("")}
+      role="list"
+    >
+      {#each getSelectedCourseNames() as courseName (courseName)}
+        <div
+          class="flex items-center gap-2 px-4 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+          onmouseenter={() => setHoveredCourse(courseName)}
+          role="listitem"
+        >
+          <button
+            type="button"
+            aria-label="{t('course.removeSection')}: {courseName}"
+            title={t("course.removeSection")}
+            class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300"
+            onclick={() => {
+              delCourse(courseName);
+              resetHoveredCourse();
+            }}
+          >
+            <IconX />
+          </button><span class="u-data text-sm font-medium">{courseName}</span>
+          {#if "credits" in getCurSemesterData()[courseName]}
+            <!-- Credits are data, not a status: no green pill. Green means seats. -->
+            <span class="u-data ml-auto text-xs text-zinc-500 dark:text-zinc-400"
+              >{getCurSemesterData()[courseName].credits} cr</span
+            >
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <div
+      class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400"
+      data-testid="courses-empty"
+    >
+      {t("list.empty")}
+    </div>
   {/if}
   <div class="flex items-baseline px-4 py-3" data-testid="total-credits">
     <span class="eyebrow">{t("list.totalCredits")}</span>

@@ -43,8 +43,8 @@
  *
  * "meta" is a safe reserved key because a course code always contains digits
  * (see normalizeCourseCode), so it can never collide with a real entry. The one
- * consumer that iterates keys, src/lib/roadmapLogic.mjs, only uses them as a
- * membership set tested against course codes, so the extra member is inert.
+ * consumers that iterate keys use them as a membership set tested against
+ * course codes, so the extra member is inert.
  *
  * Usage:
  *   node tools/scrape-prereqs.mjs [--dept CMPE,AD] [--out FILE] [--resume]

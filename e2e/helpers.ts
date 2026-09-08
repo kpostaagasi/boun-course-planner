@@ -24,7 +24,6 @@ import { expect, type Locator, type Page } from "@playwright/test";
 export const STORAGE_KEYS = [
   "semesterSelCourses2",
   "completedCourses",
-  "roadmap",
   "lang",
 ] as const;
 
@@ -47,7 +46,7 @@ const CLEARED_MARKER = "__e2e_storage_cleared";
  *
  * `path` is resolved against the project `baseURL`; pass a query string to exercise share links,
  * e.g. `gotoFresh(page, './?d=2026-2027-1&c=CMPE150.01')`. If a spec needs *pre-seeded* storage
- * (URL-vs-storage precedence, a pre-populated roadmap), do not use this helper: register your own
+ * (URL-vs-storage precedence, a pre-seeded selection), do not use this helper: register your own
  * `page.addInitScript` and call `page.goto` directly.
  */
 export async function gotoFresh(page: Page, path = "./"): Promise<void> {
@@ -169,10 +168,7 @@ export function coursesPanel(page: Page): Locator {
   return page.locator('[role="region"]');
 }
 
-/**
- * Every row in the left "Courses" panel; `.count()` is the selected-section count. Resolves to
- * nothing while the roadmap view is toggled on, because that replaces the list in the DOM.
- */
+/** Every row in the left "Courses" panel; `.count()` is the selected-section count. */
 export function selectedCourses(page: Page): Locator {
   return coursesPanel(page).locator('[role="list"] > [role=listitem]');
 }
@@ -319,8 +315,8 @@ export async function setLang(page: Page, lang: "en" | "tr"): Promise<void> {
 }
 
 /**
- * Raw `localStorage` value, or `null` when unset. Deliberately unparsed: `semesterSelCourses2` and
- * `roadmap` hold JSON while `lang` holds a bare `"en"`/`"tr"`, so the caller decides.
+ * Raw `localStorage` value, or `null` when unset. Deliberately unparsed: `semesterSelCourses2`
+ * holds JSON while `lang` holds a bare `"en"`/`"tr"`, so the caller decides.
  */
 export function readStorage(page: Page, key: string): Promise<string | null> {
   return page.evaluate((k: string) => localStorage.getItem(k), key);

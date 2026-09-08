@@ -3,7 +3,7 @@
  *
  * Lives in .mjs (with a thin re-export from i18n.svelte.ts) so `node --test`
  * can assert dictionary invariants without a build step — the same convention
- * eligibility/roadmapLogic/prereqGraph/paletteSearch/termHistory follow.
+ * eligibility/termKeys/prereqGraph/paletteSearch/termHistory follow.
  *
  * The reactive half (the `lang` rune, localStorage persistence, the dev-mode
  * missing-key warning) stays in i18n.svelte.ts; everything here is pure.
@@ -132,21 +132,6 @@ export const dict = {
     en: "for the most up-to-date schedule; this page may sometimes lag behind it.",
     tr: "sayfasını esas alın; bu sayfa zaman zaman onun gerisinde kalabilir.",
   },
-  "roadmap.title": { en: "Roadmap", tr: "Yol Haritası" },
-  "roadmap.addCourse": { en: "Add course…", tr: "Ders ekle…" },
-  "roadmap.prereqUnmet": {
-    en: "Prereq not met before this term",
-    tr: "Ön koşul bu döneme kadar tamamlanmamış",
-  },
-  "roadmap.prereqOk": { en: "Prerequisites met", tr: "Ön koşullar tamam" },
-  "roadmap.credits": { en: "credits", tr: "kredi" },
-  "roadmap.empty": { en: "Add courses to plan this term", tr: "Bu dönem için ders ekleyin" },
-  "roadmap.fromTerm": { en: "Picking from", tr: "Kaynak dönem" },
-  "roadmap.clear": { en: "Clear roadmap", tr: "Planı temizle" },
-  "roadmap.overload": {
-    en: "Heavy load — BOUN norm is ~30 ECTS/term",
-    tr: "Ağır yük — BOÜZ normu dönemde ~30 ECTS",
-  },
   "palette.title": { en: "Course palette", tr: "Ders paleti" },
   "palette.placeholder": {
     en: "Search by code, name, instructor…",
@@ -167,31 +152,6 @@ export const dict = {
   "palette.alreadyAdded": { en: "already added", tr: "zaten ekli" },
   "palette.results": { en: "Course results", tr: "Ders sonuçları" },
   "palette.sections": { en: "sections", tr: "şube" },
-  "roadmap.predicted": { en: "Predicted", tr: "Tahmini" },
-  // The roadmap must never present inference as an official listing; these two
-  // notes are what keep a synthesised future term honest.
-  "roadmap.predictedNote": {
-    en: "Inferred from past terms — not an official listing",
-    tr: "Geçmiş dönemlerden çıkarıldı — resmî ilan değil",
-  },
-  "roadmap.unavailable": { en: "Not expected", tr: "Beklenmiyor" },
-  "roadmap.unavailableNote": {
-    en: "Never offered in this season in the recorded history",
-    tr: "Kayıtlı geçmişte bu mevsimde hiç açılmamış",
-  },
-  "roadmap.seasonCount": {
-    en: "Times offered in this season",
-    tr: "Bu mevsimde açılma sayısı",
-  },
-  "roadmap.otherSeasonsOnly": {
-    en: "Offered only in other seasons",
-    tr: "Yalnızca diğer mevsimlerde açıldı",
-  },
-  "roadmap.lastOffered": { en: "Last offered", tr: "Son açılma" },
-  "roadmap.estimatedLoad": {
-    en: "Estimated from the most recent known offering",
-    tr: "En son bilinen açılıştan tahmin edildi",
-  },
   "course.prereqTree": { en: "Prerequisite tree", tr: "Ön koşul ağacı" },
   "course.showTree": { en: "Show prereq tree", tr: "Ön koşul ağacını göster" },
   "course.hideTree": { en: "Hide prereq tree", tr: "Ön koşul ağacını gizle" },
@@ -254,14 +214,6 @@ export const dict = {
     en: "The registration system publishes no seat allocation for this section yet, so this is the wording from its own quota cell — not a rule we inferred.",
     tr: "Kayıt sistemi bu şube için henüz kontenjan sayısı yayınlamadı; bu metin doğrudan sistemin kendi kontenjan hücresinden geliyor — bizim çıkardığımız bir kural değil.",
   },
-  // Offering-likelihood tiers from futureTerms.mjs. Deliberately hedged
-  // wording: only "known" is a published fact, the rest are inference from
-  // offerings.json history and must never read as an official listing.
-  "roadmap.conf.known": { en: "Published", tr: "Yayınlandı" },
-  "roadmap.conf.high": { en: "Very likely", tr: "Çok olası" },
-  "roadmap.conf.medium": { en: "Likely", tr: "Olası" },
-  "roadmap.conf.low": { en: "Uncertain", tr: "Belirsiz" },
-  "roadmap.conf.none": { en: "Unlikely", tr: "Olası değil" },
   // Prefilled GitHub issue for a data error. The body used to be hardcoded
   // Turkish no matter the UI language.
   "report.title": { en: "Data error", tr: "Veri hatası" },
