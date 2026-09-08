@@ -108,9 +108,52 @@ test("a class-quota table folds into rows", () => {
 
   assert.deepEqual(page.rows, [
     { dept: "ALL", status: "ALL", quota: 100, current: 134 },
-    { dept: "1", status: "", quota: 30, current: 31 },
+    // Tagged with the column it came from: "1" is a class, not a department.
+    { dept: "1", status: "", quota: 30, current: 31, scope: "class" },
   ]);
   assert.deepEqual(page.warnings, []);
+});
+
+test("the semester-quota table BOUN added mid-term parses, and does not double", () => {
+  // Real capture: /scripts/quotasearch.asp?abbr=LAW&code=336&section=01&donem=2026/2027-1
+  // taken the morning the crawl aborted on it. Two things about this page: it
+  // carries the "Semester Quotas:" block that did not exist when the parser was
+  // written, and that block is nested inside a plain layout table, which is
+  // what made every caption and row register twice.
+  const page = parseQuotaPage(loadFixture("quotasearch-law336-01.html"), "LAW336.01");
+
+  assert.deepEqual(page.warnings, []);
+  assert.equal(page.cap, 56);
+  assert.deepEqual(page.rows, [
+    { dept: "ECONOMICS", status: "UNDERGRADUATE", quota: 0, current: 0, note: "Consent Of Instructor" },
+    { dept: "LAW PR.", status: "UNDERGRADUATE", quota: 0, current: 0, note: "Unlimited" },
+    { dept: "MANAGEMENT", status: "UNDERGRADUATE", quota: 0, current: 0, note: "Consent Of Instructor" },
+    { dept: "5", status: "", quota: 0, current: 0, scope: "semester", note: "Unlimited" },
+    { dept: "6", status: "", quota: 0, current: 0, scope: "semester", note: "Unlimited" },
+    { dept: "7", status: "", quota: 0, current: 0, scope: "semester", note: "Unlimited" },
+    { dept: "8", status: "", quota: 0, current: 0, scope: "semester", note: "Unlimited" },
+  ]);
+});
+
+test("a wrapper table never claims the caption of the table inside it", () => {
+  // The nested shape, reduced: an uncaptioned layout table around a real
+  // departmental block. Before the ownership check the wrapper and the child
+  // both parsed, so a quota of 30 shipped as 60 — which is exactly what
+  // MIS542.01 was carrying in production (a class quota of 10, stored twice).
+  const html = loadFixture("quotasearch-cmpe150-01.html").replace(
+    "</BODY>",
+    `<table BORDER="0"><tr><td width="50%">
+       <table BORDER="1">
+         <tr class="rectitle"><td colspan=4>Departmental Quotas:</td></tr>
+         <tr class="title"><td>Department</td><td>Statu</td><td>Quota</td><td>Current</td></tr>
+         <tr class='schtd'><td>CMPE&nbsp;</td><td>ALL&nbsp;</td><td>30&nbsp;</td><td>12&nbsp;</td></tr>
+       </table>
+     </td></tr></table></BODY>`,
+  );
+  const page = parseQuotaPage(html, "CMPE150.01");
+
+  assert.deepEqual(page.warnings, []);
+  assert.deepEqual(page.rows, [{ dept: "CMPE", status: "ALL", quota: 30, current: 12 }]);
 });
 
 test("a surname-restriction table parses both cell shapes", () => {

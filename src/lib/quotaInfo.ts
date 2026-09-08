@@ -8,6 +8,14 @@ export type QuotaRow = {
   current?: number;
   /** Verbatim non-numeric Quota cell, e.g. `"Consent Of Instructor"`. */
   note?: string;
+  /**
+   * Set when the row came from the class or semester table rather than the
+   * departmental one (`"class"`, `"semester"`) — i.e. `dept` is a class or
+   * semester number, not a department. Those rows describe who may take the
+   * section, not how its seats are allocated, so `quotaDisplay` keeps them out
+   * of the seat totals and out of the "Only …" restriction line.
+   */
+  scope?: string;
 };
 
 /**

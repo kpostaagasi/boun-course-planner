@@ -163,6 +163,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The quota crawl aborted on a table BOUN added mid-term.** A "Semester
+  Quotas:" block appeared on 2026-09-08 (LAW336, PRED2xx/3xx) and pushed the
+  run past its 20-warning budget, so no quota data was written at all. It has
+  the class table's shape and now routes through the same reader.
+- **Nested quota tables were counted twice.** The site wraps a captioned quota
+  table inside a plain layout table, and the wrapper claimed its child's
+  caption: every row of a nested table parsed twice, so MIS542.01 shipped a
+  class quota of 10 as 20 seats, and 11 unrecognised captions were reported as
+  22 warnings — which is what tripped the budget.
+- **Class and semester rows no longer masquerade as seat allocations.** They
+  are a breakdown of who may take a section, not how its seats are divided, so
+  folding them in turned "Semester 1: 0/0" into a section quota of 0 with 0
+  enrolled — a fabricated FULL on an open section — and listed semester numbers
+  in the card's "Only …" department line. They are stored with a `scope` and
+  kept out of both.
 - Cmd+K toggled the palette twice because of a duplicate `document` keydown
   listener.
 - Timetable course colours were unreadable in dark mode.

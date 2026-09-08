@@ -73,6 +73,10 @@ import * as cheerio from "cheerio";
  * @property {number} quota
  * @property {number} current
  * @property {string} [note]
+ * @property {string} [scope] the lowercased header label of the first column
+ *   when it is not "Department" (`"class"`, `"semester"`), i.e. `dept` holds a
+ *   class or semester number. Such a row states who may take the section, not
+ *   how its seats are allocated, so consumers keep it out of seat totals.
  */
 
 /**
@@ -88,7 +92,8 @@ import * as cheerio from "cheerio";
  * @typedef {object} QuotaPage
  * @property {number | null} cap "Max. Classroom Capacity", null when the page
  *   states no capacity.
- * @property {QuotaRow[]} rows departmental + class quota rows, [] when none.
+ * @property {QuotaRow[]} rows departmental, class and semester quota rows, []
+ *   when none.
  * @property {SurnameRestriction[]} surname surname restrictions, [] when none.
  * @property {string[]} warnings non-fatal oddities the caller should escalate.
  * @property {boolean} absent true when the registration system does not know
@@ -122,6 +127,10 @@ const SECTION_HEADING = /Surname\s+Restriction\(s\)[\s\S]{0,400}?<strong>\s*([^<
 const TABLE_KINDS = [
   { kind: "departmental", pattern: /Departmental\s+Quota/i },
   { kind: "class", pattern: /Class\s+Quota/i },
+  // Appeared mid-term on 2026-09-08 (11 sections: LAW336, PRED2xx/3xx). Same
+  // three-column shape as the class table with "Semester" (5..8) as the first
+  // column, so it routes through the same reader.
+  { kind: "class", pattern: /Semester\s+Quota/i },
   { kind: "surname", pattern: /Surname/i },
 ];
 
@@ -195,9 +204,14 @@ function parseQuotaTable($, table, caption) {
       `"${caption}" table header missing Quota/Current (labels: ${labels.join(" | ")})`,
     );
   }
-  // "Department" on the departmental table; a class table is expected to label
-  // its first column "Class" instead. Fall back to column 0 either way.
-  const deptColumn = columns.department ?? columns.class ?? 0;
+  // "Department" on the departmental table; the class and semester tables label
+  // their first column "Class" / "Semester" and carry a bare number in it. Those
+  // rows are a breakdown of who may take the section, not an allocation of its
+  // seats, so they are tagged with their column's own label and consumers keep
+  // them out of the seat arithmetic (see quotaInfo.quotaDisplay).
+  const deptColumn = columns.department ?? 0;
+  const scope =
+    columns.department === undefined ? (labels[deptColumn] ?? "").toLowerCase() : "";
 
   for (const tr of $(table).find("tr.schtd").toArray()) {
     const cells = $(tr)
@@ -222,6 +236,7 @@ function parseQuotaTable($, table, caption) {
       quota: quota ?? 0,
       current,
     };
+    if (scope) row.scope = scope;
     // "Consent Of Instructor" and friends: no numeric allocation, but the
     // wording is the actual registration rule, so keep it verbatim.
     if (quota === null) row.note = quotaCell;
@@ -307,7 +322,16 @@ export function parseQuotaPage(html, label = "?") {
   const surname = [];
 
   for (const table of $("table").toArray()) {
-    const caption = normalizeText($(table).find("tr.rectitle").first().text());
+    const captionRow = $(table).find("tr.rectitle").first();
+    // `find` is descendant-wide, and the site nests a captioned quota table
+    // inside a plain layout table (one `<td width="50%">` per block). Without
+    // this ownership check the wrapper claims its child's caption, so every
+    // row of a nested table was read twice — MIS542.01 shipped a class quota of
+    // 10 as two identical rows, i.e. 20 seats — and every unrecognised caption
+    // was reported twice, which is what doubled 11 warnings into 22 and put the
+    // crawl over its budget.
+    if (captionRow.length > 0 && captionRow.closest("table").get(0) !== table) continue;
+    const caption = normalizeText(captionRow.text());
     // The page always emits two empty trailer tables with no caption; those are
     // the "no data" case, not a problem.
     if (!caption) continue;

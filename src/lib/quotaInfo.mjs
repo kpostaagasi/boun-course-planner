@@ -25,7 +25,7 @@
  */
 
 /**
- * One stored departmental- or class-quota row. Mirrors `QuotaRow` in
+ * One stored departmental-, class- or semester-quota row. Mirrors `QuotaRow` in
  * `tools/lib/parse-quota.mjs`, but every field is optional here because this
  * module's whole job is to survive a file that does not match expectations.
  * @typedef {object} QuotaRowInput
@@ -34,6 +34,8 @@
  * @property {number} [quota]
  * @property {number} [current]
  * @property {string} [note]
+ * @property {string} [scope] `"class"` / `"semester"` when `dept` holds a class
+ *   or semester number rather than a department.
  */
 
 /**
@@ -107,6 +109,15 @@ export function quotaDisplay(section) {
   const statuses = [];
 
   for (const row of rows) {
+    // A scoped row ("Class 4", "Semester 1") comes from the class or semester
+    // table: a breakdown of who may take the section, not an allocation of its
+    // seats. BOUN added the semester table mid-term on 2026-09-08, and folding
+    // it in would have been ruinous — its rows read "Semester 1: 0/0", which
+    // summed to a section quota of 0 with 0 enrolled, i.e. a fabricated FULL on
+    // a section that is actually open. They are stored, and they are not
+    // arithmetic: neither seats, nor departments, nor the registration note.
+    if (textOrEmpty(row?.scope)) continue;
+
     const note = textOrEmpty(row?.note);
     if (note) notes.push(note);
 
