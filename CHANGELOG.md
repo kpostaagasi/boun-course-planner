@@ -192,6 +192,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The palette shortcut covered a catalogue row's Add button.** It was a
+  `fixed` button in the bottom-right corner — the corner where every row keeps
+  its Add button. Measured on the deployed site it covered 67% of one at 360px
+  and 48% on the desktop, and a tap at that button's centre reached the
+  shortcut instead. A fixed overlay above a scrolling list collides with
+  whichever row is beneath it, so it is docked beside the search field now,
+  where it is still reachable without a keyboard and never over a row.
+- **Inline text controls were under the 24px touch floor.** `.btn-text` carries
+  the minimum itself rather than leaving it to each caller to remember, which
+  is how "How to import?" shipped at 18px. The footer's registration link is an
+  inline link inside a sentence, so it gets vertical padding instead — a real
+  25px hit box with the paragraph rendering identically.
 - **The filter dialog's Apply button was off screen on a phone.** It landed at
   y=679 in an iPhone 13's 664px viewport — below the fold, outside the dialog's
   own box, and with nothing to scroll, because the grid's wrapper had no

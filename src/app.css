@@ -434,6 +434,12 @@
     align-items: center;
     gap: 0.25rem;
     border-radius: var(--radius-sm);
+    /* 24px, carried by the class so no caller has to remember it: at 12px
+       these are the smallest controls in the app, and three of the five
+       shipped under the floor because the minimum lived in prose rather than
+       in code. Not a padding — a minimum — so a control that is already
+       taller is untouched. */
+    min-height: 1.5rem;
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--color-zinc-600);

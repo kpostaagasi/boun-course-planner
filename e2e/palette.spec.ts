@@ -77,6 +77,17 @@ async function renderedRows(
   );
 }
 
+test("the button beside the search field opens the palette", async ({ page }) => {
+  // The only way in without a keyboard, so it is the phone's entry point. It
+  // reaches the palette through a module-level slot rather than a prop, which
+  // is exactly the wiring worth pinning.
+  await gotoFresh(page);
+  await page.getByTestId("palette-open").click();
+  await expect(page.getByTestId("palette-input")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("palette-dialog")).toHaveCount(0);
+});
+
 test("one Cmd+K opens the palette, and only a second one closes it", async ({
   page,
 }) => {

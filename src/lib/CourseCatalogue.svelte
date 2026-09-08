@@ -19,6 +19,7 @@
   import { setHoveredCourse, setSearchQuery } from "./globalState.svelte";
   import { onMount } from "svelte";
   import CourseFilters from "./CourseFilters.svelte";
+  import { openCommandPalette } from "./CommandPalette.svelte";
   import {
     buildInstructorIndex,
     findInstructors,
@@ -213,6 +214,28 @@
       {/if}
     </form>
   </div>
+
+  <!--
+    Docked beside the search field, not floating over the list.
+
+    This used to be a `fixed` button in the bottom-right corner — the same
+    corner where every catalogue row keeps its Add button. At 360px it covered
+    67% of one and swallowed the tap; on the desktop, where the catalogue pane
+    scrolls under it, 48%. A fixed overlay above a scrolling list of controls
+    collides with whichever row happens to be beneath it, so no amount of
+    padding or repositioning fixes it — it has to stop floating.
+
+    Here it is always reachable, on a phone too, and it sits next to the field
+    it is a shortcut for.
+  -->
+  <button
+    type="button"
+    class="u-data flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-xs transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
+    title={t("palette.openTitle")}
+    aria-label={t("palette.openTitle")}
+    data-testid="palette-open"
+    onclick={openCommandPalette}>⌘K</button
+  >
 
   <CourseFilters />
 </div>

@@ -490,7 +490,7 @@
       -->
       <button
         type="button"
-        class="btn-text mt-2 min-h-6"
+        class="btn-text mt-2"
         data-testid="course-details-toggle"
         aria-expanded={detailsOpen}
         onclick={() => (detailsOpen = !detailsOpen)}
@@ -540,7 +540,7 @@
               <span class="u-data">{prereqInfo.prereqs.join(", ")}</span>
               <button
                 type="button"
-                class="btn-text ml-2 min-h-6"
+                class="btn-text ml-2"
                 aria-expanded={treeExpanded}
                 onclick={() => (treeExpanded = !treeExpanded)}
               >
@@ -636,7 +636,7 @@
             {/if}
             <button
               type="button"
-              class="btn-text min-h-6"
+              class="btn-text"
               data-testid="course-description-toggle"
               aria-expanded={descriptionExpanded}
               disabled={descriptionLoading}
