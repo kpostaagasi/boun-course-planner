@@ -112,6 +112,9 @@ tracked by `tools/measure-payload.mjs`.
   `quota.json`, `semester-dates.json`).
 - Live pipeline: `.github/workflows/update-data.yml` (daily 05:00 UTC) and
   the scrapers under `tools/`.
+- Pull-request gate: `.github/workflows/ci.yml` runs type-checking, unit
+  tests, the production build, the initial-payload budget and the Playwright
+  suite on every pull request.
 - Playwright e2e suite in `e2e/` (smoke, timetable, courselist, palette,
   quota, instructor, urlstate, pwa, a11y) and unit tests in
   `tools/lib/test/`.

@@ -210,3 +210,19 @@ npm install
    ```sh
    npm run dev -- --open
    ```
+
+### Checks
+
+The same five gates the [`CI` workflow](.github/workflows/ci.yml) runs on every
+pull request and on `main` after a merge:
+
+```sh
+npm run check      # svelte-check + tsc
+npm test           # node --test over the pure logic in src/lib/*.mjs
+npm run build      # production bundle
+npm run payload    # observed initial-load budget, fails over 180 KB gzipped
+npm run test:e2e   # Playwright; needs `npx playwright install chromium` once
+```
+
+`npm run test:e2e` starts its own dev and preview servers, so nothing has to be
+running first.
