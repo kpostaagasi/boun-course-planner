@@ -76,12 +76,18 @@
 <!--
   Native <dialog> + showModal: the browser supplies the focus trap and Esc
   handling, so none of that is reimplemented here.
+
+  `open:flex`, never a bare `flex`: the closed state relies on the UA rule
+  `dialog:not([open]) { display: none }`, and an author-origin `display: flex`
+  beats it whatever its specificity. A plain `flex` therefore leaves the closed
+  dialog laid out and swallowing taps across the page — it made the catalogue's
+  Add buttons unclickable on a phone.
 -->
 <dialog
   bind:this={dialog}
-  class="m-auto w-[calc(100%-1.5rem)] max-w-lg rounded-2xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-lg backdrop:bg-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+  class="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-1.5rem)] max-w-lg flex-col rounded-2xl open:flex border border-zinc-200 bg-white p-4 text-zinc-900 shadow-lg backdrop:bg-zinc-900/40 sm:p-5 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
 >
-  <form method="dialog" class="mb-4 flex items-center">
+  <form method="dialog" class="mb-4 flex shrink-0 items-center">
     <h2 class="text-base font-semibold">{t("filters.open")}</h2>
     <button
       class="ml-auto inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white"
@@ -89,7 +95,7 @@
     >
   </form>
 
-  <div class="overflow-auto">
+  <div class="min-h-0 flex-1 overflow-auto">
     <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem]">
       <label
         for="show-courses-without-schedule"
@@ -172,15 +178,24 @@
       </tbody>
     </table>
 
-    <div class="mt-5 flex justify-end">
-      <button
-        type="button"
-        onclick={() => saveFilters()}
-        data-testid="filters-apply"
-        class="btn-primary"
-      >
-        {t("filters.apply")}
-      </button>
-    </div>
+  </div>
+
+  <!--
+    Outside the scroller on purpose. The dialog is a bounded flex column — header,
+    scrolling grid, then this — so the one action the dialog exists for is on
+    screen at every viewport height. It used to sit at the end of the content,
+    which put it 15px below the fold of an iPhone 13 with nothing to scroll: the
+    grid's own wrapper had no bounded height, so it never became a scroller and
+    the overflow was simply clipped by the dialog.
+  -->
+  <div class="mt-4 flex shrink-0 justify-end border-t border-zinc-100 pt-4 dark:border-zinc-700/60">
+    <button
+      type="button"
+      onclick={() => saveFilters()}
+      data-testid="filters-apply"
+      class="btn-primary"
+    >
+      {t("filters.apply")}
+    </button>
   </div>
 </dialog>

@@ -137,3 +137,48 @@ test("renders the catalogue on a phone viewport @mobile", async ({ page }) => {
   await expect(appTitle(page)).toBeVisible();
   await expect(courseRows(page)).toHaveCount(PAGE_SIZE);
 });
+
+/**
+ * The filter dialog's Apply button has to be on screen on a phone.
+ *
+ * It shipped once at y=679 in a 664px-tall viewport — below the fold, outside
+ * the dialog's own box, and with nothing to scroll, because the grid's wrapper
+ * had no bounded height and so never became a scroller. Filters could be set
+ * and never applied. The a11y spec exercises this dialog only on the desktop
+ * project, where it fits, which is why nothing caught it; this asserts the
+ * height-dependent half.
+ *
+ * The viewport is shortened to 560px first: `toBeInViewport` is the real
+ * check, and it is only meaningful when the content genuinely cannot fit.
+ */
+test("the filter dialog keeps Apply on screen on a short phone @mobile", async ({
+  page,
+}) => {
+  await gotoFresh(page);
+  await page.setViewportSize({ width: 390, height: 560 });
+
+  await page.getByTestId("filters-open").click();
+  const apply = page.getByTestId("filters-apply");
+  await expect(apply).toBeVisible();
+  await expect(apply).toBeInViewport({ ratio: 1 });
+
+  // Nothing overlaps it: a tap at its centre has to reach the button itself.
+  const onTarget = await apply.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return hit === el || el.contains(hit);
+  });
+  expect(onTarget, "Apply is the topmost element at its own centre").toBe(true);
+
+  // The hours that did not fit are still reachable, i.e. the grid scrolls
+  // rather than being clipped away.
+  const scrolls = await page
+    .locator("dialog[open] .overflow-auto")
+    .evaluate((el) => el.scrollHeight > el.clientHeight);
+  expect(scrolls, "the hour grid scrolls inside the dialog").toBe(true);
+
+  // And the dialog actually applies rather than merely looking right.
+  await page.locator('dialog[open] input[aria-label="Mon 9"]').click();
+  await apply.click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+});
