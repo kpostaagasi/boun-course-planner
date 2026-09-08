@@ -67,7 +67,7 @@
     aria-label={t("filters.open")}
     onclick={() => dialog.showModal()}
     data-testid="filters-open"
-    class="ml-2 flex h-full items-center rounded-md border border-zinc-300 bg-white px-2 text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 cursor-pointer"
+    class="flex size-11 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-600 shadow-xs transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
   >
     <IconFilter />
   </button>
@@ -79,21 +79,21 @@
 -->
 <dialog
   bind:this={dialog}
-  class="m-auto max-w-lg rounded-lg border-2 border-zinc-900 bg-white p-4 text-zinc-900 backdrop:bg-black/60 dark:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100"
+  class="m-auto w-[calc(100%-1.5rem)] max-w-lg rounded-2xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-lg backdrop:bg-zinc-900/40 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
 >
-  <form method="dialog" class="mb-3 flex items-center">
-    <h2 class="eyebrow">{t("filters.open")}</h2>
+  <form method="dialog" class="mb-4 flex items-center">
+    <h2 class="text-base font-semibold">{t("filters.open")}</h2>
     <button
-      class="ml-auto cursor-pointer text-zinc-600 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+      class="ml-auto inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white"
       aria-label={t("palette.close")}><IconX /></button
     >
   </form>
 
   <div class="overflow-auto">
-    <div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem]">
+    <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem]">
       <label
         for="show-courses-without-schedule"
-        class="flex cursor-pointer items-center gap-1.5 text-zinc-600 dark:text-zinc-300"
+        class="flex cursor-pointer items-center gap-2 text-zinc-700 dark:text-zinc-300"
       >
         <input
           id="show-courses-without-schedule"
@@ -102,7 +102,7 @@
           onchange={() => {
             showCoursesWithoutSchedule = !showCoursesWithoutSchedule;
           }}
-          class="h-4 w-4 cursor-pointer appearance-none rounded-[3px] border border-zinc-300 transition-colors checked:border-blue-500 checked:bg-blue-500 dark:border-zinc-600 dark:checked:border-blue-400 dark:checked:bg-blue-400"
+          class="size-4 cursor-pointer appearance-none rounded-[5px] border border-zinc-300 transition-colors checked:border-blue-600 checked:bg-blue-600 dark:border-zinc-600 dark:checked:border-blue-400 dark:checked:bg-blue-400"
         />
         {t("filters.showWithoutSchedule")}
       </label>
@@ -113,10 +113,15 @@
         acts like a button. They are buttons.
       -->
       <span class="ml-auto flex gap-2">
-        <button type="button" class="btn-quiet" onclick={toggleAllSelectedDayHourFilter}
-          >{t("filters.selectAll")}</button
+        <button
+          type="button"
+          class="btn-quiet"
+          onclick={toggleAllSelectedDayHourFilter}>{t("filters.selectAll")}</button
         >
-        <button type="button" class="btn-quiet" onclick={toggleNoneSelectedDayHourFilter}
+        <button
+          type="button"
+          class="btn-quiet"
+          onclick={toggleNoneSelectedDayHourFilter}
           >{t("filters.unselectAll")}</button
         >
       </span>
@@ -125,7 +130,7 @@
     <!--
       The availability grid is the same domain object as the timetable — days
       across, hours down — so it speaks the same language: mono hour spine,
-      eyebrow day headers, and a filled block meaning "this slot is shown".
+      day headers, and a filled block meaning "this slot is shown".
     -->
     <table class="w-full table-fixed">
       <thead>
@@ -133,19 +138,22 @@
           <th class="w-12 p-1"></th>
           {#each days as day, dIdx}
             <th
-              class="eyebrow cursor-pointer select-none p-1 text-center transition-colors hover:text-blue-600 dark:hover:text-blue-300"
-              onclick={() => toggleDaySelectedDayHourFilter(dIdx)}>{t(`day.${day}`)}</th
+              class="eyebrow cursor-pointer p-1 text-center transition-colors select-none hover:text-blue-600 dark:hover:text-blue-300"
+              onclick={() => toggleDaySelectedDayHourFilter(dIdx)}
+              >{t(`day.${day}`)}</th
             >
           {/each}
         </tr>
       </thead>
       <tbody>
         {#each hours as h, hIdx}
-          <tr class={hIdx === 0 ? "" : "row-rule"}>
+          <tr>
             <td
-              class="spine cursor-pointer select-none p-1 pr-2 transition-colors hover:text-blue-600 dark:hover:text-blue-300"
+              class="spine cursor-pointer p-1 pr-2 transition-colors select-none hover:text-blue-600 dark:hover:text-blue-300"
               onclick={() => toggleHourSelectedDayHourFilter(hIdx)}
-              >{String(h).padStart(2, "0")}<span class="spine-min" aria-hidden="true">:00</span></td
+              >{String(h).padStart(2, "0")}<span class="spine-min" aria-hidden="true"
+                >:00</span
+              ></td
             >
             {#each days as day, dIdx}
               <td class="p-0.5 text-center">
@@ -155,7 +163,7 @@
                   aria-label={`${day} ${h}`}
                   checked={selectedDayHourFilter[dIdx][hIdx]}
                   onchange={() => toggleSelectedDayHourFilter(dIdx, hIdx)}
-                  class="h-5 w-full cursor-pointer appearance-none rounded-[3px] border border-zinc-200 transition-colors checked:border-blue-500 checked:bg-blue-500/80 hover:border-blue-400 dark:border-zinc-700 dark:checked:border-blue-400 dark:checked:bg-blue-400/70"
+                  class="h-6 w-full cursor-pointer appearance-none rounded-md border border-zinc-200 transition-colors checked:border-blue-300 checked:bg-blue-200 hover:border-blue-400 dark:border-zinc-700 dark:checked:border-blue-400/50 dark:checked:bg-blue-400/30"
                 />
               </td>
             {/each}
@@ -164,12 +172,12 @@
       </tbody>
     </table>
 
-    <div class="mt-3 flex justify-end">
+    <div class="mt-5 flex justify-end">
       <button
         type="button"
         onclick={() => saveFilters()}
         data-testid="filters-apply"
-        class="cursor-pointer rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
+        class="btn-primary"
       >
         {t("filters.apply")}
       </button>

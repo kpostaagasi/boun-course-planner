@@ -29,18 +29,22 @@
 </script>
 
 <main
-  class="md:max-h-screen min-h-screen md:h-screen flex flex-col bg-zinc-100 dark:bg-black"
+  class="flex min-h-screen flex-col bg-zinc-50 md:h-screen md:max-h-screen dark:bg-zinc-950"
 >
   <Header />
 
-  <div class="flex flex-col md:flex-row grow md:overflow-hidden">
+  <div
+    class="mx-auto flex w-full max-w-[110rem] grow flex-col gap-3 p-3 md:flex-row md:gap-4 md:overflow-hidden md:p-4"
+  >
+    <!-- The plan: what you have chosen, and when it happens. -->
     <div
-      class="w-full md:w-5/12 p-2 flex flex-col shrink-0 md:grow md:overflow-y-auto md:min-h-0"
+      class="flex w-full shrink-0 flex-col gap-3 md:w-5/12 md:min-h-0 md:grow md:overflow-y-auto md:pr-1"
     >
       <Timetable />
       <CourseList />
     </div>
-    <div class="w-full md:w-7/12 p-2 flex flex-col grow h-full">
+    <!-- The choosing: search, filter, browse. -->
+    <div class="flex h-full w-full grow flex-col md:w-7/12">
       <CourseCatalogue />
     </div>
   </div>

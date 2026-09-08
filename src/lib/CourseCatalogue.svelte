@@ -165,10 +165,12 @@
   });
 </script>
 
-<div class="grow-0 shrink-0 w-full flex items-center">
-  <div class="relative shadow rounded-lg overflow-hidden grow">
+<!-- Search sits at the top of the browsing pane and owns the whole width; the
+     filter dialog is the only thing allowed to share the line with it. -->
+<div class="flex w-full shrink-0 grow-0 items-center gap-2">
+  <div class="relative grow">
     <div
-      class="text-zinc-600 dark:text-zinc-300 absolute top-1/2 transform -translate-y-1/2 left-3"
+      class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-400"
     >
       <IconSearch />
     </div>
@@ -176,7 +178,7 @@
     <form onsubmit={searchFormSubmit}>
       <input
         bind:this={input}
-        class="w-full rounded-md border border-zinc-200 bg-white py-1.5 pl-10 pr-10 text-zinc-900 placeholder-zinc-400 antialiased transition-colors focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+        class="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-11 pl-11 text-[0.9375rem] text-zinc-900 placeholder-zinc-400 shadow-xs transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
         type="text"
         value={getSearchQuery()}
         oninput={(e) => {
@@ -196,7 +198,7 @@
       {#if getSearchQuery() !== ""}
         <button
           type="button"
-          class="absolute top-1/2 right-1 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-600 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-300"
+          class="absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-white"
           aria-label={t("search.clear")}
           title={t("search.clear")}
           data-testid="search-clear"
@@ -220,12 +222,10 @@
        one replaces the query with that exact scraped spelling, which is what
        switches the list into instructor mode below. -->
   <div
-    class="mt-4 flex flex-wrap items-center gap-1"
+    class="mt-3 flex flex-wrap items-center gap-1.5"
     data-testid="instructor-matches"
   >
-    <span class="text-xs text-zinc-600 dark:text-zinc-400 mr-1"
-      >{t("instructor.matches")}</span
-    >
+    <span class="eyebrow mr-1">{t("instructor.matches")}</span>
     {#each instructorMatches as person (person.key)}
       <button
         type="button"
@@ -235,7 +235,7 @@
         onclick={() => showInstructor(person.display)}
       >
         {person.display}
-        <span class="text-xs text-zinc-600 dark:text-zinc-400"
+        <span class="u-data text-zinc-500 dark:text-zinc-400"
           >{person.sections.length}</span
         >
       </button>
@@ -255,22 +255,21 @@
 {/if}
 
 {#if getCurSemCategories().length > 0 && getSearchQuery() == "" && getIsDayHourFilterApplied() == false}
-  <div class="mt-4 relative">
+  <!--
+    Departments, as the fastest way into a catalogue of 3140 sections. Folded
+    to a single row by default: 85 chips are not a reasonable first decision of
+    a fresh session, and the fold is the only thing keeping them from being one.
+  -->
+  <div class="mt-3 flex items-start gap-2">
     <div
       class={{
-        "h-[32px] overflow-hidden": !isExpanded,
-        "pb-7": isExpanded,
-        'transition-all duration-200"': true,
+        "min-w-0 grow": true,
+        "h-[30px] overflow-hidden": !isExpanded,
       }}
     >
-      <!--
-        Department abbreviations are the registration system's own vocabulary, so
-        they are set in mono. Sixty filled pills read as a wall; unfilled mono
-        text at one size lets the eye scan the column of letters instead.
-      -->
       {#each getCurSemCategories() as category (category)}
         <button
-          class="u-data mr-2.5 mb-1.5 px-0.5 text-[0.75rem] font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
+          class="u-data mr-1.5 mb-1.5 cursor-pointer rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
           onclick={() => {
             setSearchQuery(category);
           }}>{category}</button
@@ -278,16 +277,13 @@
       {/each}
     </div>
     {#if getCurSemCategories().length > 5}
-      <button
-        class={{
-          "absolute left-1/2 -translate-x-1/2 eyebrow px-2 py-1 cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-300 bg-zinc-100 dark:bg-black": true,
-          "translate-y-1/2 bottom-4": isExpanded,
-          "bottom-0": !isExpanded,
-        }}
-        onclick={() => (isExpanded = !isExpanded)}
-      >
+      <!-- Beside the row, not floating over it: an overlay toggle covered the
+           very chips it was offering to reveal. -->
+      <button class="btn-text shrink-0 py-1" onclick={() => (isExpanded = !isExpanded)}>
         {isExpanded ? t("catalogue.showLess") : t("catalogue.showMore")}
-        <span class="inline-block {isExpanded ? 'rotate-180' : ''}"><IconChevronDown /></span>
+        <span class="inline-block {isExpanded ? 'rotate-180' : ''}"
+          ><IconChevronDown /></span
+        >
       </button>
     {/if}
   </div>
@@ -295,7 +291,8 @@
 
 {#if visibleCourseNames.length > 0}
   <div
-    class="mt-4 md:overflow-y-auto overflow-x-hidden flex flex-col md:min-h-0 shrink rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700"
+    class="card mt-3 flex shrink flex-col divide-y divide-zinc-100 overflow-x-hidden md:min-h-0 md:overflow-y-auto dark:divide-zinc-700/60"
+    data-testid="catalogue"
     onmouseleave={() => setHoveredCourse("")}
     role="list"
     bind:this={courseCatalogue}
@@ -310,7 +307,10 @@
     {/each}
 
     {#if hasMorePages}
-      <div role="presentation" use:infiniteScroll={isLargeScreen ? courseCatalogue : null}>
+      <div
+        role="presentation"
+        use:infiniteScroll={isLargeScreen ? courseCatalogue : null}
+      >
         {#if isLoading}
           <p class="eyebrow px-4 py-3">{t("catalogue.loading")}</p>
         {/if}
@@ -328,25 +328,24 @@
     can rule a query out, so an unfinished fetch reports as searching rather
     than as "no matches".
   -->
-  <div
-    class="mt-4 shrink-0 rounded-lg border border-zinc-200 bg-white px-4 py-6 dark:border-zinc-700 dark:bg-zinc-800"
-    data-testid="catalogue-empty"
-  >
+  <div class="card mt-3 shrink-0 px-4 py-8 text-center" data-testid="catalogue-empty">
     {#if getSearchQuery() !== "" && !areDescriptionsLoaded()}
       <p class="eyebrow">{t("catalogue.emptySearching")}</p>
     {:else}
-      <!-- Not `.eyebrow`: it uppercases, and a query is echoed verbatim or not
-           at all — the user has to recognise what they actually typed. -->
-      <p class="text-[0.9375rem] font-semibold text-zinc-900 dark:text-zinc-100">
+      <!-- The query is echoed verbatim or not at all — the user has to
+           recognise what they actually typed. -->
+      <p class="text-[0.9375rem] font-medium text-zinc-900 dark:text-zinc-100">
         {t("catalogue.empty", { query: getSearchQuery() })}
       </p>
-      <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{t("catalogue.emptyHint")}</p>
+      <p class="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+        {t("catalogue.emptyHint")}
+      </p>
       {#if getIsDayHourFilterApplied()}
-        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {t("catalogue.emptyFiltered")}
         </p>
       {/if}
-      <div class="mt-3 flex flex-wrap gap-2">
+      <div class="mt-4 flex flex-wrap justify-center gap-2">
         {#if getSearchQuery() !== ""}
           <button
             type="button"

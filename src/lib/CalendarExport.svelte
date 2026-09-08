@@ -592,11 +592,11 @@
   );
 </script>
 
-<div class="flex flex-col gap-2">
-  <div class="flex items-center gap-3">
+<div class="flex flex-col gap-3">
+  <div class="flex flex-wrap items-center gap-2">
     <button
       type="button"
-      class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-md transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+      class="btn-primary"
       onclick={downloadCalendar}
       disabled={!canExportCalendar}
       title={calendarTooltip}
@@ -608,14 +608,14 @@
     {#if canExportCalendar}
       <button
         type="button"
-        class="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium rounded-md border border-zinc-300 text-zinc-600 hover:border-blue-500 hover:text-blue-600 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
+        class="btn-quiet px-3 py-2 text-sm"
         onclick={openInGoogleCalendar}
         title={t("calendar.addToGcal")}
         data-testid="calendar-gcal"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          style="height: 1.5rem; width: 1.5rem;"
+          class="inline-block h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -644,7 +644,7 @@
 
     <button
       type="button"
-      class="cursor-pointer text-xs text-zinc-600 underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-blue-600 hover:decoration-blue-400 dark:text-zinc-400 dark:decoration-zinc-600 dark:hover:text-blue-300"
+      class="btn-text"
       onclick={() => (showInstructions = !showInstructions)}
     >
       {t("calendar.howToImport")}
@@ -653,22 +653,22 @@
 
   {#if showInstructions}
     <div
-      class="rounded-md border border-zinc-200 p-3 text-sm dark:border-zinc-700"
+      class="rounded-xl bg-zinc-50 p-3.5 text-sm dark:bg-zinc-900/60"
     >
       <div class="mb-2 flex items-start justify-between">
-        <h4 class="eyebrow">
+        <h4 class="text-[0.8125rem] font-semibold text-zinc-900 dark:text-zinc-100">
           {t("calendar.instructionsTitle")}
         </h4>
         <button
           type="button"
-          class="cursor-pointer text-zinc-600 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+          class="inline-flex size-7 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white"
           aria-label={t("palette.close")}
           onclick={() => (showInstructions = false)}
         >
           <IconX />
         </button>
       </div>
-      <ul class="space-y-1 text-zinc-600 dark:text-zinc-300">
+      <ul class="space-y-1.5 text-[0.8125rem] text-zinc-600 dark:text-zinc-300">
         <li>
           <strong class="font-medium text-zinc-900 dark:text-zinc-100">macOS:</strong>
           {t("instructions.macos")}

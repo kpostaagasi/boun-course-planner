@@ -47,6 +47,9 @@ export const dict = {
   },
   "course.minGpa": { en: "Min. GPA:", tr: "Min. GPA:" },
   "course.showDescription": { en: "Show description", tr: "Açıklamayı göster" },
+  "course.details": { en: "Details", tr: "Detaylar" },
+  "course.hideDetails": { en: "Hide details", tr: "Detayları gizle" },
+  "course.eligibility": { en: "Prerequisites", tr: "Ön koşullar" },
   // Accessible names for the icon-only card controls; axe flagged all three as
   // nameless (button-name / link-name, critical and serious).
   "course.addSection": { en: "Add to schedule", tr: "Programa ekle" },

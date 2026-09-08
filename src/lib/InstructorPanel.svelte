@@ -93,7 +93,7 @@
 <script lang="ts">
   import { instructorsForCourse } from "./instructors";
   import type { InstructorEntry } from "./instructors";
-  import { describeSchedule, DAY_NAMES } from "./paletteSearch";
+  import { describeSchedule, uniqueRooms, DAY_NAMES } from "./paletteSearch";
   import { t } from "./i18n.svelte";
 
   let {
@@ -172,16 +172,16 @@
 </script>
 
 <div
-  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+  class="card mt-3 shrink-0 overflow-hidden dark:text-white"
   data-testid="instructor-panel"
 >
-  <div class="flex flex-wrap items-baseline gap-2 border-b border-zinc-200 px-4 py-2.5 dark:border-zinc-700">
+  <div class="flex flex-wrap items-baseline gap-2 border-b border-zinc-100 px-4 py-3 dark:border-zinc-700/60">
     <span class="eyebrow">{t("instructor.title")}</span>
-    <span class="text-[0.9375rem] font-semibold" data-testid="instructor-name"
+    <span class="text-[0.9375rem] font-semibold text-zinc-900 dark:text-zinc-50" data-testid="instructor-name"
       >{entry.display}</span
     >
     <span
-      class="u-data text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
+      class="u-data text-[0.6875rem] text-zinc-500 dark:text-zinc-400"
       title={t("instructor.sections", { n: entry.sections.length })}
     >
       {entry.sections.length}×
@@ -196,7 +196,7 @@
     </button>
   </div>
 
-  <div class="px-4 py-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+  <div class="px-4 pt-2 pb-1 text-xs text-zinc-500 dark:text-zinc-400">
     {t("instructor.scopeNote")}
     {#if entry.variants.length > 1}
       <!-- The registrar spells some people several ways across terms; showing
@@ -211,7 +211,7 @@
 
   <!-- Every entry reaching this panel comes from the current term's index, so
        there is always at least one section to list. -->
-  <div class="divide-y divide-zinc-200 dark:divide-zinc-700">
+  <div class="divide-y divide-zinc-100 dark:divide-zinc-700/60">
     {#each entry.sections as section (section.sectionKey)}
       <div
         class="flex flex-wrap items-baseline gap-2 px-4 py-2"
@@ -231,8 +231,10 @@
           })}
         </span>
         {#if section.rooms.length > 0}
+          <!-- Deduplicated: a section that meets four times repeats the same
+               two rooms four times, which read as four different rooms. -->
           <span class="u-data text-[0.8125rem] text-zinc-600 dark:text-zinc-400"
-            >{section.rooms.join(" · ")}</span
+            >{uniqueRooms(section).join(" · ")}</span
           >
         {/if}
       </div>
@@ -240,7 +242,7 @@
   </div>
 
   <div
-    class="border-t border-zinc-200 px-4 py-2.5 dark:border-zinc-700"
+    class="border-t border-zinc-100 px-4 py-3 dark:border-zinc-700/60"
     data-testid="instructor-history"
   >
     <div class="flex flex-wrap items-baseline gap-2">

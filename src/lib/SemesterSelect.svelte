@@ -65,7 +65,7 @@
 <div class="relative">
   <select
     aria-label={t("header.semester")}
-    class="u-data cursor-pointer appearance-none rounded-sm border border-zinc-300 bg-white p-1 pr-6 text-[0.8125rem] font-semibold text-zinc-900 transition-colors hover:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-blue-300 dark:focus:ring-blue-400"
+    class="u-data cursor-pointer appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pr-7 pl-2.5 text-xs font-medium sm:pr-8 sm:pl-3 sm:text-[0.8125rem] text-zinc-900 transition-colors hover:border-zinc-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus:ring-blue-400"
     value={getCurrentSemester()}
     oninput={(e) =>
       setCurrentSemester((e.currentTarget as HTMLSelectElement).value ?? "")}
@@ -79,7 +79,7 @@
     {/each}
   </select>
   <div
-    class="ml-3 absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none text-zinc-400"
+    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5 text-zinc-400 sm:pr-2"
   >
     <IconSelector />
   </div>

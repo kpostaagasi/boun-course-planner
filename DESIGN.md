@@ -1,48 +1,48 @@
 ---
 name: BOUN Course Planner
-description: A registration tool drawn as a document — paper, ink, hairline rules, one stamp of cobalt.
+description: A calm, minimal planner for students — soft neutral ground, one accent, and colour spent only on seats and clashes.
 colors:
-  paper: "#fbfcfd"
-  ink: "#0b0d11"
-  ink-grey-50: "#f5f7f9"
-  ink-grey-100: "#ecf0f3"
-  ink-grey-200: "#dde2e8"
-  ink-grey-300: "#c2cad3"
-  ink-grey-400: "#939ea9"
-  ink-grey-500: "#67737f"
-  ink-grey-600: "#4f5a66"
-  ink-grey-700: "#38424d"
-  ink-grey-800: "#1f2731"
-  ink-grey-900: "#131a22"
-  ink-grey-950: "#0c1118"
-  cobalt-50: "#eef2fd"
-  cobalt-100: "#dce4fb"
-  cobalt-200: "#c0cef8"
-  cobalt-300: "#97aef3"
-  cobalt-500: "#3c60e0"
-  cobalt-600: "#2447c9"
-  cobalt-700: "#1d39a3"
-  cobalt-900: "#16285f"
-  scarcity-open-100: "#d8e8da"
-  scarcity-open-500: "#3e7c4a"
-  scarcity-open-600: "#2f643a"
-  scarcity-open-900: "#17301d"
-  scarcity-filling-100: "#f4e4c2"
-  scarcity-filling-400: "#c08428"
-  scarcity-filling-600: "#855717"
-  scarcity-filling-900: "#3f2a0c"
-  scarcity-full-100: "#f5d9d6"
-  scarcity-full-500: "#b33a30"
-  scarcity-full-600: "#942e26"
-  scarcity-full-900: "#481713"
+  surface: "#ffffff"
+  ground: "#fafafa"
+  ink: "#0f1012"
+  neutral-50: "#fafafa"
+  neutral-100: "#f4f4f6"
+  neutral-200: "#e7e7ea"
+  neutral-300: "#d3d3d8"
+  neutral-400: "#9c9ca5"
+  neutral-500: "#6b6b75"
+  neutral-600: "#5c5c66"
+  neutral-700: "#45454d"
+  neutral-800: "#1f1f24"
+  neutral-900: "#161619"
+  neutral-950: "#0f0f11"
+  accent-50: "#eff4ff"
+  accent-100: "#dbe6fe"
+  accent-200: "#c3d4fd"
+  accent-300: "#93b4fd"
+  accent-500: "#3b76f6"
+  accent-600: "#2563eb"
+  accent-700: "#1d4ed8"
+  accent-950: "#172554"
+  scarcity-open-100: "#d7ecdc"
+  scarcity-open-500: "#3a804d"
+  scarcity-open-700: "#245433"
+  scarcity-filling-100: "#f8e7c5"
+  scarcity-filling-500: "#a36f1e"
+  scarcity-filling-700: "#6b4713"
+  scarcity-full-50: "#fdf1f0"
+  scarcity-full-100: "#f9dcda"
+  scarcity-full-500: "#b9433a"
+  scarcity-full-600: "#99342c"
+  scarcity-full-700: "#7c2a24"
 typography:
-  masthead:
-    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
-    fontSize: "0.9375rem"
-    fontWeight: 800
-    lineHeight: 1.2
-    letterSpacing: "-0.02em"
   title:
+    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.015em"
+  heading:
     fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
     fontSize: "0.9375rem"
     fontWeight: 600
@@ -52,6 +52,12 @@ typography:
     fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: "0"
+  meta:
+    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 400
     lineHeight: 1.45
     letterSpacing: "0"
   data:
@@ -59,35 +65,36 @@ typography:
     fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: 1.4
-    letterSpacing: "0"
+    letterSpacing: "-0.01em"
+    fontFeature: "tabular-nums"
+  identifier:
+    fontFamily: "Plex Mono, ui-monospace, SF Mono, Menlo, monospace"
+    fontSize: "0.9375rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.01em"
     fontFeature: "tabular-nums"
   label:
-    fontFamily: "Plex Mono, ui-monospace, SF Mono, Menlo, monospace"
-    fontSize: "0.625rem"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "0.08em"
+    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 500
+    lineHeight: 1.3
+    letterSpacing: "0"
   spine:
     fontFamily: "Plex Mono, ui-monospace, SF Mono, Menlo, monospace"
     fontSize: "0.6875rem"
-    fontWeight: 600
-    lineHeight: 1
-    letterSpacing: "0"
-    fontFeature: "tabular-nums"
-  chip:
-    fontFamily: "Plex Mono, ui-monospace, SF Mono, Menlo, monospace"
-    fontSize: "0.75rem"
     fontWeight: 500
-    lineHeight: 1.2
-    letterSpacing: "0"
+    lineHeight: 1
+    letterSpacing: "-0.01em"
+    fontFeature: "tabular-nums"
 rounded:
-  xs: "1px"
-  sm: "2px"
-  md: "2px"
-  lg: "3px"
-  xl: "4px"
-  2xl: "4px"
-  3xl: "6px"
+  xs: "4px"
+  sm: "6px"
+  md: "8px"
+  lg: "12px"
+  xl: "14px"
+  2xl: "18px"
+  3xl: "22px"
   full: "9999px"
 spacing:
   hair: "0.125rem"
@@ -96,273 +103,400 @@ spacing:
   md: "0.5rem"
   lg: "0.75rem"
   xl: "1rem"
+  2xl: "1.25rem"
+shadow:
+  xs: "0 1px 2px 0 rgb(16 17 20 / 0.04)"
+  sm: "0 1px 2px 0 rgb(16 17 20 / 0.05)"
+  md: "0 4px 12px -2px rgb(16 17 20 / 0.08)"
+  lg: "0 12px 32px -8px rgb(16 17 20 / 0.14)"
 components:
   button-primary:
-    backgroundColor: "{colors.cobalt-600}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.accent-600}"
+    textColor: "{colors.surface}"
     typography: "{typography.body}"
     rounded: "{rounded.md}"
-    padding: "0.375rem 0.75rem"
+    padding: "0.5rem 0.875rem"
   button-primary-hover:
-    backgroundColor: "{colors.cobalt-700}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.accent-700}"
+    textColor: "{colors.surface}"
   button-quiet:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink-grey-700}"
-    rounded: "{rounded.sm}"
-    padding: "0.125rem 0.5rem"
-    height: "auto"
+    backgroundColor: "{colors.neutral-100}"
+    textColor: "{colors.neutral-700}"
+    typography: "{typography.label}"
+    rounded: "{rounded.md}"
+    padding: "0.3125rem 0.625rem"
   button-quiet-hover:
+    backgroundColor: "{colors.neutral-200}"
+    textColor: "{colors.neutral-900}"
+  button-text:
     backgroundColor: "transparent"
-    textColor: "{colors.cobalt-600}"
-  pill-add:
-    backgroundColor: "{colors.scarcity-open-100}"
-    textColor: "{colors.scarcity-open-600}"
-    rounded: "{rounded.md}"
-    padding: "0.5rem"
-  pill-remove:
-    backgroundColor: "{colors.scarcity-full-100}"
-    textColor: "{colors.scarcity-full-600}"
-    rounded: "{rounded.md}"
-    padding: "0.5rem"
-  pill-syllabus:
-    backgroundColor: "{colors.cobalt-100}"
-    textColor: "{colors.cobalt-600}"
-    rounded: "{rounded.md}"
-    padding: "0.5rem"
-  input-search:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink-grey-900}"
-    rounded: "{rounded.md}"
-    padding: "0.375rem 0.75rem 0.375rem 2.5rem"
-  select-semester:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink-grey-900}"
-    typography: "{typography.data}"
+    textColor: "{colors.neutral-600}"
+    typography: "{typography.label}"
     rounded: "{rounded.sm}"
-    padding: "0.25rem 1.5rem 0.25rem 0.25rem"
+    padding: "0"
+  button-text-hover:
+    backgroundColor: "transparent"
+    textColor: "{colors.accent-600}"
+  action-add:
+    backgroundColor: "{colors.accent-600}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.xl}"
+    width: "2.75rem"
+    height: "2.75rem"
+  action-remove:
+    backgroundColor: "{colors.neutral-100}"
+    textColor: "{colors.neutral-600}"
+    rounded: "{rounded.xl}"
+    width: "2.75rem"
+    height: "2.75rem"
+  action-remove-hover:
+    backgroundColor: "{colors.scarcity-full-50}"
+    textColor: "{colors.scarcity-full-600}"
+  input-search:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.neutral-900}"
+    rounded: "{rounded.xl}"
+    padding: "0.625rem 2.75rem"
+    shadow: "{shadow.xs}"
+  select-semester:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.neutral-900}"
+    typography: "{typography.data}"
+    rounded: "{rounded.lg}"
+    padding: "0.375rem 1.75rem 0.375rem 0.625rem"
   card:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink-grey-900}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.neutral-900}"
     rounded: "{rounded.lg}"
     padding: "0"
+    shadow: "{shadow.xs}"
   card-row:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink-grey-900}"
-    padding: "0.625rem 1rem"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.neutral-900}"
+    padding: "0.75rem 1rem"
   card-row-hover:
-    backgroundColor: "{colors.ink-grey-50}"
+    backgroundColor: "{colors.neutral-50}"
   dialog:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink-grey-900}"
-    rounded: "{rounded.lg}"
-    padding: "1rem"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.neutral-900}"
+    rounded: "{rounded.2xl}"
+    padding: "1.25rem"
     width: "32rem"
+    shadow: "{shadow.lg}"
   chip-category:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink-grey-600}"
-    typography: "{typography.chip}"
-    padding: "0 0.125rem"
+    backgroundColor: "{colors.neutral-100}"
+    textColor: "{colors.neutral-600}"
+    rounded: "{rounded.full}"
+    padding: "0.25rem 0.625rem"
   chip-category-hover:
-    backgroundColor: "transparent"
-    textColor: "{colors.cobalt-600}"
+    backgroundColor: "{colors.neutral-200}"
+    textColor: "{colors.neutral-900}"
+  badge-alert:
+    backgroundColor: "{colors.scarcity-full-50}"
+    textColor: "{colors.scarcity-full-700}"
+    rounded: "{rounded.full}"
+    padding: "0.125rem 0.5rem"
   palette-row:
     backgroundColor: "transparent"
-    textColor: "{colors.ink-grey-900}"
-    padding: "0.5rem 0.75rem"
+    textColor: "{colors.neutral-900}"
+    padding: "0.625rem 1rem"
   palette-row-active:
-    backgroundColor: "{colors.cobalt-50}"
-    textColor: "{colors.ink-grey-900}"
+    backgroundColor: "{colors.accent-50}"
+    textColor: "{colors.neutral-900}"
 ---
 
 # Design System: BOUN Course Planner
 
 ## Overview
 
-**Creative North Star: "The Boğaz Editorial"**
+**Creative North Star: "Sade"** — plain, in the Turkish sense: nothing added that
+does not earn its place.
 
-A registration tool is a document, not an app. This one is drawn to read like the official schedule form it replaces: paper, ink, ruled columns, and exactly one stamp of colour. The chrome is a single cool ink-grey ramp printed on paper white; cobalt — the Bosphorus blue — is the only interaction ink in the interface; saturated warm colour is withheld for the one thing worth shouting about, which is occupancy pressure and clashes. Nothing is coloured decoratively and nothing floats. Hierarchy is drawn with hairline rules, weight and whitespace.
+A student opens this app twice: once in the calm week before registration, and
+once at 09:00 on the morning add-drop opens, with a quota moving under them and
+about two seconds of patience. The second visit governs the design. Every
+surface is arranged around one question — *can I still get this section, and does
+it fit?* — and anything that does not help answer it moves out of the way.
 
-The type does the editorial work. Schibsted Grotesk, a newspaper grotesk drawn for mastheads, carries the interface; IBM Plex Mono carries anything the registration system produced — course codes, slot times, seat counts, timestamps. The mono is semantic, not decorative: it marks machine data, and its tabular figures stop numbers from shifting width as they change. Both faces are self-hosted, because the service worker only caches same-origin requests and a CDN webfont would vanish exactly when the app matters most: offline, mid-campus.
+So the app is quiet by default: a soft neutral ground, white cards, one calm
+accent, and generous whitespace instead of rules and boxes. Depth is a single
+hairline and a shadow you have to look for. Colour is rationed: the accent means
+*you can act here*, and green / amber / red mean *seats*, *filling*, *gone or
+clashing*. Nothing else is coloured at all.
 
-The system is deliberately dense and deliberately quiet. Components are graphite at rest and take the cobalt ink on contact. Radii collapse to 1–4px throughout, because a document has edges, not pillows. The one place the design is allowed to be loud is the occupancy meter, since nothing else in the BOUN ecosystem tells a student whether a section is actually gettable.
+The other half of "sade" is progressive disclosure. The catalogue holds 3140
+sections in a live term, and each one has exam dates, prerequisite chains,
+cross-listings, catalogue text, an offering history and three secondary actions
+attached to it. All of that is still here — none of it was deleted — but it sits
+behind one `Details` disclosure per card, so a row shows five lines and one
+button instead of eleven rows and four. Minimal means fewer things competing at
+once, not fewer things available.
+
+The type carries the last of the work. Schibsted Grotesk for anything a person
+wrote; IBM Plex Mono for anything the registration system produced — course
+codes, clock times, room numbers, seat counts, timestamps. The mono is semantic,
+not decorative: it marks quoted machine data, and its tabular figures stop
+numbers from re-flowing as they update. Both faces are self-hosted, because the
+service worker only caches same-origin requests and a CDN webfont would vanish
+exactly when the app matters most: offline, mid-campus.
 
 **Key Characteristics:**
 
-- One neutral ramp (cool ink-grey), one interaction ink (cobalt), one meaning-bearing ramp (open / filling / full).
+- One neutral ramp, one accent, one three-step scarcity ramp. No fourth hue in the chrome.
 - Mono means machine data; sans means human language. No exceptions.
-- Hairline rules and whitespace instead of shadows; near-square corners (1–4px).
-- Dense, tabular, print-adjacent: 11–15px text, 2.25rem grid rows, tabular figures everywhere numbers appear.
-- Quiet at rest, ink on contact: graphite borders and labels that turn cobalt on hover.
+- Soft corners (8px controls, 12px cards, 18px dialogs) and a barely-there shadow — approachable, not ornamental.
+- Whitespace first, hairline second, tint third. Boxes and dividers are a last resort.
+- One primary action per row. Everything else lives under `Details`.
 - Unknown data is stated, italicised or greyed — never rendered as a confident number.
 
 ## Colors
 
-One cool ink-grey ramp for all chrome, one cobalt for all interaction, a three-step scarcity ramp that is the only colour permitted to carry risk, and a separate twelve-hue palette that exists solely to give a selected course an identity in the timetable.
+One dead-neutral ramp for all chrome, one accent for all interaction, a
+three-step scarcity ramp that is the only colour permitted to carry risk, and a
+separate twelve-hue palette whose sole job is to give a selected course an
+identity in the timetable.
 
 ### Primary
 
-- **Bosphorus Cobalt** (`{colors.cobalt-500}` / `{colors.cobalt-600}`): the single interaction ink. Focus rings, hover borders, hover text, checked checkboxes, the active command-palette row, the solid Apply / Add-to-Calendar button, the "✓ taken" mark, the current node of the prerequisite tree. Cobalt on a surface always means *you can act here, or you already did*.
+- **Accent** (`{colors.accent-600}`, with `{colors.accent-500}` for fills and rings): the single interaction colour. The add-section button, the Apply and Add-to-Calendar buttons, focus rings, checked checkboxes, the active command-palette row, hover on a text control, the "taken" badge, the current node of the prerequisite tree. Accent on a surface always means *you can act here, or you already did*.
 
 ### Secondary
 
-- **Scarcity Open** (`{colors.scarcity-open-500}`): seats left, meter fill below 85%, add-section pill. Muted, never a "success" green.
-- **Scarcity Filling** (`{colors.scarcity-filling-400}` / `{colors.scarcity-filling-600}`): meter fill at ≥85% occupancy, missing prerequisites ("Needs: …"), stale quota timestamps, an inferred (not published) roadmap term, blocking nodes in the prerequisite tree.
-- **Scarcity Full** (`{colors.scarcity-full-500}` / `{colors.scarcity-full-600}`): FULL and over-enrolled sections, the hatched overflow tail of the meter, timetable clash rings, final-exam clashes, remove-section pill.
+- **Scarcity Open** (`{colors.scarcity-open-500}` / `{colors.scarcity-open-700}`): seats left, meter fill below 85%.
+- **Scarcity Filling** (`{colors.scarcity-filling-500}` / `{colors.scarcity-filling-700}`): meter fill at ≥85%, missing prerequisites ("Needs: …"), a stale quota timestamp, an inferred roadmap term, blocking nodes in the prerequisite tree.
+- **Scarcity Full** (`{colors.scarcity-full-500}` / `{colors.scarcity-full-600}`): FULL and over-enrolled sections, the hatched overflow tail of the meter, timetable clash rings, the clash badge, final-exam clashes, remove-on-hover.
+
+All three are pulled a step off stock Tailwind saturation, because a list of a
+hundred sections rendered in stock green/amber/red reads as a traffic light
+rather than as information.
 
 ### Tertiary
 
-- **The Course Twelve**: a fixed twelve-hue ramp (red, orange, amber, yellow, lime, emerald, teal, sky, blue, indigo, fuchsia, pink) used *only* to identify a selected course inside the timetable. A course's hue is an FNV-1a hash of its section key, so the same course is the same colour on every visit and across every device. Each entry is a near-white `-50` fill, a firm `-600` left accent rule, and `-800` text — a ledger line, not a sticker. The PNG export draws the same twelve entries from their hex fields, so screen and exported image cannot drift apart.
+- **The Course Twelve**: a fixed twelve-hue ramp (red, orange, amber, yellow, lime, emerald, teal, sky, blue, indigo, fuchsia, pink) used *only* to identify a selected course inside the timetable. A course's hue is an FNV-1a hash of its section key, so the same course is the same colour on every visit and across every device. Each entry is a near-white `-50` fill with a 3px `-600` rule down its leading edge and `-800` text. The PNG export draws the same twelve entries from their hex fields, so screen and exported image cannot drift apart.
 
 ### Neutral
 
-- **Paper White** (`{colors.paper}`) and **Ink** (`{colors.ink}`): the substrate in light and dark. Both are cast a degree cool so that cobalt reads as the same ink at full strength; neither is pure `#fff`/`#000`.
-- **Ink Grey 100–300**: hairline rules, dividers, card borders, meter track, unchecked control borders.
-- **Ink Grey 400–500**: placeholders, decorative chevrons, disabled-ish marks.
-- **Ink Grey 600–700**: the workhorse secondary text — labels, eyebrows, spine digits, metadata. `600` is the floor for small text on paper, because `500` measures 4.37:1 and misses AA.
-- **Ink Grey 800–950**: dark-mode surfaces (`800` panels, `900` sunken/nested surfaces, `950`/Ink page ground) and light-mode primary text.
+- **Surface** (`{colors.surface}`) and **Ground** (`{colors.ground}`): cards sit white on a barely-tinted page. In dark mode the pair inverts to `{colors.neutral-800}` on `{colors.neutral-950}`.
+- **Neutral 100–300**: hairlines, dividers, card borders, meter track, quiet-button fill, unchecked control borders.
+- **Neutral 400**: placeholders, decorative chevrons, the ✕ on a selected-course row.
+- **Neutral 500–700**: secondary and tertiary text — labels, metadata, spine digits. `500` is pulled a step darker than an even ramp would put it, because it is the tertiary text colour and has to clear 4.5:1 on the *ground*, not just on card white.
+- **Neutral 800–950**: dark-mode surfaces (`800` cards, `900` nested/sunken, `950` page ground) and light-mode primary text.
 
 ### Named Rules
 
-**The One Ink Rule.** Cobalt is the only interaction colour in the chrome. If an element responds to the cursor, it turns cobalt; if it turns cobalt, it responds to the cursor. No second accent is introduced for emphasis, branding or variety.
+**The One Accent Rule.** The accent is the only interaction colour in the chrome.
+If an element responds to a click, it is accent or it is neutral-on-hover; no
+second accent is introduced for emphasis, branding or variety.
 
-**The Scarcity Rule.** Green, amber and red are reserved for capacity and risk: seats, occupancy, clashes, staleness. Credits, ECTS, section counts and selection counts stay on the ink-grey ramp even when a status pill is tempting — *a count is data, not an alert; green means seats.*
+**The Scarcity Rule.** Green, amber and red are reserved for capacity and risk:
+seats, occupancy, clashes, staleness. Credits, ECTS, section counts and selection
+counts stay on the neutral ramp even when a status pill is tempting — *a count is
+data, not an alert; green means seats.*
 
-**The Ledger Line Rule.** The twelve course hues are identity, not decoration. They appear only as a timetable block's `-50` fill with a 3px `-600` left rule, are assigned by hash rather than by selection order, and never leak into buttons, badges or chrome.
+**The Ledger Line Rule.** The twelve course hues are identity, not decoration.
+They appear only as a timetable block's `-50` fill with a 3px `-600` leading
+rule, are assigned by hash rather than by selection order, and never leak into
+buttons, badges or chrome.
 
 ## Typography
 
 **Display Font:** Schibsted Grotesk (self-hosted, variable 400–900; falls back to `ui-sans-serif`, `system-ui`, `-apple-system`)
 **Body Font:** Schibsted Grotesk — the same face; hierarchy comes from weight and size, not from a second family
-**Label/Mono Font:** IBM Plex Mono (self-hosted, 400 + 600; falls back to `ui-monospace`, `SF Mono`, `Menlo`)
+**Data Font:** IBM Plex Mono (self-hosted, 400 + 600; falls back to `ui-monospace`, `SF Mono`, `Menlo`)
 
-**Character:** A newspaper grotesk against an engineer's mono. Schibsted is compact and slightly editorial, so tracking stays at the metal (`letter-spacing: 0`) and `font-synthesis-weight` is off — every weight is a real cut. Plex Mono is not a style choice: it is the mark of data the registration system produced, with tabular figures so seat counts and hours never re-flow as they update. Both faces ship `latin` and `latin-ext` subsets because Turkish needs both — `ı` lives in one, `İ ş ğ` in the other.
+**Character:** A clean grotesk against an engineer's mono. Schibsted is compact
+and quietly modern, so tracking stays at the metal and `font-synthesis-weight` is
+off — every weight is a real cut. Plex Mono is not a style choice: it is the mark
+of data the registration system produced, with tabular figures so seat counts and
+hours never re-flow as they update. Both faces ship `latin` and `latin-ext`
+subsets because Turkish needs both — `ı` lives in one, `İ ş ğ` in the other.
 
 ### Hierarchy
 
-- **Masthead** (800, 0.9375rem, `-0.02em`): the app title only. One instance, in the header bar.
-- **Title** (600, 0.9375rem): panel and card titles, total-credit values, the selected-section count.
-- **Identifier** (mono 600, 0.8125–0.9375rem): course codes and section keys. Always mono + semibold, sized by hierarchy level, never sans.
-- **Body** (400, 0.875rem): course names, descriptions, instructions, prose. Descriptions run at 0.875rem with `whitespace-pre-line`; catalogue text is never widened past its column.
-- **Data** (mono 400, 0.6875–0.8125rem, tabular): schedules, rooms, credits, seat counts, timestamps, semester name, EN/TR toggle.
-- **Chip** (mono 500, 0.75rem): department chips only — the one size between Data and Label, unchromed and unfilled.
-- **Label / eyebrow** (mono 600, 0.625rem, `0.08em`, uppercase): section headings, day-column headers, dialog titles, the total-credit label.
-- **Spine** (mono 600, 0.6875rem, tabular, right-aligned) with **Spine-minute** (400, 0.5625rem): the hour gutter of the timetable. The minutes drop to a smaller, lighter mark at the same ink, because hierarchy here is carried by size and weight — colour would fail the contrast floor.
+- **Title** (600, 1rem, `-0.015em`): the app name in the top bar. One instance.
+- **Heading** (600, 0.9375rem): panel headings, the empty-state sentence, total-credit values.
+- **Identifier** (mono 600, 0.9375rem, tabular): course codes and section keys — the thing a student types into the registration system. Always mono + semibold, never sans.
+- **Body** (400, 0.875rem): course names, descriptions, prose.
+- **Meta** (400, 0.8125rem): the practical line of a card — instructor, seats, everything under `Details`.
+- **Data** (mono 400, 0.6875–0.8125rem, tabular): schedules, rooms, credits, seat counts, timestamps, term name.
+- **Label** (500, 0.75rem, Neutral 600): section labels and column headers. Sentence case, in the interface face — the old all-caps mono eyebrow shouted every heading in a product whose headings are all mundane ("Courses", "Filters", "Total Credits").
+- **Spine** (mono 500, 0.6875rem, tabular, right-aligned): the hour gutter of the timetable, with the minutes dropping to weight 400 at the same size and ink, because colour there would fail the contrast floor.
 
 ### Named Rules
 
-**The Machine Data Rule.** If the registration system produced the value — a code, an hour, a room, a seat count, a timestamp — it is set in mono with tabular figures. If a human wrote it, it is set in the grotesk. This is how a student tells, at a glance, what is quoted and what is authored.
+**The Machine Data Rule.** If the registration system produced the value — a
+code, an hour, a room, a seat count, a timestamp — it is set in mono with tabular
+figures. If a human wrote it, it is set in the grotesk. This is how a student
+tells, at a glance, what is quoted and what is authored.
 
-**The Ink Floor Rule.** Small text (≤11px) never goes lighter than Ink Grey 600 on paper or Ink Grey 400 on ink. Contrast is checked by the axe gate in both schemes, so a lighter grey is not a style decision, it is a failing test.
+**The Ink Floor Rule.** Small text never goes lighter than Neutral 500 on the
+ground or Neutral 400 on dark. Contrast is checked by the axe gate in both
+schemes, so a lighter grey is not a style decision, it is a failing test.
 
 ## Layout
 
-Two panes, one document. Above `md` (768px) the app is a fixed-height, non-scrolling shell: the header bar, then a 5/12 pane (timetable, then the selected-course list) beside a 7/12 pane (search, filters, catalogue), each scrolling independently with `overflow-y-auto`. Below `md` the same order stacks into a single scrolling column — timetable first, catalogue below — and the floating ⌘K button becomes the primary way into search.
+Two panes, one page. Above `md` (768px) the app is a fixed-height, non-scrolling
+shell: a 3.5rem top bar, then a 5/12 pane (timetable, then the selected-course
+panel) beside a 7/12 pane (search, filters, catalogue), each scrolling
+independently. The whole thing is capped at `110rem` and centred, so a 32"
+monitor gets whitespace rather than a stretched course row. Below `md` the same
+order stacks into a single scrolling column — timetable first, catalogue below —
+and the floating ⌘K button becomes the primary way into search.
 
-The header is a two-rule masthead: a 2px ink rule under a 2.75rem bar, then a 3px gap and a hairline — an Oxford double rule, the one piece of pure typographic ornament in the system.
+The top bar is a single hairline over the page: title left, term and EN/TR right,
+nothing else. Panes are separated by a `1rem` gutter and panels within a pane by
+`0.75rem`, so the structure is read from whitespace before any border is
+noticed.
 
-Spacing is a tight 4px-based rhythm: `0.5rem` shell padding, `1rem` horizontal card padding, `0.625rem` vertical for a course row, `0.375rem` for a list row, `0.25rem` gaps inside control clusters. The timetable is a fixed table, `2.25rem` per hour row, `3.5rem` sticky hour gutter, `5rem` day columns, `min-width: 32rem` with horizontal scroll below that; the sticky corner and gutter sit above the grid on their own z-layers. Overlapping sections split a cell into equal percentage sub-columns with a 1px gap, and a course keeps one horizontal offset for its whole vertical band so a multi-hour block is never sliced.
+Spacing is a 4px rhythm: `0.75–1rem` shell padding, `1rem` horizontal card
+padding, `0.75rem` vertical for a course row, `0.5rem` for a list row, `0.5rem`
+gaps inside control clusters. The timetable is a fixed table, `2.25rem` per hour
+row, `3.5rem` sticky hour gutter, `5rem` day columns, `min-width: 32rem` with
+horizontal scroll below that; the sticky corner and gutter sit above the grid on
+their own z-layers. Overlapping sections split a cell into equal percentage
+sub-columns with a 1px gap, and a course keeps one horizontal offset for its
+whole vertical band so a multi-hour block is never sliced.
 
-Overlays are sized to their content, not to the viewport: the filter dialog is `max-w-lg` (32rem), the command palette `max-w-2xl` (42rem) opening at `10vh`, the occupancy meter caps at `11rem`.
+Overlays are sized to their content, not to the viewport: the filter dialog is
+`max-w-lg` (32rem), the command palette `max-w-2xl` (42rem) opening at `10vh`,
+the occupancy meter caps at `11rem`.
 
 ## Elevation & Depth
 
-Flat by doctrine. There is no shadow vocabulary: depth is drawn with hairline rules, tonal surface steps (paper → Ink Grey 50 for hover, Ink Grey 800 → 900 for nested dark surfaces) and border weight. Modality is signalled by a heavier 2px ink border plus a `bg-black/60` backdrop, not by a lift. Only two box-shadows exist, and neither reads as elevation:
+Almost flat. Four shadow tokens exist and three of them are nearly invisible:
+`xs` on resting cards and the search field, `md` on the floating ⌘K button, `lg`
+on the two overlays and the roadmap's suggestion dropdown. Everything else
+separates with a hairline, a tonal step (surface → Neutral 50 on hover; Neutral
+800 → 900 for nested dark surfaces) or plain whitespace.
 
-- **Row rule** (`box-shadow: inset 0 1px 0 0` Ink Grey 100; dark: Ink Grey 700 at 60%): the timetable's hour line. It is a shadow purely for layout reasons — a real `border-top` would shift the cell's content box and split a multi-hour course into separate slabs.
-- The catalogue search wrapper carries a single default `shadow`, the one residual lift in the app.
+One box-shadow is not elevation at all:
+
+- **Row rule** (`box-shadow: inset 0 1px 0 0` Neutral 100; dark: Neutral 700 at 45%): the timetable's hour line. It is a shadow purely for layout reasons — a real `border-top` would shift the cell's content box and split a multi-hour course into separate slabs.
 
 ### Named Rules
 
-**The Flat Document Rule.** Surfaces do not lift. If something needs to separate from its neighbour, it gets a hairline, a tonal step, or whitespace — in that order. New shadow tokens are not part of this system.
+**The Quiet Elevation Rule.** A shadow says "this floats above the page", and in
+this app only three things do: the palette, the filter dialog and the ⌘K button.
+A resting panel gets `xs` or nothing. New shadow tokens are not part of this
+system.
 
 ## Shapes
 
-Near-square. Every radius token collapses to 1–4px (`sm`/`md` = 2px, `lg` = 3px, `xl` = 4px), so cards, dialogs, inputs and pills all read as cut paper rather than rounded widgets; `rounded-full` is untouched, because dots and instructor chips are genuinely round. Timetable blocks have no radius at all: they are rules on a grid, marked by a 3px left accent bar.
+Soft, not round. Radii run 4px (`xs`) → 6px (`sm`) → 8px (`md`, every button and
+small control) → 12px (`lg`, every card) → 14px (`xl`, the search field and the
+row action button) → 18px (`2xl`, dialogs); `rounded-full` is reserved for
+category chips, status badges and the meter. Timetable blocks have no radius at
+all: they are bands on a grid, marked by a 3px leading accent rule.
 
-Borders are the primary form language and come in exactly three weights: **1px** Ink Grey 200/700 for cards, dividers and controls; **2px** ink (Ink Grey 900 / 200 inverted) for the masthead rule and modal surfaces; **3px** left accent for a timetable block. The prerequisite tree is the one geometric departure — a hand-drawn SVG graph with `rx=4` nodes and 1.5px Ink Grey 300 edges.
+Borders come in one weight — **1px** Neutral 200/700 — for cards, dividers,
+dialogs and controls, plus the **3px** leading accent of a timetable block. The
+prerequisite tree is the one geometric departure: a hand-drawn SVG graph with
+`rx=8` nodes and 1.5px Neutral 300 edges.
 
 ## Components
 
-Everything is Tailwind utility composition; the shared vocabulary lives as six global classes in `src/app.css` (`.u-data`, `.eyebrow`, `.spine`/`.spine-min`, `.row-rule`, `.btn-quiet`, `.meter`). Character line for all of it: **quiet at rest, ink on contact.**
+Everything is Tailwind utility composition; the shared vocabulary lives as eight
+global classes in `src/app.css` (`.card`, `.btn-primary`, `.btn-quiet`,
+`.btn-text`, `.u-data`, `.eyebrow`, `.spine`/`.spine-min`, `.row-rule`,
+`.meter`). Character line for all of it: **quiet at rest, obvious on contact.**
 
 ### Buttons
 
-- **Shape:** near-square (2px, `rounded-md`/`rounded-sm`); pills are square too — only instructor chips go `rounded-full`.
-- **Primary (`.btn-primary` pattern):** solid Cobalt 600 on paper-white text, `0.375rem 0.75rem`, 0.875rem/500. Used sparingly — the filter dialog's Apply and the calendar export. Hover deepens to Cobalt 700 (dark mode brightens to Cobalt 500 instead).
-- **Quiet (`.btn-quiet`):** the default secondary action — 1px Ink Grey 300 border, Ink Grey 700 text, no fill, `0.125rem 0.5rem`, 0.75rem/500. Hover swaps *both* border and text to cobalt over 150ms; disabled is `opacity: 0.4` + `not-allowed`, driven by the native `disabled` attribute, never by a greyed-out colour override. Copy-link, roadmap toggle, conflict-free solver, undo, clear.
-- **Outline icon button:** same recipe expressed inline for icon-led actions (filters trigger, PNG export, Google Calendar, floating ⌘K) — 1px Ink Grey 300 border, Ink Grey 600 icon, cobalt border + icon on hover.
-- **Filled action pill:** `p-2`, 2px radius, tinted `-100` background with `-600` glyph, deepening one step on hover. Three hues only: cobalt (syllabus), Scarcity Open (add section), Scarcity Full (remove section).
-- **Focus:** every control inherits one global treatment — a 2px Cobalt 500 outline at 2px offset. Do not add per-component focus rings; the two that exist (the search input's `focus:ring-1`, the semester select's `focus:ring-2`) are the exceptions, not the pattern.
+Three, and no more:
 
-- **Touch:** every icon control is a 44×44 target below `sm`, relaxing to 36×36 above it. Four stacked 44px targets would own a phone row, so on touch they sit in a 2×2 block rather than a column.
+- **Primary (`.btn-primary`):** solid Accent 600, white text, 8px radius, `0.5rem 0.875rem`, 0.875rem/500. One per panel at most — the filter dialog's Apply, the calendar export. Hover deepens to Accent 700.
+- **Quiet (`.btn-quiet`):** the default secondary action — Neutral 100 fill, Neutral 700 text, no border, 8px radius, `0.3125rem 0.625rem`, 0.75rem/500. Hover deepens the fill one step. A tinted fill reads as a button at a glance without adding another line to a dense list, which is why the old bordered variant is gone. Copy-link, roadmap toggle, conflict-free solver, undo, clear, and the three actions inside `Details`.
+- **Text (`.btn-text`):** no box at all until hover, when it takes the accent. Disclosures only — `Details`, `Show description`, `Show more`, `How to import?`.
+- **Row action:** the single 44×44 control on the right of a catalogue row. Solid accent with a `+` when the section is not selected; Neutral 100 with a `−`, going Scarcity Full on hover, when it is. It is the only always-visible action on a card.
+- **Focus:** every control inherits one global treatment — a 2px Accent 500 outline at 2px offset. Do not add per-component focus rings; the two that exist (the search input and the semester select) are the exceptions, not the pattern.
+- **Touch:** every icon control is at least a 44×44 target; inline text controls get `min-h-6`.
 
 ### Chips
 
-- **Category chips:** mono, 0.75rem/500, Ink Grey 600, no border and no fill — deliberately unchromed, because sixty filled pills read as a wall. Cobalt text on hover.
-- **Instructor chips:** `.btn-quiet` with `rounded-full`, the only round shape in the interface.
-- **Eyebrow chip:** the catalogue's show-more toggle is the single `.eyebrow` with a background (Ink Grey 100 / Ink), because it straddles a scroll edge.
+- **Category chips:** the department codes above the catalogue — mono 0.75rem/500 in a Neutral 100 pill, folded to a single row with a `Show more` toggle *beside* the row, never floating over it.
+- **Instructor chips:** `.btn-quiet` with `rounded-full`.
+- **Status badges:** `rounded-full`, `-50` fill with `-700` text, 0.6875rem/500. Exactly two exist: "taken" (accent) and "Conflict" (scarcity full). A badge is an alert, not a label; if it is not urgent it is text.
 
 ### Cards / Containers
 
-- **Corner Style:** 3px (`rounded-lg`), `overflow-hidden` so child rules meet the edge cleanly.
-- **Background:** Paper White; Ink Grey 800 in dark mode. Nested/sunken surfaces (prerequisite tree, roadmap column body) drop to Ink Grey 900.
-- **Shadow Strategy:** none — see Elevation & Depth.
-- **Border:** 1px Ink Grey 200 / 700. Internal structure is `divide-y` at the same weight for top-level blocks and one step lighter (Ink Grey 100 / 700 at 60%) for rows nested inside a block.
-- **Internal Padding:** `1rem` horizontal, `0.625rem` vertical for a header or course row, `0.375rem` for a compact list row. Rows hover to Ink Grey 50 (dark: Ink Grey 900 at 40%).
+- **Template (`.card`):** white surface, 1px Neutral 200 border, 12px radius, `shadow-xs`. Dark mode: Neutral 800 on a softened Neutral 700 border, no shadow.
+- **Internal structure:** `divide-y` in Neutral 100 (dark: Neutral 700 at 60%) — one step lighter than the outer border, so rows read as one object rather than as a stack of cards.
+- **Internal padding:** `1rem` horizontal; `0.75rem` vertical for a header or course row, `0.5rem` for a compact list row. Rows hover to Neutral 50 (dark: Neutral 900 at 40%).
 
-This one template — 3px radius, 1px border, paper surface, `divide-y` — is the catalogue, the selected-course list, the instructor panel and the roadmap. New panels use it rather than inventing a container.
+This one template is the catalogue, the selected-course panel, the instructor
+panel and the timetable frame. New panels use it rather than inventing a
+container. The roadmap deliberately does *not*: it renders inside the
+selected-course panel, so it is a flush section with no border of its own — one
+border around the whole thing, not two.
+
+### The course row (signature layout)
+
+A row is read top to bottom in one pass:
+
+1. **Identity** — section key (mono 600) + course name, with a "taken" or "Conflict" badge if either applies.
+2. **The practical line** — instructor, schedule in real clock times, rooms, credits. Separated by whitespace, not by dots: one less mark per row, times 3140.
+3. **Seats** — the count, "N left" or FULL, the scrape timestamp, and the occupancy meter.
+4. **Alerts, only if real** — missing prerequisites, a final-exam clash, the exam schedule once the registrar publishes it.
+5. **`Details`** — one disclosure holding prerequisites and their tree, quota restrictions, cross-listings, offering history, ECTS, the catalogue description, and the three secondary actions (mark as taken, official course page, report incorrect data) as *labelled* buttons rather than bare icons.
+
+Everything above the fold answers "can I get it and does it fit". Everything
+below it is reference.
 
 ### Inputs / Fields
 
-- **Search:** 1px Ink Grey 200, paper fill, 2px radius, `0.375rem 0.75rem` with `2.5rem` left inset for the icon, Ink Grey 400 placeholder. Focus shifts the border to Cobalt 500 and adds a 1px cobalt ring.
-- **Semester select:** `appearance-none` mono control with a manually placed chevron in Ink Grey 400; hover takes the cobalt border, focus a 2px cobalt ring.
-- **Checkboxes:** `appearance-none`, 3px radius, 1px Ink Grey 300 border, filling to solid Cobalt 500 when checked. The timetable day/hour grid uses the same control at 80% opacity, to separate a bulk time filter from a single option.
-- **Command palette input:** borderless except for a bottom hairline, 1.125rem, `0.75rem` padding — the panel's own 2px border does the containing.
-- **Error / Disabled:** inputs have no error state; validation lives in the data, not the form. Disabled controls use the native attribute with `opacity: 0.4`.
-
-- **Empty:** a state with nothing in it still owes the reader a sentence and a way out — the query echoed verbatim (never through `.eyebrow`, which uppercases), what was searched, and the controls that undo it. A `role="list"` with no items is not an empty state, it is a bug.
+- **Search:** 14px radius, white fill, 1px Neutral 200, `shadow-xs`, `2.75rem` insets for the icon and the clear button, Neutral 400 placeholder. Focus shifts the border to Accent 500 and adds a 1px accent ring.
+- **Semester select:** `appearance-none` mono control with a manually placed chevron in Neutral 400; it compacts a step below `sm` so the app title never has to truncate on a 390px phone.
+- **Checkboxes:** `appearance-none`, 5–8px radius, 1px Neutral 300 border. A single option fills solid Accent 600 when checked; the timetable day/hour grid fills Accent 200 instead, because a 6×14 grid of solid accent is a wall, and "this slot is shown" is the default state rather than an assertion.
+- **Command palette input:** borderless except for a bottom hairline, 1rem, `1rem` padding — the panel's own border and shadow do the containing.
+- **Error / Disabled:** inputs have no error state; validation lives in the data, not the form. Disabled controls use the native attribute with `opacity: 0.45`.
+- **Empty:** a state with nothing in it still owes the reader a sentence and a way out — the query echoed verbatim, what was searched, and the controls that undo it, centred in a card. A `role="list"` with no items is not an empty state, it is a bug.
 
 ### Navigation
 
-There is no nav bar. The masthead holds the title, the EN/TR segmented toggle (mono, 0.6875rem/600; the active half inverts to solid ink with paper text) and the semester select pushed right. Navigation happens through search, the ⌘K palette, and URL state.
+There is no nav bar. The top bar holds the title, the semester select and the
+EN/TR segmented control (the active half is a raised white pill, and carries
+`aria-pressed`). Navigation happens through search, the ⌘K palette, and URL
+state.
 
 ### The Occupancy Meter (signature component)
 
-The one loud element, and the reason the design exists. A 2px rule under a section's seat count, `max-width: 11rem`, track in Ink Grey 200 (dark: 700). Its fill is `--fill` (current/quota) in `currentColor`, so the wrapper's text colour *is* the meter colour: Scarcity Open below 85%, Scarcity Filling at ≥85%, Scarcity Full when full or over-enrolled. The point is the tail: an over-enrolled section spills past the end of the track into a `--over` segment drawn as a 45° hatch, instead of clamping at 100% and quietly lying about a full section. Fill and tail animate at 220ms `cubic-bezier(0.2, 0, 0, 1)`, and not at all under `prefers-reduced-motion`. It is `aria-hidden`: the numbers beside it carry the same fact to a screen reader.
+The one loud element, and the reason the design exists. A rounded 3px rule under
+a section's seat count, `max-width: 11rem`, track in Neutral 200 (dark: Neutral
+700 at 80%). Its fill is `--fill` (current/quota) in `currentColor`, so the
+wrapper's text colour *is* the meter colour: Scarcity Open below 85%, Scarcity
+Filling at ≥85%, Scarcity Full when full or over-enrolled. The point is the tail:
+an over-enrolled section spills past the end of the track into a `--over` segment
+drawn as a 45° hatch, instead of clamping at 100% and quietly lying about a full
+section. Fill and tail animate at 220ms `cubic-bezier(0.2, 0, 0, 1)`, and not at
+all under `prefers-reduced-motion`. It is `aria-hidden`: the numbers beside it
+carry the same fact to a screen reader.
 
 ### Command Palette
 
-A 42rem panel at `10vh` over a `bg-black/40` backdrop: 2px ink border, 3px radius, no shadow. Sticky mono group headers on Ink Grey 50, and result rows whose *only* active treatment is a Cobalt 50 fill — keyboard-active and hover share one visual state, so there is never a second highlight competing with the caret. Each row carries mono metadata (section, hours, rooms, credits) with seats in Ink Grey 600, or bold Scarcity Full when the section is full.
-
-### The annotation slot
-
-Every explanation on a card lands in one place: a single line at the foot of the card's text column, above a hairline, in 0.75rem Ink Grey 600. The marks that own an explanation — eligibility, "prereqs unchecked", the enrolment snapshot stamp, the quota note — are disclosure buttons (`aria-expanded`) that write their sentence into it, because a `title` tooltip reaches neither a touch user nor a screen reader. One slot per card, always in the same position: the explanation never floats, and it never moves the row it belongs to.
+A 42rem panel at `10vh` over a lightly blurred Neutral 900/40 backdrop: 1px
+border, 18px radius, `shadow-lg`. Sticky mono group headers on Neutral 50, and
+result rows whose *only* active treatment is an Accent 50 fill — keyboard-active
+and hover share one visual state, so there is never a second highlight competing
+with the caret.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** express interaction only in cobalt: `hover:border-blue-500 hover:text-blue-600` (dark: `blue-400`/`blue-300`) is the house hover, and the global 2px Cobalt 500 `:focus-visible` outline is the house focus.
+- **Do** express interaction only in the accent, and let the global 2px Accent 500 `:focus-visible` outline be the house focus.
 - **Do** set every machine-produced value in `.u-data` (mono + tabular figures) and every human label in the grotesk.
-- **Do** reuse the container template — `rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800` with `divide-y` — for any new panel.
-- **Do** separate surfaces with a hairline, a tonal step or whitespace, in that order.
-- **Do** keep small text at Ink Grey 600 on paper and Ink Grey 400 on ink, and re-run the axe gate in both schemes after touching a colour.
-- **Do** state absent data as absent: italic "unpublished", a greyed "?" for unknown prerequisites, an "≈" for an inferred term.
-- **Do** reach for `.btn-quiet` for secondary actions, and let the native `disabled` attribute carry the disabled state.
+- **Do** reuse `.card` for any new panel, and `.btn-primary` / `.btn-quiet` / `.btn-text` for any new control.
+- **Do** separate surfaces with whitespace, a hairline or a tonal step, in that order.
+- **Do** put anything a student does not need in the first two seconds behind the row's `Details` disclosure — and label it there, rather than shipping another bare icon.
+- **Do** keep small text at Neutral 500 on the ground and Neutral 400 on dark, and re-run the axe gate in both schemes after touching a colour.
+- **Do** state absent data as absent: italic "unpublished", a greyed note for unknown prerequisites, an "≈" for an inferred term.
 - **Do** honour `prefers-reduced-motion`: the global reset kills transitions, and the meter opts out explicitly.
-- **Do** give an inline text control at least a 24px target (`min-h-6`) and an icon control 44px on touch.
-- **Do** put an explanation in the annotation slot as a disclosure. A `title` may repeat it for the mouse; it may never be the only copy.
 
 ### Don't:
 
-- **Don't** introduce a second accent hue into the chrome. Cobalt is the only interaction ink.
-- **Don't** spend green, amber or red on anything that is not capacity, staleness or a clash. Credits, ECTS and counts stay ink-grey — a count is data, not an alert.
-- **Don't** let the twelve course hues out of the timetable, and don't assign them by selection order; the hash is what keeps a course the same colour everywhere.
-- **Don't** add a `box-shadow`. Nothing in this system lifts.
-- **Don't** soften a corner past 4px, or add a radius to a timetable block.
-- **Don't** add a per-component focus ring when the global outline already fires.
-- **Don't** load a font from a CDN — the service worker only caches same-origin, and both `latin` and `latin-ext` subsets are required for Turkish.
-- **Don't** clamp an over-enrolled meter at 100%, and don't render a missing quota as `0`.
-- **Don't** build a filled pill for a value that has no risk attached to it.
-- **Don't** leave an explanation in a `title` alone, and don't let a signal fire on every row — an amber stamp or a consent note that is always on has stopped saying anything.
+- **Don't** introduce a second accent hue into the chrome. One accent, one meaning.
+- **Don't** spend green, amber or red on anything that is not capacity, staleness or a clash. Credits, ECTS and counts stay neutral — a count is data, not an alert.
+- **Don't** add a second always-visible action to a catalogue row. One row, one button; the rest go under `Details`.
+- **Don't** reach for a shadow to separate two resting surfaces. Only the palette, the filter dialog and the ⌘K button float.
+- **Don't** float a control over the content it is describing — the department fold's toggle sits beside the chips precisely because it used to cover them.
+- **Don't** use a `title` tooltip as the only copy of something a touch user needs; put it in the text, or under `Details`.

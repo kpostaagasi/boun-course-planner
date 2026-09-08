@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   BOUN Course Planner — design tokens, "Boğaz Editorial"
+   BOUN Course Planner — design tokens, "Sade"
 
-   Thesis: a registration tool is a document, not an app. It should read like
-   the official schedule form it replaces — paper, ink, rules, one stamp of
-   colour. The chrome is a cool ink-grey ramp on paper white; exactly one ink
-   (cobalt, the Bosphorus blue) carries interaction; saturated warm colour is
-   still reserved for the only thing worth shouting about — occupancy pressure
-   and clashes. Nothing is coloured decoratively, nothing floats: hierarchy is
-   drawn with hairline rules and whitespace, not shadows.
+   Thesis: a student opening this app during add-drop has one question — can I
+   still get this section, and does it fit? Everything on screen either answers
+   that or gets out of the way. So the surface is quiet by default: a soft
+   neutral ground, white cards, generous whitespace, one calm accent, and
+   colour reserved for the two things that are genuinely urgent — a full
+   section and a clash. Depth comes from a single hairline border and a barely
+   perceptible shadow, never from stacked tints.
+
+   Everything a student does not need in the first two seconds — exam dates,
+   prerequisite chains, catalogue text, cross-listings, the syllabus link —
+   still exists, one tap away behind a per-card disclosure. Minimal here means
+   fewer things competing at once, not fewer things available.
 
    The palette is applied by REMAPPING the Tailwind scales the app already uses
-   (zinc + gray -> one ink-grey ramp, blue -> cobalt) rather than rewriting
-   ~300 utility classes across fifteen components. One ramp, one meaning, no
-   drift. Corner radii are remapped the same way: the whole app sharpens to
-   1–4px through the tokens, because a document has edges, not pillows.
+   (zinc + gray -> one neutral ramp, blue -> the accent) rather than rewriting
+   several hundred utility classes across fifteen components. One ramp, one
+   meaning, no drift. Corner radii are remapped the same way, so the whole app
+   softens through the tokens.
 
-   Type: Schibsted Grotesk for the interface — a newspaper grotesk, drawn for
-   editorial mastheads — and IBM Plex Mono for anything the registration
-   system produced: course codes, slot times, seat counts. The mono is
-   semantic, not decorative: it marks machine data. Both faces are self-hosted
+   Type: Schibsted Grotesk for everything a person wrote, IBM Plex Mono for
+   anything the registration system produced — course codes, clock times, seat
+   counts. The mono is semantic, not decorative: it marks machine data and
+   keeps digits from shifting width as they change. Both faces are self-hosted
    because the service worker only caches same-origin requests, so a webfont on
    a CDN would vanish exactly when the app is most useful — offline, mid-campus.
    Turkish is a hard requirement, not a nicety: ı lives in the `latin` subset
@@ -94,94 +99,110 @@
     "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Paper and ink — softer than pure #fff / #000, cast a degree cool so the
-     cobalt reads as the same ink at full strength. */
-  --color-white: #fbfcfd;
-  --color-black: #0b0d11;
+  /* Card white and the near-black it prints in. Neither is pure: #fff against
+     a tinted ground glares, and #000 text on white is harder to read for long
+     stretches than a soft graphite. */
+  --color-white: #ffffff;
+  --color-black: #0f1012;
 
-  /* Ink grey: one cool ramp with a faint blue cast, the diluted version of
-     the ink everything is printed in. zinc and gray both map here. */
-  --color-zinc-50: #f5f7f9;
-  --color-zinc-100: #ecf0f3;
-  --color-zinc-200: #dde2e8;
-  --color-zinc-300: #c2cad3;
-  --color-zinc-400: #939ea9;
-  --color-zinc-500: #67737f;
-  --color-zinc-600: #4f5a66;
-  --color-zinc-700: #38424d;
-  --color-zinc-800: #1f2731;
-  --color-zinc-900: #131a22;
-  --color-zinc-950: #0c1118;
+  /* One neutral ramp, dead neutral by design: any cast here would compete with
+     the accent. zinc and gray both map to it, so a stray `gray-400` in a
+     component cannot introduce a second grey. `-500` is pulled a step darker
+     than an even ramp would put it because it is the app's tertiary text
+     colour and has to clear 4.5:1 on the zinc-50 page ground, not just on
+     card white. */
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f6;
+  --color-zinc-200: #e7e7ea;
+  --color-zinc-300: #d3d3d8;
+  --color-zinc-400: #9c9ca5;
+  --color-zinc-500: #6b6b75;
+  --color-zinc-600: #5c5c66;
+  --color-zinc-700: #45454d;
+  --color-zinc-800: #1f1f24;
+  --color-zinc-900: #161619;
+  --color-zinc-950: #0f0f11;
 
-  --color-gray-50: #f5f7f9;
-  --color-gray-100: #ecf0f3;
-  --color-gray-200: #dde2e8;
-  --color-gray-300: #c2cad3;
-  --color-gray-400: #939ea9;
-  --color-gray-500: #67737f;
-  --color-gray-600: #4f5a66;
-  --color-gray-700: #38424d;
-  --color-gray-800: #1f2731;
-  --color-gray-900: #131a22;
-  --color-gray-950: #0c1118;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f6;
+  --color-gray-200: #e7e7ea;
+  --color-gray-300: #d3d3d8;
+  --color-gray-400: #9c9ca5;
+  --color-gray-500: #6b6b75;
+  --color-gray-600: #5c5c66;
+  --color-gray-700: #45454d;
+  --color-gray-800: #1f1f24;
+  --color-gray-900: #161619;
+  --color-gray-950: #0f0f11;
 
-  /* Cobalt: the single interaction ink. Replaces blue everywhere. */
-  --color-blue-50: #eef2fd;
-  --color-blue-100: #dce4fb;
-  --color-blue-200: #c0cef8;
-  --color-blue-300: #97aef3;
-  --color-blue-400: #6485ec;
-  --color-blue-500: #3c60e0;
-  --color-blue-600: #2447c9;
-  --color-blue-700: #1d39a3;
-  --color-blue-800: #19307e;
-  --color-blue-900: #16285f;
-  --color-blue-950: #0e1738;
+  /* The single accent. It carries interaction and nothing else — never
+     decoration, never status. blue-600 is the smallest step that clears 4.5:1
+     on white, so it is the only one used for text. */
+  --color-blue-50: #eff4ff;
+  --color-blue-100: #dbe6fe;
+  --color-blue-200: #c3d4fd;
+  --color-blue-300: #93b4fd;
+  --color-blue-400: #608efa;
+  --color-blue-500: #3b76f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
 
-  /* A document has edges, not pillows: every radius token collapses to a
-     near-square chamfer. rounded-full is untouched — dots stay dots. */
-  --radius-xs: 1px;
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 3px;
-  --radius-xl: 4px;
-  --radius-2xl: 4px;
-  --radius-3xl: 6px;
+  /* Soft corners throughout: `rounded-md` buttons land on 8px, `rounded-lg`
+     cards on 12px. rounded-full is untouched — dots and pills stay round. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 22px;
 
-  /* Scarcity ramp. These three are the only saturated hues in the chrome, and
-     they carry meaning: room / filling / full-or-clashing. */
-  --color-green-50: #eef5ef;
-  --color-green-100: #d8e8da;
-  --color-green-200: #b4d2b8;
-  --color-green-300: #86b48d;
-  --color-green-400: #5c9666;
-  --color-green-500: #3e7c4a;
-  --color-green-600: #2f643a;
-  --color-green-700: #27512f;
-  --color-green-800: #1e3e25;
-  --color-green-900: #17301d;
+  /* Scarcity ramp. Green, amber and red are the only saturated hues outside
+     the accent, and they mean exactly one thing: room / filling / gone. They
+     are desaturated a step from stock Tailwind so that a list of a hundred
+     sections does not read as a traffic light. */
+  --color-green-50: #eef7f0;
+  --color-green-100: #d7ecdc;
+  --color-green-200: #b0d8ba;
+  --color-green-300: #7fbc8e;
+  --color-green-400: #549a66;
+  --color-green-500: #3a804d;
+  --color-green-600: #2c683d;
+  --color-green-700: #245433;
+  --color-green-800: #1d4229;
+  --color-green-900: #173420;
 
-  --color-amber-50: #fbf4e6;
-  --color-amber-100: #f4e4c2;
-  --color-amber-200: #e8c883;
-  --color-amber-300: #d9a94b;
-  --color-amber-400: #c08428;
-  --color-amber-500: #a26d1d;
-  --color-amber-600: #855717;
-  --color-amber-700: #6a4513;
-  --color-amber-800: #52350f;
-  --color-amber-900: #3f2a0c;
+  --color-amber-50: #fdf5e7;
+  --color-amber-100: #f8e7c5;
+  --color-amber-200: #eecd8a;
+  --color-amber-300: #dcaa50;
+  --color-amber-400: #c2872b;
+  --color-amber-500: #a36f1e;
+  --color-amber-600: #855918;
+  --color-amber-700: #6b4713;
+  --color-amber-800: #53370f;
+  --color-amber-900: #402b0c;
 
-  --color-red-50: #fbefee;
-  --color-red-100: #f5d9d6;
-  --color-red-200: #eab3ad;
-  --color-red-300: #d9827a;
-  --color-red-400: #c4564c;
-  --color-red-500: #b33a30;
-  --color-red-600: #942e26;
-  --color-red-700: #77251f;
-  --color-red-800: #5c1d18;
-  --color-red-900: #481713;
+  --color-red-50: #fdf1f0;
+  --color-red-100: #f9dcda;
+  --color-red-200: #f0b8b3;
+  --color-red-300: #e08b84;
+  --color-red-400: #cb5f56;
+  --color-red-500: #b9433a;
+  --color-red-600: #99342c;
+  --color-red-700: #7c2a24;
+  --color-red-800: #60211c;
+  --color-red-900: #4b1a16;
+
+  /* Two shadows for the whole app, both barely there. Elevation is a hint that
+     something sits on top, not a visual effect in its own right. */
+  --shadow-xs: 0 1px 2px 0 rgb(16 17 20 / 0.04);
+  --shadow-sm: 0 1px 2px 0 rgb(16 17 20 / 0.05);
+  --shadow-md: 0 4px 12px -2px rgb(16 17 20 / 0.08);
+  --shadow-lg: 0 12px 32px -8px rgb(16 17 20 / 0.14);
 }
 
 @layer base {
@@ -191,35 +212,36 @@
 
   body {
     font-family: var(--font-sans);
-    /* Schibsted is already compact; tracking stays at the metal. */
     letter-spacing: 0;
     font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Course codes, slot times and seat counts are machine data. Tabular figures
-     keep them from shifting width as the numbers change. */
+  /* Course codes, clock times and seat counts are machine data. Tabular
+     figures keep them from shifting width as the numbers change. */
   code,
   kbd,
   samp,
   .u-data {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
   }
 
-  h1 {
-    letter-spacing: -0.02em;
+  h1,
+  h2 {
+    letter-spacing: -0.015em;
   }
 
-  /* One visible focus treatment for the whole app, in the interaction ink. */
+  /* One visible focus treatment for the whole app, in the accent. */
   :focus-visible {
     outline: 2px solid var(--color-blue-500);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 6px;
   }
 
   ::selection {
-    background: var(--color-blue-200);
+    background: var(--color-blue-100);
     color: var(--color-zinc-900);
   }
   @media (prefers-color-scheme: dark) {
@@ -243,14 +265,32 @@
 
 @layer components {
   /* ------------------------------------------------------------------------
-     The signature element: the occupancy meter.
+     Surfaces. Every panel in the app is one of these, so a change to the card
+     treatment lands everywhere at once instead of in fifteen class strings.
+     --------------------------------------------------------------------- */
+  .card {
+    background: var(--color-white);
+    border: 1px solid var(--color-zinc-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xs);
+  }
+  @media (prefers-color-scheme: dark) {
+    .card {
+      background: var(--color-zinc-800);
+      border-color: color-mix(in srgb, var(--color-zinc-700) 70%, transparent);
+      box-shadow: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     The occupancy meter.
 
      Nothing else in the BOUN ecosystem shows a student whether a section is
      actually gettable, so this is the one place the design is allowed to be
-     loud. It is a 2px rule under the seat count whose fill is current/quota,
-     and — the whole point — it keeps going past the end when a section is
-     over-enrolled, spilling into a hatched overflow segment instead of
-     clamping at 100% and quietly lying about a full section.
+     loud. It is a rounded 3px rule under the seat count whose fill is
+     current/quota, and — the whole point — it keeps going past the end when a
+     section is over-enrolled, spilling into a hatched overflow segment instead
+     of clamping at 100% and quietly lying about a full section.
 
      --fill: 0..1 of the track. --over: 0..1 of the track, drawn past the end.
      --------------------------------------------------------------------- */
@@ -261,13 +301,14 @@
     display: block;
     width: 100%;
     max-width: 11rem;
-    height: 2px;
+    height: 3px;
+    border-radius: 999px;
     background: var(--color-zinc-200);
     overflow: visible;
   }
   @media (prefers-color-scheme: dark) {
     .meter {
-      background: var(--color-zinc-700);
+      background: color-mix(in srgb, var(--color-zinc-700) 80%, transparent);
     }
   }
 
@@ -277,6 +318,7 @@
     inset-block: 0;
     inset-inline-start: 0;
     inline-size: calc(var(--fill) * 100%);
+    border-radius: 999px;
     background: currentColor;
     transition: inline-size 220ms cubic-bezier(0.2, 0, 0, 1);
   }
@@ -286,9 +328,10 @@
   .meter::after {
     content: "";
     position: absolute;
-    inset-block: -1px;
+    inset-block: 0;
     inset-inline-start: 100%;
     inline-size: calc(var(--over) * 100%);
+    border-radius: 999px;
     background: repeating-linear-gradient(
       -45deg,
       currentColor 0 2px,
@@ -317,62 +360,115 @@
   @media (prefers-color-scheme: dark) {
     .row-rule {
       box-shadow: inset 0 1px 0 0
-        color-mix(in srgb, var(--color-zinc-700) 60%, transparent);
+        color-mix(in srgb, var(--color-zinc-700) 45%, transparent);
     }
   }
 
   /* ------------------------------------------------------------------------
-     One quiet button. Secondary actions had drifted into four near-identical
-     variants, several of them half-opacity teal on a dark surface, which read
-     as disabled. Graphite at rest, interaction ink on hover, everywhere.
+     Buttons. Three of them, and no more: a filled primary for the one action
+     a panel exists for, a soft secondary for everything else, and a bare
+     text button for tertiary toggles. Secondary actions used to be four
+     near-identical bordered variants; a tinted fill reads as a button at a
+     glance without adding another line to a dense list.
      --------------------------------------------------------------------- */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--color-blue-600);
+    cursor: pointer;
+    transition: background-color 150ms;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-blue-700);
+  }
+  .btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
   .btn-quiet {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-zinc-300);
-    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-md);
+    padding: 0.3125rem 0.625rem;
     font-size: 0.75rem;
     font-weight: 500;
+    line-height: 1.25;
     color: var(--color-zinc-700);
+    background: var(--color-zinc-100);
     cursor: pointer;
     transition:
-      color 150ms,
-      border-color 150ms;
+      background-color 150ms,
+      color 150ms;
   }
   .btn-quiet:hover:not(:disabled) {
-    border-color: var(--color-blue-500);
-    color: var(--color-blue-600);
+    background: var(--color-zinc-200);
+    color: var(--color-zinc-900);
   }
   .btn-quiet:disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     cursor: not-allowed;
   }
   @media (prefers-color-scheme: dark) {
     .btn-quiet {
-      border-color: var(--color-zinc-600);
       color: var(--color-zinc-200);
+      background: color-mix(in srgb, var(--color-zinc-700) 55%, transparent);
     }
     .btn-quiet:hover:not(:disabled) {
-      border-color: var(--color-blue-300);
+      background: var(--color-zinc-700);
+      color: #fff;
+    }
+  }
+
+  /* Tertiary: a disclosure or an inline switch. No box at all until hover. */
+  .btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-zinc-600);
+    cursor: pointer;
+    transition: color 150ms;
+  }
+  .btn-text:hover:not(:disabled) {
+    color: var(--color-blue-600);
+  }
+  .btn-text:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  @media (prefers-color-scheme: dark) {
+    .btn-text {
+      color: var(--color-zinc-400);
+    }
+    .btn-text:hover:not(:disabled) {
       color: var(--color-blue-300);
     }
   }
 
   /* ------------------------------------------------------------------------
-     The hour spine. Time is the organising principle of the whole product, but
-     the hour gutter used to be a 16px column with a bare number in it. Mono,
-     right-aligned, with the minutes dropped to a small mark.
+     The hour spine of the timetable. Time is the organising principle of the
+     whole product, so the hours are set in mono and right-aligned into an
+     axis rather than left as bare numbers in a gutter.
      --------------------------------------------------------------------- */
   .spine {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.6875rem;
     line-height: 1;
-    letter-spacing: 0;
-    /* zinc-600: at 11px this is small text; zinc-500 on paper is 4.37:1,
+    letter-spacing: -0.01em;
+    /* zinc-600: at 11px this is small text, and zinc-500 on white is 4.4:1 —
        measurably under the 4.5:1 AA line. */
     color: var(--color-zinc-600);
     text-align: right;
@@ -380,29 +476,25 @@
   }
   .spine-min {
     font-weight: 400;
-    font-size: 0.5625rem;
-    /* Same ink as .spine: axe evaluates rendered text even under aria-hidden,
-       so the hour/minute hierarchy is carried by size and weight instead. */
+    /* Same ink and size as .spine: axe evaluates rendered text even under
+       aria-hidden, so the hour/minute hierarchy is carried by weight alone. */
     color: var(--color-zinc-600);
   }
   @media (prefers-color-scheme: dark) {
-    .spine {
-      color: var(--color-zinc-400);
-    }
+    .spine,
     .spine-min {
       color: var(--color-zinc-400);
     }
   }
 
-  /* Eyebrow labels: small, mono, wide-tracked. Used for the few genuine
-     section headings, never as decoration. */
+  /* Section labels. Small and quiet, in the interface face — the old
+     all-caps mono eyebrow shouted every heading in a product whose headings
+     are all mundane ("Courses", "Filters", "Total Credits"). */
   .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    /* zinc-600 in light, zinc-400 in dark: 10px text needs 4.5:1 on both. */
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    /* zinc-600 in light, zinc-400 in dark: small text needs 4.5:1 on both. */
     color: var(--color-zinc-600);
   }
   @media (prefers-color-scheme: dark) {
@@ -410,4 +502,29 @@
       color: var(--color-zinc-400);
     }
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Icon sizing inside the three button classes.
+
+   The icon set was drawn at four different sizes (14, 20 and 24px), which read
+   as an accident when two of them sit in the same row of buttons. One rule
+   normalises every icon that is a *direct* child of a button — the disclosure
+   chevrons are wrapped in a span precisely so they keep their smaller size.
+
+   Deliberately unlayered: Tailwind's utility layer comes after `components`,
+   so a rule inside `@layer components` would lose to the `h-5 w-5` on the icon
+   itself no matter how specific it was.
+   ------------------------------------------------------------------------ */
+.btn-quiet > svg,
+.btn-text > svg {
+  block-size: 1rem;
+  inline-size: 1rem;
+  flex: none;
+}
+
+.btn-primary > svg {
+  block-size: 1.125rem;
+  inline-size: 1.125rem;
+  flex: none;
 }

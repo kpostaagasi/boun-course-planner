@@ -73,12 +73,12 @@
   }
 </script>
 
-<div class="mt-1 border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-900 p-2 overflow-x-auto">
+<div class="mt-1 overflow-x-auto rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900/60">
   <div class="flex items-center justify-between mb-1">
     <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("course.prereqTree")}</span>
     <button
       type="button"
-      class="text-xs cursor-pointer text-zinc-600 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+      class="inline-flex size-6 cursor-pointer items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white"
       aria-label={t("palette.close")}
       onclick={onclose}
     ><IconX /></button>
@@ -107,7 +107,7 @@
         <g role="listitem" aria-label={n.code}>
           <rect
             x={p.x} y={p.y} width={NODE_W} height={NODE_H}
-            class="{nodeClass(n)} stroke-zinc-400/60 dark:stroke-zinc-500/60" stroke-width="1" rx="4"
+            class="{nodeClass(n)} stroke-zinc-300/70 dark:stroke-zinc-600/70" stroke-width="1" rx="8"
           />
           <text
             x={p.x + NODE_W / 2} y={p.y + NODE_H / 2 + 4}

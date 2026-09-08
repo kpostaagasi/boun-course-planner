@@ -102,6 +102,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **"Sade" visual identity.** The interface was rebuilt around what a student
+  needs in the two seconds before they click Add: a soft neutral ground with
+  white cards, one calm accent for interaction, soft corners (8px controls,
+  12px cards, 18px dialogs), and whitespace instead of rules and boxes. Green,
+  amber and red are still reserved for seats, filling and clashes, and are
+  desaturated a step so a hundred rows no longer read as a traffic light.
+  Section labels dropped the all-caps mono eyebrow for sentence-case text, and
+  the secondary-button vocabulary collapsed to three global classes
+  (`.btn-primary`, `.btn-quiet`, `.btn-text`) plus one `.card` template. The
+  PNG export palette was resynchronised with the new tokens.
+- **Course rows fold.** A catalogue row now shows identity, instructor,
+  schedule, rooms, credits, seats and any live alert — and one 44px Add /
+  Remove button. Exam schedule, prerequisites and their tree, quota
+  restrictions, cross-listings, offering history, ECTS, the catalogue
+  description and the three secondary actions (mark as taken, official course
+  page, report incorrect data) moved into a per-row `Details` disclosure,
+  where they are labelled buttons rather than bare icons. Nothing was removed;
+  a row went from up to eleven stacked reference lines and four repeating icon
+  buttons to five lines and one button.
+- The top bar is a single hairline: title, term, language. The Oxford double
+  rule and the masthead treatment are gone, and the EN/TR control carries
+  `aria-pressed` so the active language is exposed to assistive tech rather
+  than only to the eye. Header controls compact below `sm` so the app title
+  never truncates on a 390px phone.
+- The department fold's "show more" toggle sits beside the chip row instead of
+  floating over it, where it covered the very chips it was offering to reveal.
 - **"Boğaz Editorial" visual identity.** The interface now reads like the
   document it replaces: paper-white ground, one cool ink-grey ramp, cobalt as
   the single interaction ink, hairline rules instead of shadows, and corner

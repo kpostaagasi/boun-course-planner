@@ -1,14 +1,14 @@
 /**
  * Shared Playwright helpers for the BOUN Course Planner e2e suite.
  *
- * The app ships no `data-testid` attributes, so every locator below is derived from a stable
- * structural fact about the rendered DOM rather than from styling or copy. Import from here instead
- * of re-deriving selectors in a spec: when the markup moves, this file is the only place to fix.
+ * Locators are derived from a stable structural fact about the rendered DOM — a role, a testid, an
+ * accessible name — never from styling or copy. Import from here instead of re-deriving selectors
+ * in a spec: when the markup moves, this file is the only place to fix.
  *
  * Structural facts these helpers rely on:
  * - The right-hand catalogue and the left "Courses" panel both use `[role=list]` /
- *   `[role=listitem]`. They are told apart by the syllabus/report links that only catalogue rows
- *   carry, so the helpers never depend on which pane comes first in the DOM.
+ *   `[role=listitem]`. The catalogue carries `data-testid="catalogue"`, which is what tells the two
+ *   apart, so the helpers never depend on which pane comes first in the DOM.
  * - A catalogue row's first `<span>` is its section key, e.g. `CMPE150.01` or `CMPE150.01 LAB 1`.
  * - The catalogue paginates 20 rows at a time via an IntersectionObserver sentinel, and every
  *   keystroke in the search box resets it to page 1.
@@ -77,14 +77,12 @@ export async function waitForCatalogue(page: Page): Promise<void> {
 }
 
 /**
- * The catalogue `[role=list]` in the right pane, identified by the links only its rows carry.
- * Resolves to nothing while the catalogue is empty (between semesters, or for a search with no
- * hits), which is why callers poll counts rather than asserting on the container itself.
+ * The catalogue `[role=list]` in the right pane. Resolves to nothing while the catalogue is empty
+ * (between semesters, or for a search with no hits), which is why callers poll counts rather than
+ * asserting on the container itself.
  */
 export function catalogue(page: Page): Locator {
-  return page
-    .locator('[role="list"]')
-    .filter({ has: page.locator('[role="listitem"] a[href]') });
+  return page.getByTestId("catalogue");
 }
 
 /** Every catalogue row currently rendered. `.count()` is what the user can actually scroll to. */
@@ -106,14 +104,31 @@ export function sectionKeys(page: Page): Promise<string[]> {
   );
 }
 
-/** The green add (+) button of a catalogue row; absent once the section is selected. */
+/** The add (+) button of a catalogue row; absent once the section is selected. */
 export function addButton(row: Locator): Locator {
-  return row.locator("button.bg-green-100");
+  return row.getByTestId("course-add");
 }
 
-/** The red remove (−) button of a catalogue row; present only once the section is selected. */
+/** The remove (−) button of a catalogue row; present only once the section is selected. */
 export function removeButton(row: Locator): Locator {
-  return row.locator("button.bg-red-100");
+  return row.getByTestId("course-remove");
+}
+
+/**
+ * The per-row `Details` disclosure, holding everything the card face does not show: the
+ * prerequisite chain, cross-listings, catalogue text, the syllabus and report links, and the
+ * completed-course toggle. Call `openDetails` before asserting on any of it.
+ */
+export function detailsToggle(row: Locator): Locator {
+  return row.getByTestId("course-details-toggle");
+}
+
+/** Expand a catalogue row's `Details` panel; no-op when it is already open. */
+export async function openDetails(row: Locator): Promise<void> {
+  if ((await row.getByTestId("course-details").count()) === 0) {
+    await detailsToggle(row).click();
+  }
+  await expect(row.getByTestId("course-details")).toBeVisible();
 }
 
 /**
@@ -298,8 +313,9 @@ export function appTitle(page: Page): Locator {
 export async function setLang(page: Page, lang: "en" | "tr"): Promise<void> {
   const button = header(page).getByRole("button", { name: lang.toUpperCase(), exact: true });
   await button.click();
-  // The active language is the ink-filled position of the toggle.
-  await expect(button).toHaveClass(/bg-zinc-900/);
+  // The active language is the pressed position of the segmented control. `aria-pressed` rather
+  // than a class, so restyling the toggle cannot silently break every language spec.
+  await expect(button).toHaveAttribute("aria-pressed", "true");
 }
 
 /**

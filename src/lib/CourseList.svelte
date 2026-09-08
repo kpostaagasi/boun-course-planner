@@ -157,91 +157,93 @@
   }
 </script>
 
+<!--
+  The plan panel: what you have chosen, what it costs you in credits, and the
+  two things you do with a finished plan — share it, or put it in a calendar.
+-->
 <div
-  class="mt-4 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white divide-y divide-zinc-200 dark:divide-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+  class="card shrink-0 divide-y divide-zinc-100 dark:divide-zinc-700/60 dark:text-white"
   onmouseleave={() => setHoveredCourse("")}
   role="region"
 >
-  <div class="flex items-baseline px-4 py-2.5">
-    <span class="text-[0.9375rem] font-semibold">{t("list.courses")}</span>
-    <!-- A count is data, not an alert: mono and quiet, not a coloured pill. -->
-    <span class="u-data ml-2 text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
-      >{courseCount}</span
-    >
-    {#if getSelectedCourseNames().length > 0}
+  <div class="flex items-center gap-2 px-4 py-3">
+    <h2 class="text-[0.9375rem] font-semibold">{t("list.courses")}</h2>
+    <!-- A count is data, not an alert: quiet, not a coloured pill. -->
+    <span class="u-data text-xs text-zinc-500 dark:text-zinc-400">{courseCount}</span>
+    <div class="ml-auto flex items-center gap-2">
+      {#if getSelectedCourseNames().length > 0}
+        <button
+          type="button"
+          class="btn-quiet"
+          onclick={copyShareLink}
+          data-testid="copy-share-link"
+        >
+          {copiedLink ? t("list.copied") : t("list.copyLink")}
+        </button>
+      {/if}
       <button
         type="button"
-        class="btn-quiet ml-auto"
-        onclick={copyShareLink}
-        data-testid="copy-share-link"
+        class="btn-quiet"
+        aria-pressed={showRoadmap}
+        onclick={() => (showRoadmap = !showRoadmap)}
+        data-testid="roadmap-toggle"
       >
-        {copiedLink ? t("list.copied") : t("list.copyLink")}
+        {t("roadmap.title")}
       </button>
-    {/if}
-    <button
-      type="button"
-      class="btn-quiet ml-2"
-      onclick={() => (showRoadmap = !showRoadmap)}
-      data-testid="roadmap-toggle"
-    >
-      {t("roadmap.title")}
-    </button>
+    </div>
   </div>
   {#if showRoadmap}
     <Roadmap />
   {:else}
-  <!-- The empty state lives OUTSIDE the role=list container: a list may only
-       contain listitems (axe: aria-required-children, critical). -->
-  {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
-    <div
-      class="divide-y divide-zinc-100 dark:divide-zinc-700/60"
-      onmouseleave={() => setHoveredCourse("")}
-      role="list"
-    >
-      {#each getSelectedCourseNames() as courseName (courseName)}
-        <div
-          class="group flex items-center px-4 py-1.5"
-          onmouseenter={() => setHoveredCourse(courseName)}
-          role="listitem"
-        >
-          <button
-            type="button"
-            aria-label="{t('course.removeSection')}: {courseName}"
-            title={t("course.removeSection")}
-            class="cursor-pointer text-zinc-600 transition-colors hover:text-red-500 dark:text-zinc-400 dark:hover:text-red-400"
-            onclick={() => {
-              delCourse(courseName);
-              resetHoveredCourse();
-            }}
+    <!-- The empty state lives OUTSIDE the role=list container: a list may only
+         contain listitems (axe: aria-required-children, critical). -->
+    {#if getCurSemesterData() && getSelectedCourseNames() && getSelectedCourseNames().length > 0}
+      <div
+        class="divide-y divide-zinc-100 dark:divide-zinc-700/60"
+        onmouseleave={() => setHoveredCourse("")}
+        role="list"
+      >
+        {#each getSelectedCourseNames() as courseName (courseName)}
+          <div
+            class="flex items-center gap-2 px-4 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+            onmouseenter={() => setHoveredCourse(courseName)}
+            role="listitem"
           >
-            <IconX />
-          </button><span class="u-data ml-2 text-sm font-semibold">{courseName}</span>
-          {#if "credits" in getCurSemesterData()[courseName]}
-            <!-- Credits are data, not a status: no green pill. Green means seats. -->
-            <span class="u-data ml-auto text-[0.6875rem] text-zinc-600 dark:text-zinc-400"
-              >{getCurSemesterData()[courseName].credits}cr</span
+            <button
+              type="button"
+              aria-label="{t('course.removeSection')}: {courseName}"
+              title={t("course.removeSection")}
+              class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300"
+              onclick={() => {
+                delCourse(courseName);
+                resetHoveredCourse();
+              }}
             >
-          {/if}
-        </div>
-      {/each}
-    </div>
-  {:else}
-    <div
-      class="flex h-10 flex-col items-center justify-center text-sm text-zinc-600 dark:text-zinc-400"
-      data-testid="courses-empty"
-    >
-      {t("list.empty")}
-    </div>
+              <IconX />
+            </button><span class="u-data text-sm font-medium">{courseName}</span>
+            {#if "credits" in getCurSemesterData()[courseName]}
+              <!-- Credits are data, not a status: no green pill. Green means seats. -->
+              <span class="u-data ml-auto text-xs text-zinc-500 dark:text-zinc-400"
+                >{getCurSemesterData()[courseName].credits} cr</span
+              >
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <div
+        class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400"
+        data-testid="courses-empty"
+      >
+        {t("list.empty")}
+      </div>
+    {/if}
   {/if}
-  {/if}
-  <div
-    class="flex items-baseline px-4 py-2.5"
-    data-testid="total-credits"
-  >
+  <div class="flex items-baseline px-4 py-3" data-testid="total-credits">
     <span class="eyebrow">{t("list.totalCredits")}</span>
-    <span class="u-data ml-2 text-[0.9375rem] font-semibold">{totalCredit}</span>
+    <span class="u-data ml-auto text-[0.9375rem] font-semibold">{totalCredit}</span>
   </div>
-  <div class="flex flex-wrap items-center gap-2 px-4 py-2.5">
+  <div class="flex flex-wrap items-center gap-2 px-4 py-3">
     <button
       type="button"
       class="btn-quiet"
@@ -251,13 +253,6 @@
     >
       {t("list.findConflictFree")}
     </button>
-    {#if solverOutcome}
-      <span
-        class="text-xs text-zinc-600 dark:text-zinc-300"
-        data-testid="solver-message"
-        data-solver-outcome={solverOutcome.kind}>{solverMessage}</span
-      >
-    {/if}
     {#if prevSchedule}
       <button
         type="button"
@@ -268,8 +263,15 @@
         {t("list.undo")}
       </button>
     {/if}
+    {#if solverOutcome}
+      <span
+        class="w-full text-xs text-zinc-600 dark:text-zinc-400"
+        data-testid="solver-message"
+        data-solver-outcome={solverOutcome.kind}>{solverMessage}</span
+      >
+    {/if}
   </div>
-  <div class="px-4 py-2.5">
+  <div class="px-4 py-3">
     <CalendarExport />
   </div>
 </div>
