@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { gotoFresh, selectCourse, searchCourses } from "./helpers";
 
 /**
- * Accessibility gate: axe-core over the app's five interactive surfaces, in
+ * Accessibility gate: axe-core over the app's four interactive surfaces, in
  * both colour schemes. The bar is zero serious and zero critical violations —
  * which includes WCAG contrast, so this is also the machine check on the
  * palette's contrast choices.
@@ -70,13 +70,6 @@ for (const scheme of SCHEMES) {
         });
         expect(inside, `Tab press ${i + 1} stayed inside the dialog`).toBe(true);
       }
-    });
-
-    test(`roadmap is clean (${scheme})`, async ({ page }) => {
-      await gotoFresh(page);
-      await page.getByTestId("roadmap-toggle").click();
-      await expect(page.getByTestId("roadmap-panel")).toBeVisible();
-      await expectNoSeriousViolations(page, `roadmap/${scheme}`);
     });
 
     test(`instructor panel is clean (${scheme})`, async ({ page }) => {

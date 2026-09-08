@@ -1,5 +1,12 @@
 # Eligibility Badges (A) + Roadmap Panel (B) Implementation Plan
 
+> **Superseded in part:** Feature B, the roadmap panel, was removed from the
+> product after shipping — it presented inference about unpublished terms as a
+> plan, which no other surface in the app does. `Roadmap.svelte`,
+> `roadmapLogic.*` and `futureTerms.*` no longer exist; term ordering lives in
+> `src/lib/termKeys.mjs`. Feature A (eligibility) is untouched and still ships.
+> The rest of this document is kept as the historical record of what was built.
+
 > **Status: COMPLETE.** All seven tasks shipped; every step below is ticked.
 > Landed in `e74badc` (task 1), `7e13e16` (2), `306204a` (3), `b5ec7c8` (4),
 > `e1fdee9` (5), `f37cf3a` (6), plus the follow-up fixes `e1ad55a` and

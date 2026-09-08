@@ -263,7 +263,7 @@ identity in the timetable.
 ### Secondary
 
 - **Scarcity Open** (`{colors.scarcity-open-500}` / `{colors.scarcity-open-700}`): seats left, meter fill below 85%.
-- **Scarcity Filling** (`{colors.scarcity-filling-500}` / `{colors.scarcity-filling-700}`): meter fill at ≥85%, missing prerequisites ("Needs: …"), a stale quota timestamp, an inferred roadmap term, blocking nodes in the prerequisite tree.
+- **Scarcity Filling** (`{colors.scarcity-filling-500}` / `{colors.scarcity-filling-700}`): meter fill at ≥85%, missing prerequisites ("Needs: …"), a stale quota timestamp, blocking nodes in the prerequisite tree.
 - **Scarcity Full** (`{colors.scarcity-full-500}` / `{colors.scarcity-full-600}`): FULL and over-enrolled sections, the hatched overflow tail of the meter, timetable clash rings, the clash badge, final-exam clashes, remove-on-hover.
 
 All three are pulled a step off stock Tailwind saturation, because a list of a
@@ -365,7 +365,7 @@ the occupancy meter caps at `11rem`.
 
 Almost flat. Four shadow tokens exist and three of them are nearly invisible:
 `xs` on resting cards and the search field, `md` on the floating ⌘K button, `lg`
-on the two overlays and the roadmap's suggestion dropdown. Everything else
+on the two overlays. Everything else
 separates with a hairline, a tonal step (surface → Neutral 50 on hover; Neutral
 800 → 900 for nested dark surfaces) or plain whitespace.
 
@@ -405,7 +405,7 @@ global classes in `src/app.css` (`.card`, `.btn-primary`, `.btn-quiet`,
 Three, and no more:
 
 - **Primary (`.btn-primary`):** solid Accent 600, white text, 8px radius, `0.5rem 0.875rem`, 0.875rem/500. One per panel at most — the filter dialog's Apply, the calendar export. Hover deepens to Accent 700.
-- **Quiet (`.btn-quiet`):** the default secondary action — Neutral 100 fill, Neutral 700 text, no border, 8px radius, `0.3125rem 0.625rem`, 0.75rem/500. Hover deepens the fill one step. A tinted fill reads as a button at a glance without adding another line to a dense list, which is why the old bordered variant is gone. Copy-link, roadmap toggle, conflict-free solver, undo, clear, and the three actions inside `Details`.
+- **Quiet (`.btn-quiet`):** the default secondary action — Neutral 100 fill, Neutral 700 text, no border, 8px radius, `0.3125rem 0.625rem`, 0.75rem/500. Hover deepens the fill one step. A tinted fill reads as a button at a glance without adding another line to a dense list, which is why the old bordered variant is gone. Copy-link, conflict-free solver, undo, clear, and the three actions inside `Details`.
 - **Text (`.btn-text`):** no box at all until hover, when it takes the accent. Disclosures only — `Details`, `Show description`, `Show more`, `How to import?`.
 - **Row action:** the single 44×44 control on the right of a catalogue row. Solid accent with a `+` when the section is not selected; Neutral 100 with a `−`, going Scarcity Full on hover, when it is. It is the only always-visible action on a card.
 - **Focus:** every control inherits one global treatment — a 2px Accent 500 outline at 2px offset. Do not add per-component focus rings; the two that exist (the search input and the semester select) are the exceptions, not the pattern.
@@ -425,9 +425,8 @@ Three, and no more:
 
 This one template is the catalogue, the selected-course panel, the instructor
 panel and the timetable frame. New panels use it rather than inventing a
-container. The roadmap deliberately does *not*: it renders inside the
-selected-course panel, so it is a flush section with no border of its own — one
-border around the whole thing, not two.
+container — and a panel that renders *inside* another one is a flush section
+with no border of its own: one border around the whole thing, not two.
 
 ### The course row (signature layout)
 
@@ -489,7 +488,7 @@ with the caret.
 - **Do** separate surfaces with whitespace, a hairline or a tonal step, in that order.
 - **Do** put anything a student does not need in the first two seconds behind the row's `Details` disclosure — and label it there, rather than shipping another bare icon.
 - **Do** keep small text at Neutral 500 on the ground and Neutral 400 on dark, and re-run the axe gate in both schemes after touching a colour.
-- **Do** state absent data as absent: italic "unpublished", a greyed note for unknown prerequisites, an "≈" for an inferred term.
+- **Do** state absent data as absent: italic "unpublished", a greyed note for unknown prerequisites, "no data" rather than a zero.
 - **Do** honour `prefers-reduced-motion`: the global reset kills transitions, and the meter opts out explicitly.
 
 ### Don't:

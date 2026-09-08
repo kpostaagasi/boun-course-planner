@@ -27,9 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in localStorage.
 - **Newly-eligible panel.** Lists the courses that the current set of
   completed courses has just unlocked in the selected term.
-- **Multi-semester roadmap.** Plan courses across upcoming terms with
-  cross-term prerequisite checking and per-term credit totals
-  (`Roadmap.svelte`, `roadmapLogic.mjs`).
 - **Conflict-free section solver.** Picks a non-overlapping set of sections
   for the chosen courses.
 - **Command palette.** Cmd+K / Ctrl+K fuzzy course search
@@ -50,8 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Colour-coded timetable blocks**, legible in both themes.
 - **LAB and P.S. sessions** are listed as separate selectable entries.
 - **Tests.** `npm test` runs `node --test tools/lib/test/*.test.mjs` covering
-  the scraper parser, semester policy, calendar parsing, eligibility, roadmap,
-  palette search and prerequisite graph logic.
+  the scraper parser, semester policy, calendar parsing, eligibility, term
+  ordering, palette search and prerequisite graph logic.
 - **Pipeline watchdog** workflow: opens an issue if the daily update has had
   no successful run for over a week. Failed runs also open/comment on an
   `automation-failure` issue, and a post-deploy smoke test fetches the index
@@ -78,13 +75,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Offline support.** A hand-written service worker precaches the app shell
   and serves `public/data/*.json` stale-while-revalidate, so the planner works
   in campus dead zones. The web manifest is now a real installable manifest.
-- **Roadmap reaches unpublished terms.** Future term keys are synthesised
-  instead of being limited to the terms BOUN has already published, and
-  offering likelihood is inferred from `offerings.json` history — labelled as
-  a prediction, with its confidence and basis spelled out, never as fact.
 - **End-to-end tests.** Playwright covers the catalogue, selection, share
-  URLs, timetable layout and export, roadmap, palette, quota, instructor view
-  and the offline service worker.
+  URLs, timetable layout and export, palette, quota, instructor view and the
+  offline service worker.
 - **Initial-payload budget gate.** `npm run payload` observes what the app
   actually fetches on first load and fails above 180 KB gzipped.
 - **Catalogue empty state.** A search that matches nothing now names the query,

@@ -110,8 +110,6 @@ missing an entry there.
   prerequisite chain.
 - Mark courses as taken → Taken / Eligible / "Needs: …" badges on every row,
   plus a panel listing the courses your completed set has just unlocked.
-- Multi-semester roadmap: plan future terms with cross-term prerequisite
-  checking and per-term credit totals.
 - Offering history: in which past terms a course was actually offered.
 - Live quota and enrolment per section: seats taken, seats left, FULL and
   over-enrolment, classroom capacity, departmental and surname restrictions —
@@ -133,8 +131,7 @@ missing an entry there.
 - EN/TR interface, dark mode, data-freshness indicator and a "report bad
   data" button.
 
-Selections, completed courses and the roadmap are persisted in
-`localStorage`.
+Selections and completed courses are persisted in `localStorage`.
 
 ## Architecture
 
@@ -148,12 +145,12 @@ thin `src/lib/<name>.ts` that re-exports it and declares the TypeScript types
 (`export * from "./<name>.mjs"`). The app imports the `.ts`; the tests import
 the `.mjs` directly, so `node --test` can exercise the frontend logic with no
 build step and no TS loader. Modules following this pattern: `eligibility`,
-`roadmapLogic`, `prereqGraph`, `paletteSearch`, `termHistory`. Tests live in
+`termKeys`, `prereqGraph`, `paletteSearch`, `termHistory`. Tests live in
 `tools/lib/test/*.test.mjs`, fixtures in `tools/lib/fixtures/`.
 
 **State is module-level runes, not stores.** `src/lib/globalState.svelte.ts`
 owns the app state as module-scope `$state` and exposes plain getter/setter
-functions (`getSelectedCourses()`, `toggleCompleted()`, `addToRoadmap()`, …).
+functions (`getSelectedCourses()`, `toggleCompleted()`, `addCourse()`, …).
 There are no Svelte stores anywhere; components import the functions and read
 them inside `$derived`.
 
@@ -161,8 +158,8 @@ them inside `$derived`.
 and `meta.json` (scrape timestamp for the freshness indicator), then the
 selected term's `<YYYY-YYYY>-<n>.json`, plus `prereqs.json`, `offerings.json`
 and `descriptions.json` in the background. `semester-dates.json` is loaded by
-the timetable strip and the calendar export. The roadmap lazily fetches
-additional term files as columns are opened. Every fetch is
+the timetable strip and the calendar export. The instructor panel lazily
+fetches a bounded window of recent term files when it opens. Every fetch is
 `${import.meta.env.BASE_URL}data/<file>.json`.
 
 **Scrapers** are four independent Node entry points under `tools/`, all

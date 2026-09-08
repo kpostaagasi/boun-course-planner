@@ -5,7 +5,7 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import CommandPalette from "./lib/CommandPalette.svelte";
-  import { loadPrereqs, loadCompleted, loadRoadmap, loadOfferings, initUrlSync } from "./lib/globalState.svelte";
+  import { loadPrereqs, loadCompleted, loadOfferings, initUrlSync } from "./lib/globalState.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
 
@@ -22,8 +22,6 @@
     loadOfferings();
     // Fire-and-forget: localStorage restore, errors handled inside loadCompleted
     loadCompleted();
-    // Fire-and-forget: localStorage restore, errors handled inside loadRoadmap
-    loadRoadmap();
     return stopUrlSync;
   });
 </script>

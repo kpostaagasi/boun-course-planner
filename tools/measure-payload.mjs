@@ -29,7 +29,8 @@
  *     prevent).
  *   - quota.json is fetched from a component instantiated inside an `{#each}`
  *     over catalogue rows. `{#each}`-gated code is eager here; `{#if}`-gated
- *     code (the Roadmap panel) is not. Syntax does not tell them apart.
+ *     code (a course card's Details panel) is not. Syntax does not tell them
+ *     apart.
  *
  * Observation has neither problem and cannot go stale: add an eager fetch
  * anywhere and the next run counts it.

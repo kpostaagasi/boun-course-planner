@@ -34,9 +34,8 @@ test("malformed keys are ignored", () => {
 });
 
 test("a single-season archive is never 'every'", () => {
-  // futureTerms re-runs termHistory over one season's offerings; a course
-  // cannot run twice in the same season of one academic year, so the seasonal
-  // pattern is always "yearly" or "sparse".
+  // A course cannot run twice in the same season of one academic year, so an
+  // archive filtered to one season is always "yearly" or "sparse".
   const r = termHistory(["2022-2023-2", "2023-2024-2", "2024-2025-2"]);
   assert.equal(r.count, 3);
   assert.deepEqual(r.seasons, [2]);

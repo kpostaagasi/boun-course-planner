@@ -2,7 +2,7 @@
   import { getSemesterData } from "./globalState.svelte";
   import { buildInstructorIndex } from "./instructors";
   import type { InstructorIndex, SectionRecord, TermDataset } from "./instructors";
-  import { sortTermsNewestFirst } from "./roadmapLogic";
+  import { sortTermsNewestFirst } from "./termKeys";
 
   /**
    * How many terms the teaching history covers, current term included.
