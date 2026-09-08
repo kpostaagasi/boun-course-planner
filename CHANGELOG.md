@@ -192,6 +192,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The filter dialog's Apply button was off screen on a phone.** It landed at
+  y=679 in an iPhone 13's 664px viewport — below the fold, outside the dialog's
+  own box, and with nothing to scroll, because the grid's wrapper had no
+  bounded height and so never became a scroller. Filters could be set and never
+  applied. The dialog is now a bounded flex column (header, scrolling grid,
+  pinned Apply), verified at 664, 640 and 560px tall and unchanged on the
+  desktop. A regression from the visual redesign, which added ~88px of height
+  to a dialog that previously fit; the accessibility spec exercises this dialog
+  only on the desktop project, so nothing caught it. An `@mobile` e2e test now
+  covers the height-dependent half.
+
 - **The quota crawl aborted on a table BOUN added mid-term.** A "Semester
   Quotas:" block appeared on 2026-09-08 (LAW336, PRED2xx/3xx) and pushed the
   run past its 20-warning budget, so no quota data was written at all. It has
