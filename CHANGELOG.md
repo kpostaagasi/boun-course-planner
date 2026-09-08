@@ -95,6 +95,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Start-up deletes the `roadmap` key a removed feature left in `localStorage`,
+  so a browser that used a version which had it does not carry its data around
+  forever. The prune is a named list, not a sweep — keys still in use are
+  untouched — and it is where any future removed feature's storage goes.
 - **"Sade" visual identity.** The interface was rebuilt around what a student
   needs in the two seconds before they click Add: a soft neutral ground with
   white cards, one calm accent for interaction, soft corners (8px controls,

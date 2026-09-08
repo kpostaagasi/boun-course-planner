@@ -81,6 +81,26 @@ test("keeps the selection across a reload", async ({ page }) => {
   expect(await totalCredits(page)).toBe(SECTION_CREDITS);
 });
 
+test("start-up drops localStorage a removed feature left behind", async ({ page }) => {
+  await gotoFresh(page);
+  const term = await semesterSelect(page).inputValue();
+  await selectCourse(page, SECTION);
+
+  // What a browser that used the version with the roadmap still carries. It is
+  // seeded after gotoFresh, so the wipe cannot be what clears it.
+  await page.addInitScript(() => {
+    localStorage.setItem("roadmap", JSON.stringify({ "2027/2028-1": ["CMPE300"] }));
+  });
+  await page.reload();
+  await waitForCatalogue(page);
+
+  expect(await readStorage(page, "roadmap")).toBeNull();
+  // The prune is a named list, not a sweep: everything still in use survives.
+  await expect(selectedCourse(page, SECTION)).toBeVisible();
+  const stored = await readStorage(page, "semesterSelCourses2");
+  expect(JSON.parse(stored as string)).toMatchObject({ [term]: [SECTION] });
+});
+
 test("switches language and remembers it across a reload", async ({ page }) => {
   await gotoFresh(page);
   await expect(appTitle(page)).toHaveText("BOUN Course Planner");

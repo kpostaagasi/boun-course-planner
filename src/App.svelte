@@ -5,12 +5,20 @@
   import Timetable from "./lib/Timetable.svelte";
   import CourseList from "./lib/CourseList.svelte";
   import CommandPalette from "./lib/CommandPalette.svelte";
-  import { loadPrereqs, loadCompleted, loadOfferings, initUrlSync } from "./lib/globalState.svelte";
+  import {
+    loadPrereqs,
+    loadCompleted,
+    loadOfferings,
+    initUrlSync,
+    pruneRetiredStorage,
+  } from "./lib/globalState.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
 
   onMount(() => {
     initLang();
+    // Drop localStorage a removed feature left behind; nothing reads it now.
+    pruneRetiredStorage();
     // Back/Forward navigates between selection states; cleaned up on unmount.
     const stopUrlSync = initUrlSync();
     // Fire-and-forget: errors handled inside loadPrereqs

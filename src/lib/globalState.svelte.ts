@@ -736,3 +736,33 @@ export function getCompletedCourses(): string[] {
 export function getCompletedCourseSet(): Set<string> {
   return completedCourses;
 }
+
+// ---- Storage left behind by removed features ----
+
+/**
+ * Keys this app used to write and no longer reads. They are dropped once, on
+ * start-up, so a browser that used a version which had the feature does not
+ * carry its data around forever — there is nothing left that could ever read
+ * it back, and it is invisible to the user who would otherwise have to clear
+ * site data by hand to be rid of it.
+ *
+ * Add to this list when a feature that persisted something is removed; entries
+ * can be dropped again once enough time has passed that no live browser can
+ * still be holding one.
+ */
+const RETIRED_STORAGE_KEYS = [
+  // The multi-semester roadmap, removed because it presented inference about
+  // unpublished terms as a plan.
+  "roadmap",
+];
+
+/** Delete the keys of removed features. Safe to call more than once. */
+export function pruneRetiredStorage(): void {
+  for (const key of RETIRED_STORAGE_KEYS) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // private mode / storage disabled: nothing to prune, and nothing to fix
+    }
+  }
+}
