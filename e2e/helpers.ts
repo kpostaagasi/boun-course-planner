@@ -25,6 +25,8 @@ export const STORAGE_KEYS = [
   "semesterSelCourses2",
   "completedCourses",
   "lang",
+  "gpaEntries",
+  "gpaBaseline",
 ] as const;
 
 /** Rows the catalogue renders per pagination step (`pageSize` in `CourseCatalogue.svelte`). */
@@ -312,6 +314,49 @@ export async function setLang(page: Page, lang: "en" | "tr"): Promise<void> {
   // The active language is the pressed position of the segmented control. `aria-pressed` rather
   // than a class, so restyling the toggle cannot silently break every language spec.
   await expect(button).toHaveAttribute("aria-pressed", "true");
+}
+
+/* -------------------------------------------------------------------------
+   The tab strip and the GPA panel behind it.
+
+   The app has two views of one selection: the planner, and the GPA it implies.
+   `openTab` is the only way in — the GPA panel is not mounted while the planner
+   is showing, so a locator alone would resolve to nothing.
+   ---------------------------------------------------------------------- */
+
+/** Switch views and wait for the strip to report the new selection. */
+export async function openTab(page: Page, tab: "planner" | "gpa"): Promise<void> {
+  const button = page.getByTestId(`tab-${tab}`);
+  await button.click();
+  // aria-selected rather than a class, for the same reason setLang() reads
+  // aria-pressed: restyling the control must not break every GPA spec.
+  await expect(button).toHaveAttribute("aria-selected", "true");
+}
+
+/** Every course row the GPA panel lists, in DOM order. */
+export function gpaRows(page: Page): Locator {
+  return page.locator('#panel-gpa [role="list"] > [role=listitem]');
+}
+
+/** The grade `<select>` for one section in the GPA panel. */
+export function gpaGrade(page: Page, sectionKey: string): Locator {
+  return page.getByTestId("gpa-grade").and(page.locator(`[data-course=${JSON.stringify(sectionKey)}]`));
+}
+
+/** Grade one section and wait for the choice to stick. */
+export async function setGrade(page: Page, sectionKey: string, grade: string): Promise<void> {
+  const select = gpaGrade(page, sectionKey);
+  await select.selectOption(grade);
+  await expect(select).toHaveValue(grade);
+}
+
+/**
+ * A figure the GPA panel reports, as text. Returned verbatim rather than parsed
+ * because "—" — the panel's word for "you have not told us" — is a meaningful
+ * answer that a numeric parse would flatten into NaN or 0.
+ */
+export function gpaFigure(page: Page, which: "term" | "cumulative" | "credits"): Promise<string> {
+  return page.getByTestId(`gpa-${which}`).innerText();
 }
 
 /**

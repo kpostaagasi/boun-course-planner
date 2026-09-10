@@ -119,6 +119,21 @@ missing an entry there.
 - Final exam date, session and location where the registration system
   publishes them, with a warning when two selected sections share a final.
 
+**GPA**
+
+- A second tab that grades the plan you just built: every selected section
+  (LAB and P.S. sub-rows excepted — they carry no credits of their own) is
+  listed with its credits and a BOUN grade picker, and the term GPA is the
+  credit-weighted average of what you entered.
+- Enter your standing cumulative GPA and completed credits to project where
+  the term leaves you, with BOUN's repeat rule applied: a course repeated
+  from FF, DD or DC counts once, and the old attempt is withdrawn from the
+  baseline.
+- Nothing is graded until you say so: an unentered term reports no GPA rather
+  than a 0.00, and a cumulative record outside 0–4 is refused rather than
+  quietly clamped. The figures are a projection from your own input, never an
+  official record.
+
 **Export and sharing**
 
 - `.ics` download and Google Calendar export using the real semester
@@ -131,7 +146,8 @@ missing an entry there.
 - EN/TR interface, dark mode, data-freshness indicator and a "report bad
   data" button.
 
-Selections and completed courses are persisted in `localStorage`.
+Selections, completed courses and the grades entered on the GPA tab are
+persisted in `localStorage`.
 
 ## Architecture
 
@@ -145,7 +161,7 @@ thin `src/lib/<name>.ts` that re-exports it and declares the TypeScript types
 (`export * from "./<name>.mjs"`). The app imports the `.ts`; the tests import
 the `.mjs` directly, so `node --test` can exercise the frontend logic with no
 build step and no TS loader. Modules following this pattern: `eligibility`,
-`termKeys`, `prereqGraph`, `paletteSearch`, `termHistory`. Tests live in
+`termKeys`, `prereqGraph`, `paletteSearch`, `termHistory`, `gpa`. Tests live in
 `tools/lib/test/*.test.mjs`, fixtures in `tools/lib/fixtures/`.
 
 **State is module-level runes, not stores.** `src/lib/globalState.svelte.ts`

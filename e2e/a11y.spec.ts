@@ -1,9 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { gotoFresh, selectCourse, searchCourses } from "./helpers";
+import { gotoFresh, selectCourse, searchCourses, openTab, setGrade } from "./helpers";
 
 /**
- * Accessibility gate: axe-core over the app's four interactive surfaces, in
+ * Accessibility gate: axe-core over the app's five interactive surfaces, in
  * both colour schemes. The bar is zero serious and zero critical violations —
  * which includes WCAG contrast, so this is also the machine check on the
  * palette's contrast choices.
@@ -70,6 +70,21 @@ for (const scheme of SCHEMES) {
         });
         expect(inside, `Tab press ${i + 1} stayed inside the dialog`).toBe(true);
       }
+    });
+
+    test(`GPA tab is clean (${scheme})`, async ({ page }) => {
+      await gotoFresh(page);
+      await selectCourse(page, "CMPE150.01");
+      await openTab(page, "gpa");
+      // Filled in, so the retake control and the hint it reveals are on screen
+      // too; an empty panel would not exercise half of the tab.
+      await setGrade(page, "CMPE150.01", "FF");
+      await page.getByTestId("gpa-retake").selectOption("DD");
+      // And the rejected-input path, whose message must be reachable from the
+      // field it is about.
+      await page.getByTestId("gpa-previous").fill("9");
+      await expect(page.getByTestId("gpa-previous")).toHaveAttribute("aria-invalid", "true");
+      await expectNoSeriousViolations(page, `gpa/${scheme}`);
     });
 
     test(`instructor panel is clean (${scheme})`, async ({ page }) => {

@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GPA tab.** A second view of the plan, behind a tab strip under the header:
+  the sections selected in the planner are listed with their credits and a
+  BOUN grade picker, and the term GPA is their credit-weighted average.
+  Entering a standing cumulative GPA and credit count projects the term onto
+  it, applying BOUN's repeat rule (a course repeated from FF/DD/DC counts
+  once; the old attempt is withdrawn from the baseline). The arithmetic is
+  ported from the standalone BOUN GPA Calculator into `src/lib/gpa.mjs` and
+  pinned by `tools/lib/test/gpa.test.mjs`; an ungraded term reports no GPA
+  rather than a 0.00, and an out-of-range record is refused rather than
+  clamped. Grades persist in `localStorage`.
 - **Automated data pipeline.** `tools/scrape.mjs` scrapes every department's
   schedule page from registration.boun.edu.tr daily, validates the result and
   commits `public/data/<term>.json` + `semesters.json`; GitHub Actions rebuilds

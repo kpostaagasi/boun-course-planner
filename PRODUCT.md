@@ -67,8 +67,9 @@ Cmd/Ctrl+K command palette, conflict-free section solver, prerequisite tree
 with transitive chain, Taken/Eligible/"Needs: …" state from completed
 courses, offering and instructor history across archived terms, live quota and
 enrolment with restrictions, final-exam dates with conflict warning, `.ics`
-and Google Calendar export, timetable PNG, share links, EN/TR, dark mode,
-freshness indicator, report-bad-data.
+and Google Calendar export, timetable PNG, share links, a GPA tab that grades
+the selected sections and projects them onto a standing cumulative record,
+EN/TR, dark mode, freshness indicator, report-bad-data.
 
 Binding constraints — future work must not break these:
 

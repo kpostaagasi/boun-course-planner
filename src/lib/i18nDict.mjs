@@ -335,6 +335,79 @@ export const dict = {
     en: "Searching catalogue descriptions…",
     tr: "Katalog açıklamaları aranıyor…",
   },
+  // ---- Tabs ----
+  "tab.planner": { en: "Planner", tr: "Planlayıcı" },
+  "tab.gpa": { en: "GPA", tr: "Not Ortalaması" },
+  "tab.switcher": { en: "Views", tr: "Görünümler" },
+
+  // ---- GPA calculator ----
+  // The tab computes a projection from grades the student types in; it is not
+  // a record of anything the registrar knows, and the copy says so rather than
+  // letting a confident-looking 3.42 imply otherwise.
+  "gpa.termCourses": { en: "This term", tr: "Bu dönem" },
+  "gpa.empty": {
+    en: "No courses selected for this term yet.",
+    tr: "Bu dönem için henüz ders seçilmedi.",
+  },
+  "gpa.emptyHint": {
+    en: "Pick sections in the planner and they show up here to be graded.",
+    tr: "Planlayıcıdan şube seçin; not vermek için burada görünürler.",
+  },
+  "gpa.goToPlanner": { en: "Open the planner", tr: "Planlayıcıyı aç" },
+  "gpa.grade": { en: "Grade", tr: "Not" },
+  "gpa.gradeFor": { en: "Grade for {course}", tr: "{course} için not" },
+  "gpa.noGradeOption": { en: "Not graded", tr: "Not girilmedi" },
+  "gpa.credits": { en: "cr", tr: "kredi" },
+  // LAB and P.S. sub-rows carry no credit figure at all in the registrar's
+  // data, so they are left out rather than shown as a zero.
+  "gpa.creditsUnknown": {
+    en: "Credits unknown, so this course is left out of the average.",
+    tr: "Kredisi bilinmiyor, bu yüzden ders ortalamaya katılmıyor.",
+  },
+  // The retake control is one select, so its empty option has to say what
+  // choosing nothing means rather than leaving a blank row-end.
+  "gpa.notRetake": { en: "Not a retake", tr: "Tekrar değil" },
+  "gpa.retakeOf": { en: "Repeats {grade}", tr: "{grade} tekrarı" },
+  "gpa.previousGradeFor": {
+    en: "Grade being repeated in {course}",
+    tr: "{course} dersinde tekrarlanan not",
+  },
+  "gpa.retakeHint": {
+    en: "A repeated course counts once: as soon as you enter the new grade, the old attempt is withdrawn from your cumulative record.",
+    tr: "Tekrar edilen ders bir kez sayılır: yeni notu girdiğiniz anda eski deneme kümülatif kaydınızdan düşülür.",
+  },
+  "gpa.record": { en: "Your record so far", tr: "Şu ana kadarki kaydınız" },
+  "gpa.recordHint": {
+    en: "Copy these from the registration system. Leave them empty to see only this term's GPA.",
+    tr: "Bunları kayıt sisteminden alın. Yalnızca bu dönemin ortalamasını görmek için boş bırakın.",
+  },
+  "gpa.previousGpa": { en: "Cumulative GPA", tr: "Kümülatif ortalama" },
+  "gpa.previousCredits": { en: "Credits completed", tr: "Tamamlanan kredi" },
+  "gpa.gpaRange": {
+    en: "Enter a GPA between 0 and 4.",
+    tr: "0 ile 4 arasında bir ortalama girin.",
+  },
+  "gpa.creditsRange": {
+    en: "Enter the credits as a number, 0 or more.",
+    tr: "Krediyi 0 veya daha büyük bir sayı olarak girin.",
+  },
+  "gpa.result": { en: "Result", tr: "Sonuç" },
+  "gpa.termGpa": { en: "Term GPA", tr: "Dönem ortalaması" },
+  "gpa.cumulativeGpa": { en: "Cumulative GPA", tr: "Kümülatif ortalama" },
+  "gpa.gradedCredits": { en: "Credits averaged", tr: "Ortalamaya giren kredi" },
+  "gpa.noGrades": {
+    en: "Enter a grade to see a GPA.",
+    tr: "Ortalamayı görmek için not girin.",
+  },
+  "gpa.needsRecord": {
+    en: "Fill in your record above to project a cumulative GPA.",
+    tr: "Kümülatif ortalama tahmini için yukarıdaki kaydınızı doldurun.",
+  },
+  "gpa.clear": { en: "Clear grades", tr: "Notları temizle" },
+  "gpa.disclaimer": {
+    en: "A projection from the grades you entered — not an official record. The registration system is the authority.",
+    tr: "Girdiğiniz notlardan çıkarılan bir tahmindir, resmî bir kayıt değildir. Kayıt sistemi esastır.",
+  },
 };
 
 /**

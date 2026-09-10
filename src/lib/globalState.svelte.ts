@@ -766,3 +766,137 @@ export function pruneRetiredStorage(): void {
     }
   }
 }
+
+// ---- Tabs ----
+
+/**
+ * The two things this app does. The planner is the product; the GPA tab reads
+ * the plan the planner produced, so it is a second view of one selection
+ * rather than a second app — which is why it lives behind a tab and not behind
+ * a route, and why nothing about it is encoded in the share link.
+ */
+export type Tab = "planner" | "gpa";
+
+let activeTab = $state<Tab>("planner");
+
+export function getActiveTab(): Tab {
+  return activeTab;
+}
+
+export function setActiveTab(value: Tab) {
+  activeTab = value;
+}
+
+// ---- GPA (the grades entered against the planned term) ----
+
+/** What the student typed against one planned section. */
+export type GpaEntry = {
+  /** A key of `GRADE_POINTS`, or "" when no grade has been chosen yet. */
+  grade: string;
+  /**
+   * The grade this attempt replaces, when the course is a repeat, or "".
+   * Kept separately from `grade` so unticking "retake" does not lose the new
+   * grade, and re-ticking it does not silently resurrect an old one.
+   */
+  retakeOf: string;
+};
+
+/** Grades keyed by term, then by section key — the same shape the selection uses. */
+type GpaEntries = Record<string, Record<string, GpaEntry>>;
+
+const GPA_ENTRIES_KEY = "gpaEntries";
+const GPA_BASELINE_KEY = "gpaBaseline";
+
+let gpaEntries = $state<GpaEntries>(readGpaEntries());
+
+function readGpaEntries(): GpaEntries {
+  try {
+    const raw = localStorage.getItem(GPA_ENTRIES_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      return {};
+    }
+    return parsed as GpaEntries;
+  } catch {
+    // private mode / corrupt data: start empty rather than throwing at boot
+    return {};
+  }
+}
+
+function persistGpaEntries() {
+  try {
+    localStorage.setItem(GPA_ENTRIES_KEY, JSON.stringify(gpaEntries));
+  } catch {
+    // ignore persistence failures
+  }
+}
+
+/** The grades entered for the term being browsed. Read-only; use the setters. */
+export function getGpaEntriesForCurrentSemester(): Record<string, GpaEntry> {
+  return gpaEntries[currentSemester] ?? {};
+}
+
+function mutateEntry(sectionKey: string, patch: Partial<GpaEntry>) {
+  const term = (gpaEntries[currentSemester] ??= {});
+  const entry = (term[sectionKey] ??= { grade: "", retakeOf: "" });
+  Object.assign(entry, patch);
+  // An entry that says nothing is storage we would carry forever; drop it so
+  // clearing a grade actually clears it.
+  if (!entry.grade && !entry.retakeOf) delete term[sectionKey];
+  persistGpaEntries();
+}
+
+export function setGpaGrade(sectionKey: string, grade: string) {
+  mutateEntry(sectionKey, { grade });
+}
+
+export function setGpaRetakeOf(sectionKey: string, retakeOf: string) {
+  mutateEntry(sectionKey, { retakeOf });
+}
+
+/** Forget every grade entered for the term being browsed. */
+export function clearGpaEntries() {
+  delete gpaEntries[currentSemester];
+  persistGpaEntries();
+}
+
+/**
+ * The cumulative record carried into this term, kept verbatim as the student
+ * typed it. Strings, not numbers: an empty field means "not told", which is a
+ * different thing from a zero and has to survive a reload as such.
+ */
+export type GpaBaseline = { gpa: string; credits: string };
+
+let gpaBaseline = $state<GpaBaseline>(readGpaBaseline());
+
+function readGpaBaseline(): GpaBaseline {
+  try {
+    const raw = localStorage.getItem(GPA_BASELINE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        return {
+          gpa: typeof parsed.gpa === "string" ? parsed.gpa : "",
+          credits: typeof parsed.credits === "string" ? parsed.credits : "",
+        };
+      }
+    }
+  } catch {
+    // private mode / corrupt data: start empty
+  }
+  return { gpa: "", credits: "" };
+}
+
+export function getGpaBaseline(): GpaBaseline {
+  return gpaBaseline;
+}
+
+export function setGpaBaseline(patch: Partial<GpaBaseline>) {
+  Object.assign(gpaBaseline, patch);
+  try {
+    localStorage.setItem(GPA_BASELINE_KEY, JSON.stringify(gpaBaseline));
+  } catch {
+    // ignore persistence failures
+  }
+}
