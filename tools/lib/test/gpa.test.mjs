@@ -210,6 +210,27 @@ test("the aggregate cap keeps a contradictory record from inventing points", () 
   assert.equal(stats.gpa, 2);
 });
 
+test("the aggregate cap binds while credits remain, not only at zero", () => {
+  // The other cap tests drive keptCredits to 0, where Math.min(0*4, ...) and
+  // Math.max(0, ...) agree and the cap is not what produces the answer — so
+  // deleting the cap left every test green. Here 3 baseline credits survive and
+  // the withdrawn points are far too few to match them: uncapped, the baseline
+  // would carry 42 points on 3 credits (a 14.0 average) and the result would
+  // clamp to 4.00 instead of 2.50.
+  const stats = computeCumulativeStats(
+    [{ credits: 9, grade: "CC" }],
+    { gpa: 3.5, credits: 12 },
+    [{ credits: 9, oldGrade: "FF" }],
+  );
+  assert.equal(stats.previousCreditsKept, 3);
+  assert.equal(stats.retakeCreditsRemoved, 9);
+  // Asserted on points, not only on the GPA: the final Math.min(4, ...) hides
+  // an inflated numerator, which is how the missing cap stayed invisible.
+  assert.equal(stats.points, 18 + 12);
+  assert.equal(stats.gpaCredits, 12);
+  close(stats.gpa, 2.5, "gpa");
+});
+
 test("an out-of-range or unparseable record is clamped, never propagated", () => {
   const term = [{ credits: 3, grade: "AA" }];
   for (const previous of [

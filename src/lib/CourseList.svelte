@@ -7,6 +7,10 @@
     delCourse,
     resetHoveredCourse,
     setCourseList,
+    getSolverUndo,
+    setSolverUndo,
+    getSolverOutcome,
+    setSolverOutcome,
   } from "./globalState.svelte";
   import { groupKey, solveConflictFree } from "./solver";
   import { buildSelectionSearch } from "./urlState";
@@ -71,18 +75,10 @@
         markCopied();
       });
   }
-  /**
-   * What the last solve found, recorded as facts rather than prose so the
-   * message can be derived: flipping the language re-renders it instead of
-   * leaving a stale English sentence on screen.
-   */
-  type SolverOutcome =
-    | { kind: "applied" }
-    | { kind: "unsatisfiable"; blockedOn: string; labsPinned: boolean }
-    | { kind: "gave-up"; blockedOn: string };
-
-  let prevSchedule = $state<string[] | null>(null);
-  let solverOutcome = $state<SolverOutcome | null>(null);
+  // `SolverOutcome`, the undo buffer and the last outcome live in globalState,
+  // not here: this component is unmounted whenever the GPA tab is showing, and
+  // component state would take the only route back to the pre-solve plan with
+  // it. See the note on `solverUndo` there.
 
   /**
    * Does the selection contain a section the solver structurally cannot swap?
@@ -105,7 +101,7 @@
   // The dictionary entries are placeholder-free sentence openers, so the key
   // the solver reported is appended here rather than interpolated.
   const solverMessage = $derived.by(() => {
-    const outcome = solverOutcome;
+    const outcome = getSolverOutcome();
     if (!outcome) {
       return "";
     }
@@ -125,33 +121,34 @@
     const current = getSelectedCourseNames();
     const result = solveConflictFree(current, getCurSemesterData());
     if (result.ok) {
-      prevSchedule = [...current];
+      setSolverUndo([...current]);
       setCourseList(result.schedule);
-      solverOutcome = { kind: "applied" };
+      setSolverOutcome({ kind: "applied" });
       return;
     }
     if (result.reason === "budget-exhausted") {
       // The search was cut off at SOLVER_TRIAL_BUDGET, so nothing was proven
       // and "no combination exists" would be false. `blockedOn` is only where
       // the search stalled, never a refuted requirement.
-      solverOutcome = { kind: "gave-up", blockedOn: result.blockedOn };
+      setSolverOutcome({ kind: "gave-up", blockedOn: result.blockedOn });
       return;
     }
     // Search tree fully explored: the impossibility claim is earned.
-    solverOutcome = {
+    setSolverOutcome({
       kind: "unsatisfiable",
       blockedOn: result.blockedOn,
       labsPinned: hasPinnedSubsections(current),
-    };
+    });
   }
 
   function undoConflictFree() {
-    if (!prevSchedule) {
+    const previous = getSolverUndo();
+    if (!previous) {
       return;
     }
-    setCourseList(prevSchedule);
-    prevSchedule = null;
-    solverOutcome = null;
+    setCourseList(previous);
+    setSolverUndo(null);
+    setSolverOutcome(null);
   }
 </script>
 
@@ -236,7 +233,7 @@
     >
       {t("list.findConflictFree")}
     </button>
-    {#if prevSchedule}
+    {#if getSolverUndo()}
       <button
         type="button"
         class="btn-quiet"
@@ -246,11 +243,11 @@
         {t("list.undo")}
       </button>
     {/if}
-    {#if solverOutcome}
+    {#if getSolverOutcome()}
       <span
         class="w-full text-xs text-zinc-600 dark:text-zinc-400"
         data-testid="solver-message"
-        data-solver-outcome={solverOutcome.kind}>{solverMessage}</span
+        data-solver-outcome={getSolverOutcome()?.kind}>{solverMessage}</span
       >
     {/if}
   </div>

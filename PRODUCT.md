@@ -54,8 +54,9 @@ history.
   summer term with a much smaller catalogue.
 - Semester start/end dates and official holidays come from the academic
   calendar and drive `.ics` / Google Calendar export.
-- Course selections and completed courses live in `localStorage`; share
-  links encode the selected sections in the URL.
+- Course selections, completed courses, and the grades and standing cumulative
+  GPA entered on the GPA tab live in `localStorage`; share links encode the
+  selected sections in the URL. None of it leaves the device.
 - Usage is bilingual (Turkish campus, English-language instruction) and
   frequently mobile, sometimes on poor connectivity.
 

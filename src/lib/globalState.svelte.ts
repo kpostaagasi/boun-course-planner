@@ -787,6 +787,45 @@ export function setActiveTab(value: Tab) {
   activeTab = value;
 }
 
+// ---- Conflict-free solver: the undo buffer and the last outcome ----
+
+/**
+ * What the last solve found, recorded as facts rather than prose so the message
+ * can be derived and re-render on a language change.
+ */
+export type SolverOutcome =
+  | { kind: "applied" }
+  | { kind: "unsatisfiable"; blockedOn: string; labsPinned: boolean }
+  | { kind: "gave-up"; blockedOn: string };
+
+/**
+ * These live here rather than inside CourseList because the solver overwrites
+ * the stored selection in place (`setCourseList` persists, and its history
+ * write is a `replace`, so Back does not hold the pre-solve plan either). The
+ * Undo button is therefore the ONLY way back to what the student picked by
+ * hand — and component state does not survive the tab switch that unmounts the
+ * planner panel. Keeping it module-level is what makes "solve, look at the GPA,
+ * change my mind" recoverable.
+ */
+let solverUndo = $state<string[] | null>(null);
+let solverOutcome = $state<SolverOutcome | null>(null);
+
+export function getSolverUndo(): string[] | null {
+  return solverUndo;
+}
+
+export function setSolverUndo(value: string[] | null) {
+  solverUndo = value;
+}
+
+export function getSolverOutcome(): SolverOutcome | null {
+  return solverOutcome;
+}
+
+export function setSolverOutcome(value: SolverOutcome | null) {
+  solverOutcome = value;
+}
+
 // ---- GPA (the grades entered against the planned term) ----
 
 /** What the student typed against one planned section. */
@@ -809,15 +848,40 @@ const GPA_BASELINE_KEY = "gpaBaseline";
 
 let gpaEntries = $state<GpaEntries>(readGpaEntries());
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Read the stored grades, keeping only what is actually shaped like a grade.
+ *
+ * The whole tree is validated, not just its root. A term whose value is a
+ * string or an array survives a root-only check and then breaks `mutateEntry`:
+ * assigning a property to a primitive throws in module (strict) code, and the
+ * throw escapes the change handler, so the GPA tab stops accepting grades for
+ * good — with no in-app way out, because the "Clear grades" button only renders
+ * once a grade has been recorded. Anything unrecognised is dropped here
+ * instead, the same self-healing `readSelectedCourseNames` does.
+ */
 function readGpaEntries(): GpaEntries {
   try {
     const raw = localStorage.getItem(GPA_ENTRIES_KEY);
     if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      return {};
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPlainObject(parsed)) return {};
+    const clean: GpaEntries = {};
+    for (const [semester, courses] of Object.entries(parsed)) {
+      if (!isPlainObject(courses)) continue;
+      const term: Record<string, GpaEntry> = {};
+      for (const [sectionKey, entry] of Object.entries(courses)) {
+        if (!isPlainObject(entry)) continue;
+        const grade = typeof entry.grade === "string" ? entry.grade : "";
+        const retakeOf = typeof entry.retakeOf === "string" ? entry.retakeOf : "";
+        if (grade || retakeOf) term[sectionKey] = { grade, retakeOf };
+      }
+      if (Object.keys(term).length > 0) clean[semester] = term;
     }
-    return parsed as GpaEntries;
+    return clean;
   } catch {
     // private mode / corrupt data: start empty rather than throwing at boot
     return {};
@@ -838,8 +902,15 @@ export function getGpaEntriesForCurrentSemester(): Record<string, GpaEntry> {
 }
 
 function mutateEntry(sectionKey: string, patch: Partial<GpaEntry>) {
-  const term = (gpaEntries[currentSemester] ??= {});
-  const entry = (term[sectionKey] ??= { grade: "", retakeOf: "" });
+  // Read back through the proxy after assigning rather than using the value of
+  // `??=`: a logical assignment evaluates to its right-hand side, but a $state
+  // proxy stores a *wrapped* copy of it, so `??=` hands back a raw object whose
+  // later mutations never reach the proxy's traps (Svelte's
+  // `assignment_value_stale` warning).
+  if (!gpaEntries[currentSemester]) gpaEntries[currentSemester] = {};
+  const term = gpaEntries[currentSemester];
+  if (!term[sectionKey]) term[sectionKey] = { grade: "", retakeOf: "" };
+  const entry = term[sectionKey];
   Object.assign(entry, patch);
   // An entry that says nothing is storage we would carry forever; drop it so
   // clearing a grade actually clears it.

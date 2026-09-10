@@ -9,6 +9,7 @@ import {
   selectCourse,
   deselectCourse,
   setLang,
+  waitForCatalogue,
 } from "./helpers";
 
 /**
@@ -216,6 +217,78 @@ test("the tab strip and the panel are translated, not hardcoded English", async 
 });
 
 /**
+ * Every fixed-width <select> must fit its own widest option, in both languages.
+ *
+ * A native select CLIPS rather than ellipsising, and axe cannot see it: the
+ * accessible name comes from aria-label, so the AX tree reads clean while the
+ * pixels are cut. The grade picker shipped at w-20 with a 40px text box against
+ * a 72px (EN) / 94px (TR) empty option, so every ungraded row — the state the
+ * tab opens in — read "Not gr" / "Not gi". This pins the whole class, not the
+ * two instances.
+ *
+ * Measured in the font the browser actually resolved, after document.fonts.ready:
+ * the pickers switch between the mono and sans faces, so both states are checked.
+ */
+for (const lang of ["en", "tr"] as const) {
+  test(`no GPA select clips its own options (${lang})`, async ({ page }) => {
+    await gotoFresh(page);
+    await setLang(page, lang);
+    await selectCourse(page, "CMPE150.01");
+    await openTab(page, "gpa");
+
+    const measure = async (state: string) => {
+      await page.evaluate(() => document.fonts.ready);
+      const clipped = await page.evaluate(() => {
+        const canvas = document.createElement("canvas").getContext("2d")!;
+        const bad: string[] = [];
+        for (const el of document.querySelectorAll("#panel-gpa select")) {
+          const sel = el as HTMLSelectElement;
+          const cs = getComputedStyle(sel);
+          const inner =
+            sel.getBoundingClientRect().width -
+            parseFloat(cs.paddingLeft) -
+            parseFloat(cs.paddingRight) -
+            parseFloat(cs.borderLeftWidth) -
+            parseFloat(cs.borderRightWidth);
+          canvas.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+          for (const option of sel.options) {
+            const width = canvas.measureText(option.text).width;
+            if (width > inner) {
+              bad.push(
+                `${sel.dataset.testid}="${option.text}" needs ${width.toFixed(0)}px, has ${inner.toFixed(0)}px`,
+              );
+            }
+          }
+        }
+        return bad;
+      });
+      expect(clipped, `${state}: every option fits its control`).toEqual([]);
+    };
+
+    await measure("ungraded");
+    // Graded: the grade picker switches to the mono face, which is wider.
+    await setGrade(page, "CMPE150.01", "AA");
+    await page.getByTestId("gpa-retake").selectOption("FF");
+    await measure("graded");
+  });
+}
+
+/**
+ * The credit cell must stay on one line. "3 cr" fits a narrow slot; the Turkish
+ * unit is a whole word ("3 kredi") and wrapped every row to double height.
+ */
+test("the credit cell does not wrap in Turkish", async ({ page }) => {
+  await gotoFresh(page);
+  await setLang(page, "tr");
+  await selectCourse(page, "CMPE150.01");
+  await openTab(page, "gpa");
+  const box = page.getByTestId("gpa-row-credits").first();
+  const height = await box.evaluate((el) => el.getBoundingClientRect().height);
+  const lineHeight = await box.evaluate((el) => parseFloat(getComputedStyle(el).lineHeight));
+  expect(height, "one line, not two").toBeLessThan(lineHeight * 1.6);
+});
+
+/**
  * The GPA row is the densest thing this tab renders — code, name, credits, a
  * grade select, a retake toggle and a second select, all on one line. On a
  * phone that line has to wrap rather than push the page sideways.
@@ -236,4 +309,67 @@ test("the GPA panel fits a phone without scrolling sideways @mobile", async ({ p
   for (const testid of ["gpa-grade", "gpa-retake"]) {
     await expect(page.getByTestId(testid)).toBeInViewport();
   }
+});
+
+
+/**
+ * The solver overwrites the stored selection in place and its history write is
+ * a `replace`, so the Undo button is the ONLY route back to the plan the
+ * student picked by hand. It used to be component state in CourseList, which
+ * the tab switch unmounts — and "solve, then go look at the GPA" is exactly the
+ * path a student takes, so the buffer died on the most likely journey.
+ */
+test("the solver's Undo survives a trip to the GPA tab", async ({ page }) => {
+  await gotoFresh(page);
+  await selectCourse(page, "CMPE150.01");
+  await selectCourse(page, "HTR311.01");
+  await page.getByTestId("find-conflict-free").click();
+  await expect(page.getByTestId("solver-undo")).toBeVisible();
+  const message = await page.getByTestId("solver-message").innerText();
+
+  await openTab(page, "gpa");
+  await openTab(page, "planner");
+
+  await expect(page.getByTestId("solver-undo")).toBeVisible();
+  expect(await page.getByTestId("solver-message").innerText()).toBe(message);
+});
+
+/**
+ * Storage the app did not write must not be able to brick the tab.
+ *
+ * `readGpaEntries` used to validate only the root object, so a term whose value
+ * was a string reached `mutateEntry`, which assigns a property to a primitive —
+ * a TypeError in module code. It escaped the change handler, so grading died
+ * permanently, and the "Clear grades" button never rendered (it needs a
+ * recorded grade), leaving no in-app way out.
+ *
+ * gotoFresh() wipes storage in an init script, so this seeds its own instead.
+ */
+test("a corrupt gpaEntries value cannot brick the tab", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(String(error)));
+  // Seeded once, not on every navigation: the reload below has to see what the
+  // app persisted, not a fresh copy of the junk.
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem("__e2e_corrupt_seeded") === "1") return;
+    sessionStorage.setItem("__e2e_corrupt_seeded", "1");
+    localStorage.setItem("semesterSelCourses2", JSON.stringify({ "2026-2027-1": ["CMPE150.01"] }));
+    localStorage.setItem(
+      "gpaEntries",
+      JSON.stringify({ "2026-2027-1": "pwned", other: [1, 2], third: { "X.01": 7 } }),
+    );
+    localStorage.setItem("lang", "en");
+  });
+  await page.goto("./");
+  await waitForCatalogue(page);
+  await openTab(page, "gpa");
+
+  await setGrade(page, "CMPE150.01", "AA");
+  expect(await gpaFigure(page, "term")).toBe("4.00");
+  expect(errors, "no uncaught error from the corrupt value").toEqual([]);
+
+  // And it round-trips: the junk was dropped on read, not carried back to disk.
+  await page.reload();
+  await openTab(page, "gpa");
+  await expect(gpaGrade(page, "CMPE150.01")).toHaveValue("AA");
 });

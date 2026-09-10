@@ -146,8 +146,11 @@ missing an entry there.
 - EN/TR interface, dark mode, data-freshness indicator and a "report bad
   data" button.
 
-Selections, completed courses and the grades entered on the GPA tab are
-persisted in `localStorage`.
+Selections, completed courses, the grades entered on the GPA tab and the
+standing cumulative GPA typed into it are persisted in `localStorage` (keys
+`semesterSelCourses2`, `completedCourses`, `gpaEntries`, `gpaBaseline`).
+"Clear grades" clears the term's grades only; the standing record is cleared by
+emptying its two fields. Nothing leaves the device.
 
 ## Architecture
 

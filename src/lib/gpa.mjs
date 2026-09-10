@@ -177,6 +177,10 @@ export function computeCumulativeStats(termCourses, previous, retakes = []) {
 
   const gpaCredits = term.gpaCredits + keptCredits;
   const points = term.points + keptPoints;
+  // The final clamp is belt to the cap's braces, and is unreachable while the
+  // cap above holds: `keptPoints <= keptCredits * 4` and no grade is worth more
+  // than 4, so `points <= gpaCredits * 4` already. The cap is the load-bearing
+  // half — see the regression test that pins it with credits still remaining.
   return {
     gpa: gpaCredits > 0 ? Math.min(4, Math.max(0, points / gpaCredits)) : null,
     gpaCredits,

@@ -356,7 +356,10 @@ export const dict = {
   "gpa.goToPlanner": { en: "Open the planner", tr: "Planlayıcıyı aç" },
   "gpa.grade": { en: "Grade", tr: "Not" },
   "gpa.gradeFor": { en: "Grade for {course}", tr: "{course} için not" },
-  "gpa.noGradeOption": { en: "Not graded", tr: "Not girilmedi" },
+  // Kept short on purpose: this is the empty option of a fixed-width select,
+  // and a native select clips rather than ellipsising. Measured against the
+  // control's text box, not guessed.
+  "gpa.noGradeOption": { en: "No grade", tr: "Girilmedi" },
   "gpa.credits": { en: "cr", tr: "kredi" },
   // LAB and P.S. sub-rows carry no credit figure at all in the registrar's
   // data, so they are left out rather than shown as a zero.
@@ -378,11 +381,16 @@ export const dict = {
   },
   "gpa.record": { en: "Your record so far", tr: "Şu ana kadarki kaydınız" },
   "gpa.recordHint": {
-    en: "Copy these from the registration system. Leave them empty to see only this term's GPA.",
-    tr: "Bunları kayıt sisteminden alın. Yalnızca bu dönemin ortalamasını görmek için boş bırakın.",
+    en: "Copy these from the registration system. GPA credits are the ones behind that average — a repeated FF counts, a P does not. Leave both empty to see only this term's GPA.",
+    tr: "Bunları kayıt sisteminden alın. GPA'ya dahil kredi, o ortalamanın arkasındaki kredidir: tekrarlanan bir FF sayılır, P sayılmaz. Yalnızca bu dönemin ortalamasını görmek için ikisini de boş bırakın.",
   },
   "gpa.previousGpa": { en: "Cumulative GPA", tr: "Kümülatif ortalama" },
-  "gpa.previousCredits": { en: "Credits completed", tr: "Tamamlanan kredi" },
+  // NOT "credits completed": this figure is the denominator of the cumulative
+  // average, so it must be GPA credits — a repeated FF is in it and a P is not.
+  // The standalone calculator called it exactly this ("GPA Credits So Far" /
+  // "GPA'ya Dahil Kredi"); relabelling it to earned credits silently produced a
+  // wrong cumulative GPA for anyone carrying an FF or a P.
+  "gpa.previousCredits": { en: "GPA credits so far", tr: "GPA'ya dahil kredi" },
   "gpa.gpaRange": {
     en: "Enter a GPA between 0 and 4.",
     tr: "0 ile 4 arasında bir ortalama girin.",

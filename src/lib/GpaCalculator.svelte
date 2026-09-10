@@ -202,25 +202,35 @@
                 >{t("gpa.creditsUnknown")}</span
               >
             {:else}
+              <!-- w-16 + nowrap, not w-12: the unit is a word in Turkish
+                   ("3 kredi"), and at w-12 every row wrapped to two lines. -->
               <span
-                class="u-data w-12 shrink-0 text-right text-xs text-zinc-500 dark:text-zinc-400"
+                class="u-data w-16 shrink-0 text-right text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400"
                 data-testid="gpa-row-credits"
                 data-course={row.key}>{row.credits} {t("gpa.credits")}</span
               >
             {/if}
 
+            <!--
+              w-28, not w-20: a native select clips rather than ellipsising, and
+              at w-20 the 40px text box cut the empty option — the state every
+              row starts in — to "Not gr" in English and "Not gi" in Turkish.
+              Mono is switched off while that option is showing, because it is
+              prose; a chosen grade is registrar data and stays mono.
+            -->
             {@render picker(
               t("gpa.gradeFor", { course: row.key }),
               "gpa-grade",
               row.key,
               row.grade,
-              "w-20",
+              "w-28",
               [
                 { value: "", text: t("gpa.noGradeOption") },
                 ...GRADES.map((grade) => ({ value: grade, text: grade })),
               ],
               row.credits === undefined,
               (next) => setGpaGrade(row.key, next),
+              row.grade !== "",
             )}
 
             <!--

@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ported from the standalone BOUN GPA Calculator into `src/lib/gpa.mjs` and
   pinned by `tools/lib/test/gpa.test.mjs`; an ungraded term reports no GPA
   rather than a 0.00, and an out-of-range record is refused rather than
-  clamped. Grades persist in `localStorage`.
+  clamped. The grades and the standing record both persist in `localStorage`
+  (`gpaEntries`, `gpaBaseline`) and never leave the device.
 - **Automated data pipeline.** `tools/scrape.mjs` scrapes every department's
   schedule page from registration.boun.edu.tr daily, validates the result and
   commits `public/data/<term>.json` + `semesters.json`; GitHub Actions rebuilds
