@@ -29,7 +29,14 @@ import {
 /** The term the app opens on, matching the other specs' pinned fixtures. */
 const TERM = "2026-2027-1";
 
-type QuotaRow = { dept?: string; quota?: number; current?: number; note?: string };
+type QuotaRow = {
+  dept?: string;
+  quota?: number;
+  current?: number;
+  note?: string;
+  /** `"class"` / `"semester"` when `dept` holds a class or semester subdivision. */
+  scope?: string;
+};
 type QuotaRecord = { cap?: number | null; rows?: QuotaRow[] };
 type QuotaFile = {
   meta?: { term?: string; scrapedAt?: string };
@@ -76,9 +83,17 @@ test("a section in the quota dataset shows a real occupancy indicator, dated", a
   // payload is a note such as "Consent Of Instructor" — the card shows the note
   // rather than a meaningless "0/0 seats taken". 1249 publish a capacity with no
   // rows at all. Prefer the richest genuine state and fall back in that order.
+  // A row carrying a `scope` ("Class 4", "Semester 1") is a *subdivision* of the
+  // section's allocation, not another share of it, and `quotaInfo.mjs` skips it
+  // for that reason — summing it double-counts and can fabricate a FULL. This
+  // recomputation is independent of the app's code, but it has to be
+  // independent of the same specification, so it applies the rule too. It did
+  // not, and went red the first time the scraper emitted a scoped row for the
+  // section this test happens to pick.
+  const counts = (row: QuotaRow) => !row.note && !row.scope;
   const hasNumericRow = (key: string) =>
     (sections[key].rows ?? []).some(
-      (row) => !row.note && typeof row.quota === "number",
+      (row) => counts(row) && typeof row.quota === "number",
     );
   const inTerm = (key: string) => key in termData;
   const present =
@@ -95,11 +110,13 @@ test("a section in the quota dataset shows a real occupancy indicator, dated", a
   // app's own derivation. Rows are summed, never read at index 0.
   const record = sections[present!];
   const rows = record.rows ?? [];
-  const numeric = rows.filter((row) => !row.note && typeof row.quota === "number");
+  const numeric = rows.filter((row) => counts(row) && typeof row.quota === "number");
   const note = rows.find((row) => row.note)?.note;
   if (numeric.length > 0) {
     const totalQuota = numeric.reduce((sum, row) => sum + (row.quota ?? 0), 0);
-    const totalCurrent = rows.reduce((sum, row) => sum + (row.current ?? 0), 0);
+    const totalCurrent = rows
+      .filter((row) => !row.scope)
+      .reduce((sum, row) => sum + (row.current ?? 0), 0);
     await expect(state).toContainText(String(totalQuota));
     await expect(state).toContainText(String(totalCurrent));
   } else if (note) {
