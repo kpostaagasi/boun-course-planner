@@ -20,11 +20,11 @@ import {
   waitForCatalogue,
 } from "./helpers";
 
-/** A section with a single fixed meeting: Tuesday, slot 8, which the timetable labels hour 16. */
+/** A section with a single fixed meeting: Monday, slot 5, which the timetable labels hour 13. */
 const SECTION = "CMPE150.01";
 const SECTION_CREDITS = 3;
-const SECTION_DAY_INDEX = 1;
-const SECTION_HOUR = 16;
+const SECTION_DAY_INDEX = 0;
+const SECTION_HOUR = 13;
 
 test("loads the shell and the current term's catalogue", async ({ page }) => {
   await gotoFresh(page);
@@ -63,6 +63,10 @@ test("adds a section to the panel, the credit total and the timetable", async ({
   await expect(selectedCourse(page, SECTION)).toBeVisible();
   expect(await totalCredits(page)).toBe(SECTION_CREDITS);
   await expect(timetableCell(page, SECTION_DAY_INDEX, SECTION_HOUR)).toContainText(SECTION);
+  // One tap from the plan to the registrar's page for that exact section.
+  await expect(
+    selectedCourse(page, SECTION).getByTestId("list-official-page")
+  ).toHaveAttribute("href", /coursedescription\.asp\?course=CMPE150&section=01&/);
 });
 
 test("keeps the selection across a reload", async ({ page }) => {

@@ -4,9 +4,9 @@
  * Fixtures are pinned to `2026-2027-1`, the term the app opens on, and to
  * sections whose schedules are stable in `public/data/2026-2027-1.json`:
  *
- *   CMPE101.01          M slots 1-2 (09:00, 10:00) + T slot 8 (16:00)
- *   CMPE150.01          T slot 8 (16:00)            -> clashes at Tue 16:00
- *   CMPE150.01 P.S. 1   M slots 1-2                 -> clashes across Mon 09:00-10:00
+ *   CMPE101.01          M slots 1-2 (09:00, 10:00) + T slot 3 (11:00)
+ *   CMPE599.01          M slots 1-2                 -> clashes across Mon 09:00-10:00
+ *   CMPE150.01          M slot 5 (13:00)
  *   CMPE101.01 LAB 1    F slots 3-4 (11:00, 12:00)
  *   CMPE101.01 LAB 2    F slots 3-4                 -> two-hour, two-column clash
  */
@@ -39,9 +39,9 @@ test("overlapping courses sit side by side instead of stacking the row", async (
 }) => {
   await gotoFresh(page);
   await selectCourse(page, "CMPE101.01");
-  await selectCourse(page, "CMPE150.01");
+  await selectCourse(page, "CMPE599.01");
 
-  const clash = timetableCell(page, TUE, 16);
+  const clash = timetableCell(page, MON, 9);
   const clashBoxes = clash.getByTestId("tt-box");
   await expect(clashBoxes).toHaveCount(2);
 
@@ -63,9 +63,9 @@ test("overlapping courses sit side by side instead of stacking the row", async (
 
   // A two-way clash row is exactly as tall as a row with one course and as a row with none.
   const rows = timetable(page).locator("tbody tr");
-  const clashRow = await rect(rows.nth(16 - FIRST_HOUR));
-  const singleRow = await rect(rows.nth(9 - FIRST_HOUR)); // Mon 09:00, one course
-  const emptyRow = await rect(rows.nth(13 - FIRST_HOUR)); // nothing scheduled
+  const clashRow = await rect(rows.nth(9 - FIRST_HOUR));
+  const singleRow = await rect(rows.nth(11 - FIRST_HOUR)); // Tue 11:00, one course
+  const emptyRow = await rect(rows.nth(15 - FIRST_HOUR)); // nothing scheduled
   expect(Math.abs(clashRow.height - singleRow.height)).toBeLessThan(1);
   expect(Math.abs(clashRow.height - emptyRow.height)).toBeLessThan(1);
 
@@ -79,9 +79,9 @@ test("a multi-hour course keeps one horizontal offset across every hour it spans
   page,
 }) => {
   await gotoFresh(page);
-  // Mon 09:00-10:00 becomes a two-column cluster: CMPE101.01 vs CMPE150.01 P.S. 1.
+  // Mon 09:00-10:00 becomes a two-column cluster: CMPE101.01 vs CMPE599.01.
   await selectCourse(page, "CMPE101.01");
-  await selectCourse(page, "CMPE150.01 P.S. 1");
+  await selectCourse(page, "CMPE599.01");
 
   const first = timetableCell(page, MON, 9).locator('[data-course="CMPE101.01"]');
   const second = timetableCell(page, MON, 10).locator('[data-course="CMPE101.01"]');
@@ -98,8 +98,9 @@ test("a multi-hour course keeps one horizontal offset across every hour it spans
   expect(top.width).toBeLessThan(cellRect.width * 0.75);
   // Continuous band: the two hours are vertically adjacent, not separated.
   expect(Math.abs(top.y + top.height - bottom.y)).toBeLessThan(1);
-  // Only the first hour carries the label; the continuation is a bare band.
-  await expect(first).toHaveText("CMPE101.01");
+  // Only the first hour carries the label and the room; the continuation is a bare band.
+  await expect(first).toContainText("CMPE101.01");
+  await expect(first.getByTestId("tt-room")).not.toBeEmpty();
   await expect(second).toHaveText("");
 
   // Same invariant for a clash that is two hours tall on both sides.

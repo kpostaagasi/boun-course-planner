@@ -6,11 +6,11 @@
  * Fixtures are pinned to `2026-2027-1`, the term the app opens on, and to
  * sections whose schedules are stable in `public/data/2026-2027-1.json`:
  *
- *   CMPE101.01          M slots 1-2 + T slot 8, 4 credits
+ *   CMPE101.01          M slots 1-2 + T slot 3, 4 credits
  *   CMPE101.01 LAB 1    F slots 3-4  \ identical slots, and `groupKey` leaves each
  *   CMPE101.01 LAB 2    F slots 3-4  / in a group of one -> provably unsatisfiable
- *   CMPE150.01          T slot 8     \ clash at Tue 16:00, resolvable by swapping
- *   PHYS331.01          T slot 8     / CMPE150.01 for CMPE150.02
+ *   CMPE150.01          M slot 5     \ clash at Mon 13:00; AD211 has a single section,
+ *   AD211.01            M slots 3-5  / so the only fix is CMPE150.01 -> CMPE150.02 (M slot 7)
  *
  * The solver outcome is asserted through `data-solver-outcome` rather than by
  * reading the sentence: "proven impossible" and "search gave up" are different
@@ -98,7 +98,7 @@ test("two conflicting labs report a proven impossibility, not a search that gave
 test("undo restores the selection the solver replaced", async ({ page }) => {
   await gotoFresh(page);
   await selectCourse(page, "CMPE150.01");
-  await selectCourse(page, "PHYS331.01");
+  await selectCourse(page, "AD211.01");
   await expect(selectedCourses(page)).toHaveCount(2);
 
   await page.getByTestId("find-conflict-free").click();
@@ -107,7 +107,7 @@ test("undo restores the selection the solver replaced", async ({ page }) => {
   await expect(message).toHaveAttribute("data-solver-outcome", "applied");
   await expect(selectedCourse(page, "CMPE150.02")).toHaveCount(1);
   await expect(selectedCourse(page, "CMPE150.01")).toHaveCount(0);
-  await expect(selectedCourse(page, "PHYS331.01")).toHaveCount(1);
+  await expect(selectedCourse(page, "AD211.01")).toHaveCount(1);
 
   await page.getByTestId("solver-undo").click();
 
