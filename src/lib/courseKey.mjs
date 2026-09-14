@@ -26,6 +26,26 @@ export function baseCode(sectionKey) {
 }
 
 /**
+ * Registrar page for one section, e.g.
+ * `coursedescription.asp?course=AD  211&section=01&term=2026%2F2027-1`.
+ *
+ * Takes the dataset's `code` field (`"AD  211.01"`), not the section key: the
+ * registrar's own padding is part of the query it answers to. The section is
+ * the digit run after the first `.`, so the LAB / P.S. sub-rows — whose codes
+ * carry no suffix but whose keys do — still resolve to their parent section.
+ * @param {string} code dataset `code`, or the section key as a fallback
+ * @param {string} semester term id, e.g. `"2026-2027-1"`
+ * @returns {string}
+ */
+export function officialCourseUrl(code, semester) {
+  const course = code.split(".")[0];
+  const section = code.match(/\.(\d+)/)?.[1] ?? "";
+  // Only the year separator is escaped; the term already carries a literal `-`.
+  const term = semester.replace("-", "%2F");
+  return `https://registration.boun.edu.tr/scripts/schedule/coursedescription.asp?course=${course}&section=${section}&term=${term}`;
+}
+
+/**
  * Instructor cells that name nobody. The registrar publishes unstaffed
  * sections as `STAFF STAFF` (82 sections of 2026/2027-1, 979 across all 25
  * terms), and the Turkish pages have historically used "belirtilmedi"

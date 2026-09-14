@@ -30,7 +30,7 @@
   } from "./globalState.svelte";
   import { t, getLang } from "./i18n.svelte";
   import { getEligibility } from "./eligibility";
-  import { baseCode, isPlaceholderInstructor } from "./courseKey";
+  import { baseCode, isPlaceholderInstructor, officialCourseUrl } from "./courseKey";
   import { conflicts as slotsOverlap } from "./solver";
   import { quotaDisplay, quotaIsStale } from "./quotaInfo";
   import { examConflictFor, type ExamSection } from "./examConflict";
@@ -52,11 +52,7 @@
   /** Course identity, e.g. `"AD251.01 P.S. 1"` -> `"AD251"`. Derived once. */
   const base = $derived(baseCode(course.code));
 
-  const syllabusLink = $derived.by(() => {
-    const [code, section] = course.code.split(".");
-    const term = currentSemester.replace("-", "%2F");
-    return `https://registration.boun.edu.tr/scripts/schedule/coursedescription.asp?course=${code}&section=${section}&term=${term}`;
-  });
+  const syllabusLink = $derived(officialCourseUrl(course.code, currentSemester));
 
   // The prefilled issue body used to be hardcoded Turkish no matter the UI
   // language, so an English-speaking reporter got a Turkish template.
@@ -655,10 +651,11 @@
             </button>
           {/if}
 
-          <!-- The three actions that are not "add this section". They repeated on
-               every row of a 3140-section catalogue; here they are named rather
-               than left as bare icons, which is also what makes them reachable on
-               touch and by screen reader. -->
+          <!-- The two actions that are neither "add this section" nor "open the
+               official page". They repeated on every row of a 3140-section
+               catalogue; here they are named rather than left as bare icons,
+               which is also what makes them reachable on touch and by screen
+               reader. -->
           <div class="flex flex-wrap items-center gap-2 pt-0.5">
             <button
               type="button"
@@ -670,15 +667,6 @@
               <IconCheck />
               {isCompleted(base) ? t("course.markNotTaken") : t("course.markTaken")}
             </button>
-            <a
-              class="btn-quiet"
-              href={syllabusLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconDocument />
-              {t("course.syllabusLink")}
-            </a>
             <a
               class="btn-quiet"
               href={reportIssueUrl}
@@ -695,11 +683,22 @@
     </div>
 
     <!--
-      The one action the row exists for. A single 44px target instead of the
-      four that used to stack here — the other three moved under Details, where
-      they are labelled instead of guessed at from an icon.
+      The two actions worth a 44px target on every row: add/remove the section,
+      and open the registrar's own page for it. The rest live under Details,
+      where they are labelled instead of guessed at from an icon.
     -->
-    <div class="shrink-0">
+    <div class="flex shrink-0 items-center gap-1">
+      <a
+        href={syllabusLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-testid="course-syllabus"
+        aria-label="{t('course.syllabusLink')}: {courseName}"
+        title={t("course.syllabusLink")}
+        class="inline-flex size-11 items-center justify-center rounded-xl text-zinc-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:text-zinc-500 dark:hover:bg-blue-900/40 dark:hover:text-blue-300"
+      >
+        <IconDocument />
+      </a>
       {#if selected}
         <button
           type="button"

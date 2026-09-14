@@ -400,7 +400,7 @@
                   data-course={occ.course}
                   data-hour={row.hour}
                   data-day={day}
-                  title={occ.course}
+                  title={occ.room === "" ? occ.course : `${occ.course} · ${occ.room}`}
                   style={boxStyle(occ)}
                   class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1.5 text-left text-[10px] leading-[1.15] sm:text-xs {color.bg} {color.text} {color.border}
                   {occ.course == hoveredCourse && !selectedCourses.includes(occ.course)
@@ -408,7 +408,10 @@
                     : occ.course == hoveredCourse
                       ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
                       : ''}"
-                >{#if occ.isFirst}{occ.course}{/if}</div
+                >{#if occ.isFirst}{occ.course}{#if occ.room !== ""}<span
+                      class="u-data block truncate text-[9px] sm:text-[10px]"
+                      data-testid="tt-room">{occ.room}</span
+                    >{/if}{/if}</div
                 >{/each}</td
             >
           {/each}

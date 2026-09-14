@@ -1,1 +1,5 @@
-export { baseCode, isPlaceholderInstructor } from "./courseKey.mjs";
+export {
+  baseCode,
+  isPlaceholderInstructor,
+  officialCourseUrl,
+} from "./courseKey.mjs";

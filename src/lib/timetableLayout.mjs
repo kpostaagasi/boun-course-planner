@@ -120,6 +120,7 @@ export function courseColor(name) {
  * @property {boolean} isFirst true when the hour above is not part of this course
  * @property {boolean} isLast true when the hour below is not part of this course
  * @property {number} color index into {@link PALETTE}
+ * @property {string} room room of this meeting; "" when the scrape lacks one
  */
 
 /**
@@ -137,7 +138,9 @@ export function courseColor(name) {
  * @property {number} occupantCount total rendered boxes; 0 means nothing to show
  */
 
-/** @typedef {{ days?: string[] | null, hours?: number[] | null }} SectionSchedule */
+/**
+ * @typedef {{ days?: string[] | null, hours?: number[] | null, rooms?: string[] | null }} SectionSchedule
+ */
 
 /**
  * @param {Set<number>} set
@@ -253,6 +256,11 @@ export function assignSubColumns(courses) {
 export function buildTimetableLayout(courseNames, semesterData, hoveredCourse = "") {
   /** @type {Map<string, Set<number>>[]} */
   const perDay = DAYS.map(() => new Map());
+  // `rooms` is index-aligned with `days`/`hours`, and a section can meet in
+  // two different rooms on the same day, so the room is keyed per meeting
+  // (day + clock hour) rather than per section.
+  /** @type {Map<string, string>[]} */
+  const perDayRooms = DAYS.map(() => new Map());
   let lastHour = MIN_LAST_HOUR;
   let courseOnSaturday = false;
 
@@ -267,6 +275,7 @@ export function buildTimetableLayout(courseNames, semesterData, hoveredCourse = 
       const hours = section.hours;
       // 42.5% of sections are unscheduled: empty/missing days. Nothing to place.
       if (!days || !hours) continue;
+      const rooms = Array.isArray(section.rooms) ? section.rooms : [];
       const pairs = Math.min(days.length, hours.length);
       for (let j = 0; j < pairs; j++) {
         const dayIdx = DAYS.indexOf(/** @type {Day} */ (days[j]));
@@ -280,6 +289,8 @@ export function buildTimetableLayout(courseNames, semesterData, hoveredCourse = 
           perDay[dayIdx].set(name, set);
         }
         set.add(hour);
+        const room = typeof rooms[j] === "string" ? rooms[j].trim() : "";
+        if (room !== "") perDayRooms[dayIdx].set(`${name}@${hour}`, room);
         if (hour > lastHour) lastHour = hour;
         if (DAYS[dayIdx] === "St") courseOnSaturday = true;
       }
@@ -309,6 +320,7 @@ export function buildTimetableLayout(courseNames, semesterData, hoveredCourse = 
           isFirst: !info.hours.has(hour - 1),
           isLast: !info.hours.has(hour + 1),
           color: colorIndexFor(course),
+          room: perDayRooms[d].get(`${course}@${hour}`) ?? "",
         });
       }
       cell.sort((a, b) => a.col - b.col);

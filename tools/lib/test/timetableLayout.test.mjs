@@ -186,6 +186,27 @@ test("the hovered course is previewed unless it is already selected", () => {
   assert.equal(cell(dupe, "M", 9).length, 1);
 });
 
+test("each occupant carries the room of its own meeting", () => {
+  const d = {
+    // Same day, two blocks, two rooms: keying the room per section would
+    // print one of them in both places.
+    "AD211.01": {
+      days: ["M", "M", "M"],
+      hours: [1, 2, 6],
+      rooms: ["M 1171", "M 1171", "İB 102"],
+    },
+    // Index-aligned junk and a missing room must degrade to "".
+    "EC101.01": { days: ["W"], hours: [1], rooms: [null] },
+    "HIST105.01": { days: ["F"], hours: [1] },
+  };
+  const layout = buildTimetableLayout(["AD211.01", "EC101.01", "HIST105.01"], d);
+  assert.equal(occ(layout, "M", 9, "AD211.01").room, "M 1171");
+  assert.equal(occ(layout, "M", 10, "AD211.01").room, "M 1171");
+  assert.equal(occ(layout, "M", 14, "AD211.01").room, "İB 102");
+  assert.equal(occ(layout, "W", 9, "EC101.01").room, "");
+  assert.equal(occ(layout, "F", 9, "HIST105.01").room, "");
+});
+
 test("assignSubColumns is deterministic regardless of insertion order", () => {
   const forward = assignSubColumns(
     new Map([

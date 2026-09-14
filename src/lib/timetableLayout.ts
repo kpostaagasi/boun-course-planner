@@ -18,6 +18,7 @@ export type Day = "M" | "T" | "W" | "Th" | "F" | "St";
 export type SectionSchedule = {
   days?: string[] | null;
   hours?: number[] | null;
+  rooms?: string[] | null;
 };
 
 /**
@@ -42,6 +43,7 @@ export type Occupant = {
   isFirst: boolean;
   isLast: boolean;
   color: number;
+  room: string;
 };
 
 export type LayoutRow = {

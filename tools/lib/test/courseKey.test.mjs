@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { baseCode, isPlaceholderInstructor } from "../../../src/lib/courseKey.mjs";
+import {
+  baseCode,
+  isPlaceholderInstructor,
+  officialCourseUrl,
+} from "../../../src/lib/courseKey.mjs";
 
 test("baseCode strips the section suffix from a plain key", () => {
   assert.equal(baseCode("CMPE150.01"), "CMPE150");
@@ -55,4 +59,20 @@ test("real names containing a placeholder substring are not placeholders", () =>
 test("a partly-named section is a real name, not a placeholder", () => {
   // Every token must be a placeholder, so one real token is enough.
   assert.equal(isPlaceholderInstructor("STAFF AKIN"), false);
+});
+
+test("officialCourseUrl points at the registrar page for the exact section", () => {
+  assert.equal(
+    officialCourseUrl("AD  211.01", "2026-2027-1"),
+    "https://registration.boun.edu.tr/scripts/schedule/coursedescription.asp" +
+      "?course=AD  211&section=01&term=2026%2F2027-1",
+  );
+  // Only the year separator becomes a slash; the term suffix keeps its dash.
+  assert.match(officialCourseUrl("CMPE150.02", "2025-2026-3"), /term=2025%2F2026-3$/);
+});
+
+test("officialCourseUrl resolves a LAB / P.S. key to its parent section", () => {
+  // Keys carry the sub-row suffix, so a naive split on "." yields "01 P".
+  assert.match(officialCourseUrl("AD251.01 P.S. 1", "2026-2027-1"), /&section=01&/);
+  assert.match(officialCourseUrl("CMPE150.02 LAB 3", "2026-2027-1"), /&section=02&/);
 });

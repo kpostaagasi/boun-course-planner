@@ -15,6 +15,8 @@
   import { groupKey, solveConflictFree } from "./solver";
   import { buildSelectionSearch } from "./urlState";
   import IconX from "./icons/IconX.svelte";
+  import IconDocument from "./icons/IconDocument.svelte";
+  import { officialCourseUrl } from "./courseKey";
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
   import { t } from "./i18n.svelte";
@@ -202,12 +204,32 @@
           >
             <IconX />
           </button><span class="u-data text-sm font-medium">{courseName}</span>
-          {#if "credits" in getCurSemesterData()[courseName]}
-            <!-- Credits are data, not a status: no green pill. Green means seats. -->
-            <span class="u-data ml-auto text-xs text-zinc-500 dark:text-zinc-400"
-              >{getCurSemesterData()[courseName].credits} cr</span
+          <div class="ml-auto flex shrink-0 items-center gap-1">
+            {#if "credits" in getCurSemesterData()[courseName]}
+              <!-- Credits are data, not a status: no green pill. Green means seats. -->
+              <span class="u-data text-xs text-zinc-500 dark:text-zinc-400"
+                >{getCurSemesterData()[courseName].credits} cr</span
+              >
+            {/if}
+            <!-- One tap from the plan to the registrar's own page for the
+                 section: the same target Course.svelte offers under Details,
+                 which is two panels away once a course is chosen. -->
+            <a
+              href={officialCourseUrl(
+                getCurSemesterData()[courseName].code ?? courseName,
+                getCurrentSemester()
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="list-official-page"
+              data-course={courseName}
+              aria-label="{t('course.syllabusLink')}: {courseName}"
+              title={t("course.syllabusLink")}
+              class="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/40 dark:hover:text-blue-300"
             >
-          {/if}
+              <IconDocument />
+            </a>
+          </div>
         </div>
       {/each}
     </div>
