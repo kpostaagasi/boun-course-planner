@@ -262,6 +262,7 @@
         oninput={() => (activeIndex = 0)}
         class="w-full border-b border-zinc-100 bg-transparent px-4 py-3.5 text-base text-zinc-900 placeholder-zinc-400 focus:outline-none dark:border-zinc-700/60 dark:text-white dark:placeholder-zinc-500"
         placeholder={t("palette.placeholder")}
+        aria-label={t("palette.placeholder")}
         role="combobox"
         aria-expanded={results.length > 0}
         aria-controls="palette-listbox"

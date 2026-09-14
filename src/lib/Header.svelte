@@ -1,29 +1,53 @@
 <script>
   import SemesterSelect from "./SemesterSelect.svelte";
   import { t, getLang, setLang } from "./i18n.svelte";
+  import { getTheme, toggleTheme } from "./theme.svelte";
+  import IconSun from "./icons/IconSun.svelte";
+  import IconMoon from "./icons/IconMoon.svelte";
 
   /** The two UI languages, in toggle order. @type {("en" | "tr")[]} */
   const LANGS = ["en", "tr"];
 </script>
 
 <!--
-  The top bar states the app's name, the term being browsed and the language,
-  and then stops. It is a single hairline over the page — no rules, no tint, no
-  second row — because everything a student came here to do happens below it.
+  The top bar states the app's name, the term being browsed, the theme and the
+  language, and then stops. It is a single hairline over the page — no rules,
+  no tint, no second row — because everything a student came here to do happens
+  below it.
 -->
 <header
   data-testid="app-header"
   class="shrink-0 grow-0 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
 >
-  <div class="mx-auto flex min-h-14 max-w-[110rem] items-center gap-2 px-3 sm:gap-3 sm:px-5">
+  <div class="mx-auto flex min-h-14 max-w-[110rem] items-center gap-1.5 px-2 sm:gap-3 sm:px-5">
     <h1
       class="min-w-0 truncate text-[0.9375rem] font-semibold text-zinc-900 sm:text-base dark:text-zinc-50"
     >
       {t("header.title")}
     </h1>
 
-    <div class="ml-auto flex shrink-0 items-center gap-2">
+    <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
       <SemesterSelect />
+
+      <!--
+        Same well as the language control, one control wide. The icon is the
+        destination, not the current state: a moon means "switch to dark".
+      -->
+      <button
+        type="button"
+        class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 transition-colors hover:text-zinc-900 sm:size-8 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+        aria-label={getTheme() === "dark" ? t("theme.toLight") : t("theme.toDark")}
+        title={getTheme() === "dark" ? t("theme.toLight") : t("theme.toDark")}
+        aria-pressed={getTheme() === "dark"}
+        data-testid="theme-toggle"
+        onclick={toggleTheme}
+      >
+        {#if getTheme() === "dark"}
+          <IconSun />
+        {:else}
+          <IconMoon />
+        {/if}
+      </button>
 
       <!--
         A segmented control, not two buttons: the current language is the

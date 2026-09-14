@@ -7,9 +7,9 @@
     getSemesterDatesFailed,
     loadSemesterDates,
   } from "./globalState.svelte";
-  import IconDocument from "./icons/IconDocument.svelte";
+  import IconCalendar from "./icons/IconCalendar.svelte";
   import IconX from "./icons/IconX.svelte";
-  import { t as i18nT } from "./i18n.svelte";
+  import { t } from "./i18n.svelte";
 
   // Semester data with dates and holidays loaded from JSON
   type SemesterData = {
@@ -290,11 +290,7 @@
 
     const semesterDateRange = semesterDates[currentSemester];
     if (!semesterDateRange) {
-      alert(
-        "Semester dates not available for " +
-          currentSemester +
-          ". Calendar export needs the official term dates, which are added manually from the academic calendar."
-      );
+      alert(t("calendar.alertNoDates", { term: currentSemester }));
       return "";
     }
 
@@ -350,7 +346,7 @@
   function downloadCalendar() {
     const icsContent = generateICS();
     if (!icsContent) {
-      alert("No courses selected or semester data not available.");
+      alert(t("calendar.alertNoCourses"));
       return;
     }
 
@@ -527,24 +523,19 @@
     return urls;
   }
 
-  const t = i18nT;
   function openInGoogleCalendar() {
     const currentSemester = getCurrentSemester();
     const selectedCourses = getSelectedCourseNames();
     const semesterData = getCurSemesterData();
 
     if (!currentSemester || !semesterData || selectedCourses.length === 0) {
-      alert("No courses selected or semester data not available.");
+      alert(t("calendar.alertNoCourses"));
       return;
     }
 
     const semesterDateRange = semesterDates[currentSemester];
     if (!semesterDateRange) {
-      alert(
-        "Semester dates not available for " +
-          currentSemester +
-          ". Calendar export needs the official term dates, which are added manually from the academic calendar.",
-      );
+      alert(t("calendar.alertNoDates", { term: currentSemester }));
       return;
     }
 
@@ -596,13 +587,13 @@
   <div class="flex flex-wrap items-center gap-2">
     <button
       type="button"
-      class="btn-primary"
+      class={canExportCalendar ? "btn-primary" : "btn-quiet"}
       onclick={downloadCalendar}
       disabled={!canExportCalendar}
       title={calendarTooltip}
       data-testid="calendar-ics"
     >
-      <IconDocument />
+      <IconCalendar />
       {t("calendar.addToCalendar")}
     </button>
     {#if canExportCalendar}
@@ -613,33 +604,9 @@
         title={t("calendar.addToGcal")}
         data-testid="calendar-gcal"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="inline-block h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
+        <IconCalendar />
         {t("calendar.addToGcal")}
       </button>
-    {/if}
-
-    <!-- A disabled export button with no explanation reads as a broken app, so
-         the reason is shown inline once the fetch has settled; during the
-         in-flight moment there is nothing truthful to say yet. -->
-    {#if !canExportCalendar && datesStatus !== "loading"}
-      <span
-        class="text-xs text-zinc-600 dark:text-zinc-400"
-        data-testid="calendar-reason"
-        data-dates-status={datesStatus}>{calendarTooltip}</span
-      >
     {/if}
 
     <button
@@ -650,6 +617,19 @@
       {t("calendar.howToImport")}
     </button>
   </div>
+
+  <!-- Own row, not jammed against How to import: the two used to read as one
+       sentence ("Select courses to enable calendar export How to import?").
+       A disabled export button with no explanation reads as a broken app, so
+       the reason is shown once the fetch has settled; during the in-flight
+       moment there is nothing truthful to say yet. -->
+  {#if !canExportCalendar && datesStatus !== "loading"}
+    <p
+      class="text-xs text-zinc-600 dark:text-zinc-400"
+      data-testid="calendar-reason"
+      data-dates-status={datesStatus}>{calendarTooltip}</p
+    >
+  {/if}
 
   {#if showInstructions}
     <div

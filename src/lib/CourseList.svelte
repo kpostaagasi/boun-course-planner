@@ -196,7 +196,7 @@
             type="button"
             aria-label="{t('course.removeSection')}: {courseName}"
             title={t("course.removeSection")}
-            class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300"
+            class="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 sm:size-9 sm:rounded-lg dark:hover:bg-red-900/40 dark:hover:text-red-300"
             onclick={() => {
               delCourse(courseName);
               resetHoveredCourse();
@@ -225,7 +225,7 @@
               data-course={courseName}
               aria-label="{t('course.syllabusLink')}: {courseName}"
               title={t("course.syllabusLink")}
-              class="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/40 dark:hover:text-blue-300"
+              class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-zinc-400 transition-colors hover:bg-blue-50 hover:text-blue-600 sm:size-9 sm:rounded-lg dark:hover:bg-blue-900/40 dark:hover:text-blue-300"
             >
               <IconDocument />
             </a>
@@ -235,10 +235,11 @@
     </div>
   {:else}
     <div
-      class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400"
+      class="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400"
       data-testid="courses-empty"
     >
-      {t("list.empty")}
+      <p class="text-sm">{t("list.empty")}</p>
+      <p class="mt-1 text-xs">{t("list.emptyHint")}</p>
     </div>
   {/if}
   <div class="flex items-baseline px-4 py-3" data-testid="total-credits">

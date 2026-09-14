@@ -65,7 +65,7 @@
 <div class="relative">
   <select
     aria-label={t("header.semester")}
-    class="u-data cursor-pointer appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pr-7 pl-2.5 text-xs font-medium sm:pr-8 sm:pl-3 sm:text-[0.8125rem] text-zinc-900 transition-colors hover:border-zinc-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus:ring-blue-400"
+    class="u-data cursor-pointer appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pr-6 pl-2 text-xs font-medium sm:pr-8 sm:pl-3 sm:text-[0.8125rem] text-zinc-900 transition-colors hover:border-zinc-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus:ring-blue-400"
     value={getCurrentSemester()}
     oninput={(e) =>
       setCurrentSemester((e.currentTarget as HTMLSelectElement).value ?? "")}

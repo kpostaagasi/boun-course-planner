@@ -27,6 +27,7 @@ export const STORAGE_KEYS = [
   "lang",
   "gpaEntries",
   "gpaBaseline",
+  "theme",
 ] as const;
 
 /** Rows the catalogue renders per pagination step (`pageSize` in `CourseCatalogue.svelte`). */

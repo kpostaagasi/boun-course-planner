@@ -34,13 +34,13 @@ declare global {
   }
 }
 
-const EN_EMPTY = "You have no selected course";
+const EN_EMPTY = "No courses selected";
 
 test("the empty state is translated, not hardcoded English", async ({ page }) => {
   await gotoFresh(page);
 
   const empty = page.getByTestId("courses-empty");
-  await expect(empty).toHaveText(EN_EMPTY);
+  await expect(empty).toContainText(EN_EMPTY);
 
   await setLang(page, "tr");
   const translated = (await empty.innerText()).trim();

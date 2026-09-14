@@ -17,7 +17,10 @@
 /** @type {Record<string, Entry>} */
 export const dict = {
   "header.title": { en: "BOUN Course Planner", tr: "BOUN Ders Planlayıcı" },
+  "theme.toDark": { en: "Switch to dark theme", tr: "Koyu temaya geç" },
+  "theme.toLight": { en: "Switch to light theme", tr: "Açık temaya geç" },
   "search.placeholder": { en: "Search courses", tr: "Ders ara" },
+  "search.label": { en: "Search courses", tr: "Ders ara" },
   "search.clear": { en: "Clear search", tr: "Aramayı temizle" },
   "header.semester": { en: "Semester", tr: "Dönem" },
   "filters.open": { en: "Filter Courses", tr: "Dersleri Filtrele" },
@@ -73,7 +76,7 @@ export const dict = {
     tr: "Bu ders için katalog açıklaması yok",
   },
   "list.courses": { en: "Courses", tr: "Dersler" },
-  "list.copyLink": { en: "Copy Link", tr: "Bağlantıyı Kopyala" },
+  "list.copyLink": { en: "Copy link", tr: "Bağlantıyı kopyala" },
   "list.copied": { en: "Copied!", tr: "Kopyalandı!" },
   "calendar.addToCalendar": { en: "Add to Calendar", tr: "Takvime Ekle" },
   "calendar.howToImport": { en: "How to import?", tr: "Nasıl içe aktarılır?" },
@@ -82,8 +85,16 @@ export const dict = {
     tr: "Takvim dosyasını indir (.ics)",
   },
   "calendar.tooltipSelectCourses": {
-    en: "Select courses to enable calendar export",
-    tr: "Takvim dışa aktarımı için ders seçin",
+    en: "Select courses to enable calendar export.",
+    tr: "Takvim dışa aktarımı için ders seçin.",
+  },
+  "calendar.alertNoCourses": {
+    en: "Select courses before exporting a calendar.",
+    tr: "Takvimi dışa aktarmadan önce ders seçin.",
+  },
+  "calendar.alertNoDates": {
+    en: "Calendar dates for {term} have not been added yet. Export needs the official term dates.",
+    tr: "{term} dönemi için takvim tarihleri henüz eklenmedi. Dışa aktarım resmî dönem tarihlerini gerektirir.",
   },
   // The `en` slot used to hold the Turkish sentence verbatim, so English users
   // saw Turkish on a disabled export button. semester-dates.json covers only
@@ -272,7 +283,11 @@ export const dict = {
     en: "Offered in {n} terms since 2017",
     tr: "2017'den beri {n} dönemde açıldı",
   },
-  "list.empty": { en: "You have no selected course", tr: "Seçili dersiniz yok" },
+  "list.empty": { en: "No courses selected", tr: "Henüz ders seçilmedi" },
+  "list.emptyHint": {
+    en: "Search the catalogue to add a section.",
+    tr: "Katalogdan bir şube arayıp ekleyin.",
+  },
   // The TR wording here is load-bearing: e2e/helpers.ts locates the figure with
   // /(Total Credits|Toplam Kredi)/i, so changing it breaks every spec that
   // reads the credit total.

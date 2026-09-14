@@ -103,6 +103,10 @@
   // not the first decision of a fresh session, and shipping it open undid that
   // on line one.
   let isExpanded = $state(false);
+  // Visible shortcut on the palette button. ⌘K is a Mac glyph and is noise on
+  // a phone, so below `md` it is just "K". Windows/Linux get Ctrl+K; Mac stays
+  // ⌘K. The aria-label already names Ctrl/Cmd+K in both languages.
+  let paletteShortcut = $state("⌘K");
 
   function loadMore() {
     if (isLoading || !hasMorePages) return;
@@ -147,19 +151,17 @@
   onMount(() => {
     // Corresponds to Tailwind's `md` breakpoint
     const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const mac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || "");
 
-    // Handler to update the state
-    const handleResize = (e: MediaQueryListEvent) => {
-      isLargeScreen = e.matches;
+    const sync = (large: boolean) => {
+      isLargeScreen = large;
+      paletteShortcut = large ? (mac ? "⌘K" : "Ctrl+K") : "K";
     };
 
-    // Set the initial value
-    isLargeScreen = mediaQuery.matches;
-
-    // Listen for changes
+    sync(mediaQuery.matches);
+    const handleResize = (e: MediaQueryListEvent) => sync(e.matches);
     mediaQuery.addEventListener("change", handleResize);
 
-    // Cleanup on component destroy
     return () => {
       mediaQuery.removeEventListener("change", handleResize);
     };
@@ -181,6 +183,7 @@
         bind:this={input}
         class="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-11 pl-11 text-[0.9375rem] text-zinc-900 placeholder-zinc-400 shadow-xs transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-hidden dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
         type="text"
+        aria-label={t("search.label")}
         value={getSearchQuery()}
         oninput={(e) => {
           setSearchQuery((e.currentTarget as HTMLInputElement).value ?? "");
@@ -230,11 +233,11 @@
   -->
   <button
     type="button"
-    class="u-data flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white text-[0.6875rem] font-semibold text-zinc-600 shadow-xs transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
+    class="u-data flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white px-1.5 text-[0.6875rem] font-semibold text-zinc-600 shadow-xs transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
     title={t("palette.openTitle")}
     aria-label={t("palette.openTitle")}
     data-testid="palette-open"
-    onclick={openCommandPalette}>⌘K</button
+    onclick={openCommandPalette}>{paletteShortcut}</button
   >
 
   <CourseFilters />

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: `dark:` follows `html.dark`, which the theme toggle
+   (and the blocking snippet in index.html) set. Without this override the
+   variant would keep listening to prefers-color-scheme and ignore the button. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================================
    BOUN Course Planner — design tokens, "Sade"
 
@@ -208,6 +213,17 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    caret-color: var(--color-blue-600);
+    accent-color: var(--color-blue-600);
+    scrollbar-color: var(--color-zinc-300) transparent;
+    scrollbar-width: thin;
+    color-scheme: light;
+  }
+  html.dark {
+    caret-color: var(--color-blue-400);
+    accent-color: var(--color-blue-400);
+    scrollbar-color: var(--color-zinc-600) transparent;
+    color-scheme: dark;
   }
 
   body {
@@ -244,11 +260,9 @@
     background: var(--color-blue-100);
     color: var(--color-zinc-900);
   }
-  @media (prefers-color-scheme: dark) {
-    ::selection {
-      background: var(--color-blue-800);
-      color: var(--color-zinc-100);
-    }
+  .dark ::selection {
+    background: var(--color-blue-800);
+    color: var(--color-zinc-100);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -274,7 +288,7 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xs);
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .card {
       background: var(--color-zinc-800);
       border-color: color-mix(in srgb, var(--color-zinc-700) 70%, transparent);
@@ -306,7 +320,7 @@
     background: var(--color-zinc-200);
     overflow: visible;
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .meter {
       background: color-mix(in srgb, var(--color-zinc-700) 80%, transparent);
     }
@@ -357,7 +371,7 @@
   .row-rule {
     box-shadow: inset 0 1px 0 0 var(--color-zinc-100);
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .row-rule {
       box-shadow: inset 0 1px 0 0
         color-mix(in srgb, var(--color-zinc-700) 45%, transparent);
@@ -417,7 +431,7 @@
     opacity: 0.45;
     cursor: not-allowed;
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .btn-quiet {
       color: var(--color-zinc-200);
       background: color-mix(in srgb, var(--color-zinc-700) 55%, transparent);
@@ -453,7 +467,7 @@
     opacity: 0.45;
     cursor: not-allowed;
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .btn-text {
       color: var(--color-zinc-400);
     }
@@ -486,7 +500,7 @@
        aria-hidden, so the hour/minute hierarchy is carried by weight alone. */
     color: var(--color-zinc-600);
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .spine,
     .spine-min {
       color: var(--color-zinc-400);
@@ -503,7 +517,7 @@
     /* zinc-600 in light, zinc-400 in dark: small text needs 4.5:1 on both. */
     color: var(--color-zinc-600);
   }
-  @media (prefers-color-scheme: dark) {
+  @variant dark {
     .eyebrow {
       color: var(--color-zinc-400);
     }

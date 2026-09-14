@@ -17,9 +17,11 @@
   } from "./lib/globalState.svelte";
   import GoogleAnalytics from "./lib/GoogleAnalytics.svelte";
   import { initLang } from "./lib/i18n.svelte";
+  import { initTheme } from "./lib/theme.svelte";
 
   onMount(() => {
     initLang();
+    const stopTheme = initTheme();
     // Drop localStorage a removed feature left behind; nothing reads it now.
     pruneRetiredStorage();
     // Back/Forward navigates between selection states; cleaned up on unmount.
@@ -33,7 +35,10 @@
     loadOfferings();
     // Fire-and-forget: localStorage restore, errors handled inside loadCompleted
     loadCompleted();
-    return stopUrlSync;
+    return () => {
+      stopUrlSync();
+      stopTheme();
+    };
   });
 </script>
 
