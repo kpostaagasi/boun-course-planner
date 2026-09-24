@@ -353,11 +353,11 @@
                 {t("quota.seats", { current: quota.current, quota: quota.quota })}
               </span>
               {#if quota.overEnrolled}
-                <span class="font-medium text-red-600 dark:text-red-400">
+                <span class="font-medium text-red-600 dark:text-red-300">
                   {t("quota.over", { n: quota.current - quota.quota })}
                 </span>
               {:else if quota.full}
-                <span class="font-medium text-red-600 dark:text-red-400"
+                <span class="font-medium text-red-600 dark:text-red-300"
                   >{t("quota.full")}</span
                 >
               {:else}
@@ -458,7 +458,7 @@
       {/if}
       {#if examStatus.status === "clash"}
         <div
-          class="mt-1 text-[0.8125rem] font-medium text-red-600 dark:text-red-400"
+          class="mt-1 text-[0.8125rem] font-medium text-red-600 dark:text-red-300"
           data-testid="course-exam-clash"
         >
           {t("course.examClash", { keys: examStatus.with.join(", ") })}

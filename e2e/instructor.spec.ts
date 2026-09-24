@@ -245,11 +245,17 @@ test("placeholder instructors are never offered as people", async ({ page }) => 
   await gotoFresh(page);
 
   // `STAFF STAFF` staffs 82 sections of the current term, so the catalogue
-  // still has hits to show — but nothing may present it as a person.
+  // still has hits to show — but nothing may present it as a person. A real
+  // name that merely contains the query may still be offered: chip matching is
+  // by substring, and `EKREM KUTBAY` contains "TBA".
+  const placeholder = /^(STAFF|TBA)(\s+(STAFF|TBA))*$/i;
   for (const query of ["STAFF", "STAFF STAFF", "TBA"]) {
     await searchCourses(page, query);
-    await expect(page.getByTestId("instructor-chip")).toHaveCount(0);
     await expect(page.getByTestId("instructor-panel")).toHaveCount(0);
+    const chipNames = (
+      await page.getByTestId("instructor-chip").allInnerTexts()
+    ).map((text) => text.split("\n")[0].trim());
+    expect(chipNames.filter((name) => placeholder.test(name))).toEqual([]);
   }
 });
 

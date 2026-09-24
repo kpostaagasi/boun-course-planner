@@ -337,7 +337,7 @@
                     <span
                       class="u-data ml-auto shrink-0 text-[0.6875rem] {entry.quota
                         .status === 'full'
-                        ? 'font-semibold text-red-600 dark:text-red-400'
+                        ? 'font-semibold text-red-600 dark:text-red-300'
                         : 'text-zinc-600 dark:text-zinc-400'}"
                       data-testid="palette-seats">{seatText(entry)}</span
                     >
