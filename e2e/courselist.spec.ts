@@ -168,3 +168,48 @@ test("a failed semester-dates fetch explains itself instead of a dead button", a
   // The Google Calendar button shares the gate, so it is not rendered at all.
   await expect(page.getByTestId("calendar-gcal")).toHaveCount(0);
 });
+
+test("calendar export gives each meeting its own room", async ({ page, context }) => {
+  // AS250.01 (2025-2026-1) meets W in JF 333 and F in TB 415. `rooms` is
+  // index-aligned with `days`/`hours`; the export used to write every room
+  // into every event, so calendars showed the first day's room throughout.
+  await gotoFresh(page, "./?d=2025-2026-1&c=AS250.01");
+  const exportButton = page.getByTestId("calendar-ics");
+  await expect(exportButton).toBeEnabled();
+
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    exportButton.click(),
+  ]);
+  const ics = await download
+    .createReadStream()
+    .then((stream) => new Response(stream as unknown as ReadableStream).text());
+  const locationByDay = Object.fromEntries(
+    ics
+      .split("BEGIN:VEVENT")
+      .slice(1)
+      .map((event) => [
+        event.match(/^DTSTART:(\d{8})/m)![1],
+        event.match(/^LOCATION:(.*)$/m)![1].trim(),
+      ])
+  );
+  expect(Object.values(locationByDay).sort()).toEqual([
+    "JF 333\\, Boğaziçi University",
+    "TB 415\\, Boğaziçi University",
+  ]);
+
+  // The Google Calendar links split the same way.
+  const opened: string[] = [];
+  await context.exposeFunction("__recordOpen", (url: string) => opened.push(url));
+  await page.evaluate(() => {
+    window.open = ((url: string) => {
+      (window as any).__recordOpen(url);
+      return null;
+    }) as typeof window.open;
+  });
+  await page.getByTestId("calendar-gcal").click();
+  await expect.poll(() => opened.length).toBe(2);
+  expect(
+    opened.map((url) => new URL(url).searchParams.get("location")).sort()
+  ).toEqual(["JF 333, Boğaziçi University", "TB 415, Boğaziçi University"]);
+});

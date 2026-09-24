@@ -10,6 +10,7 @@
   import IconCalendar from "./icons/IconCalendar.svelte";
   import IconX from "./icons/IconX.svelte";
   import { t } from "./i18n.svelte";
+  import { uniqueRooms } from "./paletteSearch";
 
   // Semester data with dates and holidays loaded from JSON
   type SemesterData = {
@@ -80,6 +81,80 @@
     return date.toISOString().split("T")[0].replace(/-/g, "");
   }
 
+  type MeetingBlock = {
+    day: string;
+    startHour: number;
+    endHour: number; // Exclusive: start of the next hour
+    location: string;
+  };
+
+  // Location for one meeting block. `rooms` is index-aligned with `days` and
+  // `hours`, so each block takes only its own slots' rooms; a scraped row
+  // whose rooms don't line up falls back to every room of the section.
+  function blockLocation(courseInfo: any, slots: number[]): string {
+    const rooms: string[] = courseInfo.rooms ?? [];
+    const picked =
+      rooms.length === courseInfo.days.length
+        ? slots.map((i) => rooms[i])
+        : rooms;
+    const unique = uniqueRooms({ rooms: picked });
+    if (unique.length === 0) {
+      return "Boğaziçi University";
+    }
+    if (unique.length === 1 && unique[0] === "Online") {
+      return "Online";
+    }
+    return `${unique.join(", ")}, Boğaziçi University`;
+  }
+
+  // Group a section's slots into runs of consecutive hours per day, each
+  // carrying the room(s) of its own slots.
+  function getMeetingBlocks(courseInfo: any): MeetingBlock[] {
+    if (!courseInfo.days || !courseInfo.hours) {
+      return [];
+    }
+
+    const daySlots: Record<string, number[]> = {};
+    for (let i = 0; i < courseInfo.days.length; i++) {
+      const day = courseInfo.days[i];
+      daySlots[day] = daySlots[day] || [];
+      daySlots[day].push(i);
+    }
+
+    const blocks: MeetingBlock[] = [];
+    Object.entries(daySlots).forEach(([day, slots]) => {
+      slots.sort((a, b) => courseInfo.hours[a] - courseInfo.hours[b]);
+      let group = [slots[0]];
+      const flush = () => {
+        blocks.push({
+          day,
+          startHour: courseInfo.hours[group[0]],
+          endHour: courseInfo.hours[group[group.length - 1]] + 1,
+          location: blockLocation(courseInfo, group),
+        });
+      };
+      for (let i = 1; i < slots.length; i++) {
+        if (courseInfo.hours[slots[i]] === courseInfo.hours[slots[i - 1]] + 1) {
+          group.push(slots[i]);
+        } else {
+          flush();
+          group = [slots[i]];
+        }
+      }
+      flush();
+    });
+    return blocks;
+  }
+
+  // ICS TEXT values must escape backslashes, commas, semicolons and newlines
+  function escapeICSText(value: string): string {
+    return value
+      .replace(/\\/g, "\\\\")
+      .replace(/;/g, "\\;")
+      .replace(/,/g, "\\,")
+      .replace(/\n/g, "\\n");
+  }
+
   function getFirstDayOfWeek(startDate: Date, targetDay: string): Date {
     const dayIndex = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"].indexOf(
       dayMapping[targetDay]
@@ -107,38 +182,12 @@
     // Get holidays for current semester
     const semesterHolidays = holidaysData[currentSemester] || [];
 
-    // Group consecutive hours by day
-    const dayGroups: Record<string, number[]> = {};
-    for (let i = 0; i < courseInfo.days.length; i++) {
-      const day = courseInfo.days[i];
-      const hour = courseInfo.hours[i];
-      if (!dayGroups[day]) {
-        dayGroups[day] = [];
-      }
-      dayGroups[day].push(hour);
-    }
-
-    // Create events for each day
-    Object.entries(dayGroups).forEach(([day, hours]) => {
-      // Sort hours and group consecutive ones
-      hours.sort((a, b) => a - b);
-      const consecutiveGroups: number[][] = [];
-      let currentGroup = [hours[0]];
-
-      for (let i = 1; i < hours.length; i++) {
-        if (hours[i] === hours[i - 1] + 1) {
-          currentGroup.push(hours[i]);
-        } else {
-          consecutiveGroups.push(currentGroup);
-          currentGroup = [hours[i]];
-        }
-      }
-      consecutiveGroups.push(currentGroup);
-
-      // Create a recurring event for each consecutive group
-      consecutiveGroups.forEach((group, groupIndex) => {
-        const startHour = group[0];
-        const endHour = group[group.length - 1] + 1; // End time is start of next hour
+    // Create a recurring event for each consecutive-hour block
+    const dayBlockCounts: Record<string, number> = {};
+    getMeetingBlocks(courseInfo).forEach(
+      ({ day, startHour, endHour, location }) => {
+        const groupIndex = dayBlockCounts[day] ?? 0;
+        dayBlockCounts[day] = groupIndex + 1;
 
         // Find the first occurrence of this day in the semester
         const firstOccurrence = getFirstDayOfWeek(startDate, day);
@@ -163,18 +212,6 @@
         // Generate unique ID
         const uid = `${courseName}-${day}-${startHour}-${groupIndex}-${Date.now()}@boun-course-planner`;
 
-        // Get location information
-        let location = "Boğaziçi University";
-        if (courseInfo.rooms && courseInfo.rooms.length > 0) {
-          // If rooms info is available, use it
-          if (courseInfo.rooms[0] === "Online") {
-            location = "Online";
-          } else {
-            // Join multiple rooms with commas, or use the specific room info
-            location = `${courseInfo.rooms.join(", ")}, Boğaziçi University`;
-          }
-        }
-
         // Create the recurring event
         const eventLines = [
           "BEGIN:VEVENT",
@@ -183,7 +220,7 @@
           `DTEND:${formatDate(eventEnd)}`,
           `SUMMARY:${courseName}`,
           `DESCRIPTION:Course: ${courseInfo.name || courseName}\\nInstructor: ${courseInfo.instructor || "N/A"}\\nCredits: ${courseInfo.credits || "N/A"}`,
-          `LOCATION:${location}`,
+          `LOCATION:${escapeICSText(location)}`,
           `RRULE:FREQ=WEEKLY;UNTIL=${formatDate(new Date(endDate.getTime() + 24 * 60 * 60 * 1000))}`,
         ];
 
@@ -195,8 +232,8 @@
         eventLines.push("END:VEVENT");
 
         events.push(eventLines.join("\r\n"));
-      });
-    });
+      }
+    );
 
     return events;
   }
@@ -426,35 +463,10 @@
     const semesterHolidays =
       holidaysData[getCurrentSemester()] || [];
 
-    // Group consecutive hours by day (same as createCalendarEvent)
-    const dayGroups: Record<string, number[]> = {};
-    for (let i = 0; i < courseInfo.days.length; i++) {
-      const day = courseInfo.days[i];
-      dayGroups[day] = dayGroups[day] || [];
-      dayGroups[day].push(courseInfo.hours[i]);
-    }
-
     const urls: string[] = [];
 
-    Object.entries(dayGroups).forEach(([day, hours]) => {
-      hours.sort((a, b) => a - b);
-      const consecutiveGroups: number[][] = [];
-      let currentGroup = [hours[0]];
-
-      for (let i = 1; i < hours.length; i++) {
-        if (hours[i] === hours[i - 1] + 1) {
-          currentGroup.push(hours[i]);
-        } else {
-          consecutiveGroups.push(currentGroup);
-          currentGroup = [hours[i]];
-        }
-      }
-      consecutiveGroups.push(currentGroup);
-
-      consecutiveGroups.forEach((group) => {
-        const startHour = group[0];
-        const endHour = group[group.length - 1] + 1;
-
+    getMeetingBlocks(courseInfo).forEach(
+      ({ day, startHour, endHour, location }) => {
         const firstOccurrence = getFirstDayOfWeek(startDate, day);
 
         const eventStart = new Date(firstOccurrence);
@@ -462,15 +474,6 @@
 
         const eventEnd = new Date(firstOccurrence);
         eventEnd.setHours(8 + endHour, 0, 0, 0);
-
-        let location = "Boğaziçi University";
-        if (courseInfo.rooms && courseInfo.rooms.length > 0) {
-          if (courseInfo.rooms[0] === "Online") {
-            location = "Online";
-          } else {
-            location = `${courseInfo.rooms.join(", ")}, Boğaziçi University`;
-          }
-        }
 
         const detailsParts = [
           `Course: ${courseInfo.name || courseName}`,
@@ -517,8 +520,8 @@
         urls.push(
           `https://calendar.google.com/calendar/render?${params.join("&")}`,
         );
-      });
-    });
+      }
+    );
 
     return urls;
   }
