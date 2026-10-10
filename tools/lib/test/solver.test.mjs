@@ -4,6 +4,8 @@ import {
   groupKey,
   conflicts,
   solveConflictFree,
+  scoreSchedule,
+  solveAll,
   SOLVER_TRIAL_BUDGET,
 } from "../../../src/lib/solver.mjs";
 
@@ -186,10 +188,96 @@ test("solveConflictFree is deterministic across runs and data key order", () => 
   for (const k of Object.keys(swappable).reverse()) reversed[k] = swappable[k];
   assert.notDeepEqual(Object.keys(reversed), Object.keys(swappable));
   assert.deepEqual(solveConflictFree(selected, reversed), first);
-
   // Requirement order follows `selected`, so a different selection order is
   // allowed to yield a different (still deterministic) schedule.
   const flipped = solveConflictFree(["B200.01", "A100.01"], swappable);
   assert.equal(flipped.ok, true);
   assert.deepEqual(flipped.schedule, ["B200.01", "A100.02"]);
+});
+
+test("scoreSchedule penalizes freeDays", () => {
+  const sch = ["A100.01", "B200.02"]; // M1, M3
+  // Penalty = 2 (two meetings on Monday) => score = -2
+  assert.equal(scoreSchedule(sch, swappable, { freeDays: ["M"] }), -2);
+  assert.equal(scoreSchedule(sch, swappable, { freeDays: ["T"] }), 0);
+});
+
+test("scoreSchedule penalizes noEarly", () => {
+  const sch = ["A100.01", "B200.02"]; // M1, M3
+  // Penalty = 1 (A100.01 is on M1)
+  assert.equal(scoreSchedule(sch, swappable, { noEarly: true }), -1);
+});
+
+test("scoreSchedule penalizes fewerDays", () => {
+  const sch = ["A100.01", "B200.02"]; // M1, M3
+  // Both on Monday => 1 distinct day
+  assert.equal(scoreSchedule(sch, swappable, { fewerDays: true }), -1);
+});
+
+test("scoreSchedule penalizes avoidSlots", () => {
+  const sch = ["A100.01", "B200.02"]; // M1, M3
+  const avoidSlots = Array(6).fill(0).map(() => Array(14).fill(true));
+  avoidSlots[0][2] = false; // Avoid M3
+  assert.equal(scoreSchedule(sch, swappable, { avoidSlots }), -1);
+});
+
+test("solveAll returns limited options and ranks by score", () => {
+  // Extend swappable to have more options
+  const data = {
+    "A100.01": { days: ["M"], hours: [1] },
+    "A100.02": { days: ["T"], hours: [2] },
+    "B200.01": { days: ["M"], hours: [1] },
+    "B200.02": { days: ["W"], hours: [3] },
+    "B200.03": { days: ["T"], hours: [2] }, // Clashes with A100.02
+  };
+  // Valid combinations:
+  // A100.01 + B200.02 (M1, W3) -> days: M, W -> fewerDays penalty = 2
+  // A100.02 + B200.01 (T2, M1) -> days: T, M -> fewerDays penalty = 2
+  // A100.02 + B200.02 (T2, W3) -> days: T, W -> fewerDays penalty = 2
+  const result = solveAll(["A100.01", "B200.01"], data, {
+    limit: 2,
+    prefs: { freeDays: ["M"] },
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.options.length, 2);
+  assert.equal(result.truncated, false);
+  
+  // The one without 'M' should score highest (0 penalty).
+  // A100.02 + B200.02 has no M, score = 0
+  assert.deepEqual(result.options[0].schedule, ["A100.02", "B200.02"]);
+  assert.equal(result.options[0].score, 0);
+  // A100.01 + B200.02 has M, score = -1
+  // A100.02 + B200.01 has M, score = -1
+});
+
+test("solveAll budget exhaustion and unsatisfiable", () => {
+  const { data, selected } = densePool(10, 10, 7);
+  
+  // Budget exhausted
+  const capped = solveAll(selected, data, { budget: 100 });
+  assert.equal(capped.ok, false);
+  assert.equal(capped.reason, "budget-exhausted");
+  
+  // Unsatisfiable
+  const proven = solveAll(["CMPE101.01 LAB 1", "CMPE101.01 LAB 2"], deadLabs, { budget: Infinity });
+  assert.equal(proven.ok, false);
+  assert.equal(proven.reason, "unsatisfiable");
+});
+
+test("solveAll deterministic tie-breaking", () => {
+  const data = {
+    "A100.01": { days: ["M"], hours: [1] },
+    "A100.02": { days: ["T"], hours: [2] },
+    "B200.01": { days: ["W"], hours: [3] },
+    "B200.02": { days: ["Th"], hours: [4] },
+  };
+  // 4 combinations, all non-clashing. All have score 0 with empty prefs.
+  const res = solveAll(["A100.01", "B200.01"], data, { limit: 10 });
+  assert.equal(res.ok, true);
+  assert.equal(res.options.length, 4);
+  const str1 = JSON.stringify(res.options);
+  
+  const res2 = solveAll(["A100.01", "B200.01"], data, { limit: 10 });
+  const str2 = JSON.stringify(res2.options);
+  assert.equal(str1, str2); // Deterministic order
 });

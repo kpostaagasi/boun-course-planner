@@ -16,6 +16,25 @@
 
 /** @type {Record<string, Entry>} */
 export const dict = {
+  "solver.altTitle": { en: "Find Alternatives", tr: "Alternatif Bul" },
+  "solver.freeDays": { en: "Free day", tr: "Boş gün" },
+  "solver.noEarly": { en: "No 09:00 classes", tr: "09:00 dersi olmasın" },
+  "solver.fewerDays": { en: "Fewer campus days", tr: "Kampüste daha az gün" },
+  "solver.useFilter": { en: "Respect my day/hour filter", tr: "Gün/saat filtremi dikkate al" },
+  "solver.findAlternatives": { en: "Find alternatives", tr: "Alternatifleri bul" },
+  "solver.option": { en: "Option {index}/{total}", tr: "Seçenek {index}/{total}" },
+  "solver.apply": { en: "Apply", tr: "Uygula" },
+  "solver.close": { en: "Close", tr: "Kapat" },
+  "solver.prev": { en: "Previous option", tr: "Önceki seçenek" },
+  "solver.next": { en: "Next option", tr: "Sonraki seçenek" },
+  "solver.previewNote": {
+    en: "The timetable shows this option as a preview; nothing changes until you apply it.",
+    tr: "Tablo bu seçeneği önizleme olarak gösteriyor; uygulamadıkça seçimin değişmez.",
+  },
+  "solver.truncated": {
+    en: "The search stopped early, so these are the best of the combinations found, not necessarily the best overall.",
+    tr: "Arama erken durdu; bunlar bulunan kombinasyonların en iyileri, tümünün en iyisi olmayabilir.",
+  },
   "header.title": { en: "BOUN Course Planner", tr: "BOUN Ders Planlayıcı" },
   "theme.toDark": { en: "Switch to dark theme", tr: "Koyu temaya geç" },
   "theme.toLight": { en: "Switch to light theme", tr: "Açık temaya geç" },

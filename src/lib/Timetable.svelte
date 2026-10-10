@@ -5,6 +5,8 @@
     getCurSemesterData,
     getCurrentSemester,
     getSemesterDatesFor,
+    getSolverAlternatives,
+    getSolverAlternativeIndex,
     loadSemesterDates,
   } from "./globalState.svelte";
   import { t, getLang } from "./i18n.svelte";
@@ -13,9 +15,11 @@
     DAY_LABEL_KEYS,
     PALETTE,
     buildTimetableLayout,
+    type Layout,
+    type Occupant,
   } from "./timetableLayout";
-  import type { Layout, Occupant } from "./timetableLayout";
   import IconDownload from "./icons/IconDownload.svelte";
+  import SolverAlternatives from "./SolverAlternatives.svelte";
 
   type Holiday = { date: string; name?: string; timeType?: string; time?: string };
 
@@ -49,19 +53,27 @@
 
   // One pass produces the rows, the Saturday flag and the sub-column
   // allocation together; the old code walked the selection twice.
+  const alternatives = $derived(getSolverAlternatives());
+  const altIndex = $derived(getSolverAlternativeIndex());
+
+  const displayCourses = $derived(
+    alternatives && alternatives.length > 0
+      ? alternatives[altIndex].schedule
+      : getSelectedCourseNames()
+  );
+
   const layout = $derived<Layout>(
     getCurrentSemester() != "" && getCurSemesterData()
       ? buildTimetableLayout(
-          getSelectedCourseNames(),
+          displayCourses,
           getCurSemesterData(),
           getHoveredCourse()
         )
       : buildTimetableLayout([], null)
   );
-
+  const selectedCourses = $derived(displayCourses);
   const courseOnSaturday = $derived(layout.courseOnSaturday);
   const hoveredCourse = $derived(getHoveredCourse());
-  const selectedCourses = $derived(getSelectedCourseNames());
 
   /** Percentage geometry for one sub-column. 1px of air guarantees no overlap. */
   function boxStyle(occ: Occupant): string {
@@ -419,4 +431,5 @@
       {/each}
     </tbody>
   </table>
+  <SolverAlternatives />
 </div>

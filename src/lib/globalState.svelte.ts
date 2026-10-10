@@ -10,6 +10,8 @@ import {
   type UrlSelection,
 } from "./urlState";
 import { compileSearch } from "./searchQuery";
+import type { SolverPrefs, SolveAllResult, SolveAllOk } from "./solver";
+import { solveAll } from "./solver";
 import type { QuotaRow, QuotaSection } from "./quotaInfo";
 
 let currentSemester = $state(""); // Currently selected semester
@@ -970,4 +972,107 @@ export function setGpaBaseline(patch: Partial<GpaBaseline>) {
   } catch {
     // ignore persistence failures
   }
+}
+
+// ---- Solver Alternatives ----
+
+
+let solverPrefs = $state<{
+  freeDays: string[];
+  noEarly: boolean;
+  fewerDays: boolean;
+  useFilter: boolean;
+}>({
+  freeDays: [],
+  noEarly: false,
+  fewerDays: false,
+  useFilter: false,
+});
+
+let solverAlternatives = $state<SolveAllOk["options"] | null>(null);
+let solverAlternativeIndex = $state(0);
+let solverAlternativesTruncated = $state(false);
+// The selection (term + keys) the alternatives were computed for. If the user
+// changes either, the options no longer describe their plan and are hidden.
+let solverAlternativesFor = $state("");
+
+function selectionSignature() {
+  return currentSemester + "\u0000" + getSelectedCourseNames().join("|");
+}
+let solverAlternativesOutcome = $state<Extract<SolveAllResult, { ok: false }> | null>(null);
+
+export function getSolverPrefs() {
+  return solverPrefs;
+}
+
+export function getSolverAlternatives() {
+  if (!solverAlternatives || solverAlternativesFor !== selectionSignature()) {
+    return null;
+  }
+  return solverAlternatives;
+}
+
+export function getSolverAlternativesTruncated() {
+  return solverAlternativesTruncated;
+}
+
+export function closeSolverAlternatives() {
+  solverAlternatives = null;
+  solverAlternativesOutcome = null;
+  solverAlternativeIndex = 0;
+}
+
+export function getSolverAlternativeIndex() {
+  return solverAlternativeIndex;
+}
+
+export function setSolverAlternativeIndex(idx: number) {
+  solverAlternativeIndex = idx;
+}
+
+export function getSolverAlternativesOutcome() {
+  if (solverAlternativesFor !== selectionSignature()) return null;
+  return solverAlternativesOutcome;
+}
+
+export function runSolverAlternatives() {
+  const selected = getSelectedCourseNames();
+  const data = getCurSemesterData();
+  if (!data || selected.length === 0) return;
+
+  const prefsToPass: SolverPrefs = {
+    freeDays: solverPrefs.freeDays,
+    noEarly: solverPrefs.noEarly,
+    fewerDays: solverPrefs.fewerDays,
+  };
+
+  if (solverPrefs.useFilter) {
+    prefsToPass.avoidSlots = getSelectedDayHourFilter();
+  }
+
+  const result = solveAll(selected, data, { prefs: prefsToPass }) as SolveAllResult;
+  solverAlternativesFor = selectionSignature();
+  if (result.ok) {
+    solverAlternatives = result.options;
+    solverAlternativesTruncated = result.truncated;
+    solverAlternativeIndex = 0;
+    solverAlternativesOutcome = null;
+  } else {
+    solverAlternatives = null;
+    solverAlternativeIndex = 0;
+    solverAlternativesOutcome = result;
+  }
+}
+
+export function applySolverAlternative() {
+  const options = getSolverAlternatives();
+  if (!options || options.length === 0) return;
+  const schedule = options[solverAlternativeIndex].schedule;
+  const current = getSelectedCourseNames();
+  setSolverUndo([...current]);
+  setCourseList(schedule);
+  setSolverOutcome({ kind: "applied" });
+  // Reset alternatives view when applied
+  solverAlternatives = null;
+  solverAlternativesOutcome = null;
 }
