@@ -5,6 +5,8 @@
     getCurSemesterData,
     getCurrentSemester,
     getSemesterDatesFor,
+    getSolverAlternatives,
+    getSolverAlternativeIndex,
     loadSemesterDates,
   } from "./globalState.svelte";
   import { t, getLang } from "./i18n.svelte";
@@ -13,9 +15,11 @@
     DAY_LABEL_KEYS,
     PALETTE,
     buildTimetableLayout,
+    type Layout,
+    type Occupant,
   } from "./timetableLayout";
-  import type { Layout, Occupant } from "./timetableLayout";
   import IconDownload from "./icons/IconDownload.svelte";
+  import SolverAlternatives from "./SolverAlternatives.svelte";
 
   type Holiday = { date: string; name?: string; timeType?: string; time?: string };
 
@@ -49,19 +53,28 @@
 
   // One pass produces the rows, the Saturday flag and the sub-column
   // allocation together; the old code walked the selection twice.
+  const alternatives = $derived(getSolverAlternatives());
+  const altIndex = $derived(getSolverAlternativeIndex());
+
+  const displayCourses = $derived(
+    alternatives && alternatives.length > 0
+      ? alternatives[altIndex].schedule
+      : getSelectedCourseNames()
+  );
+
   const layout = $derived<Layout>(
     getCurrentSemester() != "" && getCurSemesterData()
       ? buildTimetableLayout(
-          getSelectedCourseNames(),
+          displayCourses,
           getCurSemesterData(),
           getHoveredCourse()
         )
       : buildTimetableLayout([], null)
   );
-
+  const selectedCourses = $derived(displayCourses);
+  const previewing = $derived(!!alternatives && alternatives.length > 0);
   const courseOnSaturday = $derived(layout.courseOnSaturday);
   const hoveredCourse = $derived(getHoveredCourse());
-  const selectedCourses = $derived(getSelectedCourseNames());
 
   /** Percentage geometry for one sub-column. 1px of air guarantees no overlap. */
   function boxStyle(occ: Occupant): string {
@@ -338,9 +351,19 @@
     {t("timetable.exportPng")}
   </button>
 </div>
+{#if previewing}
+  <p
+    data-testid="timetable-preview-badge"
+    class="mb-1 inline-flex w-fit items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-900 dark:bg-sky-900/60 dark:text-sky-100"
+  >
+    {t("solver.previewBadge", { index: altIndex + 1, total: alternatives?.length ?? 0 })}
+  </p>
+{/if}
 <div
   data-testid="timetable-scroll"
-  class="card w-full shrink-0 overflow-x-auto dark:text-white"
+  class="card w-full shrink-0 overflow-x-auto dark:text-white {previewing
+    ? 'outline-2 outline-dashed outline-sky-500 outline-offset-2'
+    : ''}"
 >
   <table
     class="w-full min-w-[32rem] table-fixed text-center text-sm antialiased lg:text-base"
@@ -420,3 +443,4 @@
     </tbody>
   </table>
 </div>
+<SolverAlternatives />
