@@ -50,7 +50,7 @@
   }
 </script>
 
-<div class="mt-6 border border-zinc-300 dark:border-zinc-700 rounded-lg p-4 bg-zinc-50 dark:bg-zinc-800/50">
+<div class="mt-4 border border-zinc-300 dark:border-zinc-700 rounded-lg p-4 bg-zinc-50 dark:bg-zinc-800/50">
   <h3 class="text-sm font-semibold mb-3">{t("solver.altTitle")}</h3>
   
   <div class="flex flex-col gap-3 text-sm">
@@ -115,7 +115,7 @@
     {/if}
 
     {#if alternatives && alternatives.length > 0}
-      <div class="flex items-center gap-4 mt-2 p-3 bg-white dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 shadow-sm">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 p-3 bg-white dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 shadow-sm">
         <div class="flex items-center gap-2">
           <button
             type="button"
@@ -126,7 +126,7 @@
           >
             &larr;
           </button>
-          <span class="font-medium">
+          <span class="font-medium whitespace-nowrap" aria-live="polite">
             {t("solver.option", { index: currentIndex + 1, total: alternatives.length })}
           </span>
           <button

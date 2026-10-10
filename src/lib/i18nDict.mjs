@@ -25,6 +25,10 @@ export const dict = {
   "solver.option": { en: "Option {index}/{total}", tr: "Seçenek {index}/{total}" },
   "solver.apply": { en: "Apply", tr: "Uygula" },
   "solver.close": { en: "Close", tr: "Kapat" },
+  "solver.previewBadge": {
+    en: "Preview: option {index}/{total} (not applied)",
+    tr: "Önizleme: seçenek {index}/{total} (uygulanmadı)",
+  },
   "solver.prev": { en: "Previous option", tr: "Önceki seçenek" },
   "solver.next": { en: "Next option", tr: "Sonraki seçenek" },
   "solver.previewNote": {
