@@ -116,7 +116,7 @@ test("a multi-hour course keeps one horizontal offset across every hour it spans
 });
 
 test.describe("narrow screens @mobile", () => {
-  test("the timetable scrolls horizontally with nothing clipped", async ({ page }) => {
+  test("the timetable fits the screen with every weekday visible, nothing clipped", async ({ page }) => {
     await gotoFresh(page);
     await selectCourse(page, "CMPE101.01");
     await selectCourse(page, "CMPE101.01 LAB 1");
@@ -125,31 +125,18 @@ test.describe("narrow screens @mobile", () => {
     const scroller = page.getByTestId("timetable-scroll");
     await expect(scroller).toBeVisible();
 
-    // The table keeps a usable minimum width, so the wrapper genuinely overflows.
+    // On a phone the grid fits its card: no sideways scrolling to reach Friday.
     const metrics = await scroller.evaluate((el) => ({
       scrollWidth: el.scrollWidth,
       clientWidth: el.clientWidth,
     }));
-    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
 
-    // No Saturday course is selected, so Friday is the rightmost column...
+    // No Saturday course is selected, so Friday is the rightmost column, on screen.
     await expect(timetableDayHeader(page, SAT)).toHaveClass(/hidden/);
-    const friday = timetableDayHeader(page, FRI);
-
-    // ...and it is off-screen until we scroll.
     const viewport = await rect(scroller);
-    const before = await rect(friday);
-    expect(before.x + before.width).toBeGreaterThan(viewport.x + viewport.width);
-
-    await scroller.evaluate((el) => {
-      el.scrollLeft = el.scrollWidth;
-    });
-    await expect
-      .poll(async () => {
-        const now = await rect(friday);
-        return now.x + now.width;
-      })
-      .toBeLessThanOrEqual(viewport.x + viewport.width + 1);
+    const friday = await rect(timetableDayHeader(page, FRI));
+    expect(friday.x + friday.width).toBeLessThanOrEqual(viewport.x + viewport.width + 1);
 
     // The hour gutter stays pinned so you never lose your place.
     const gutter = await rect(timetable(page).locator("tbody tr").first().locator("th"));

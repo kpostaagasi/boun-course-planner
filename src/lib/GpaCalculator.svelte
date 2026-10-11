@@ -165,8 +165,8 @@
   fetched, nothing is official, and the panel says so at the bottom rather than
   letting a two-decimal figure imply a transcript.
 -->
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-3 md:gap-4">
-  <div class="card divide-y divide-zinc-100 dark:divide-zinc-700/60 dark:text-white">
+<div class="mx-auto grid w-full max-w-3xl gap-3 md:gap-4 xl:max-w-6xl xl:grid-cols-[3fr_2fr] xl:items-start">
+  <div class="card divide-y divide-zinc-100 xl:row-span-3 dark:divide-zinc-700/60 dark:text-white">
     <div class="flex items-center gap-2 px-4 py-3">
       <h2 class="text-[0.9375rem] font-semibold">{t("gpa.termCourses")}</h2>
       <span class="u-data text-xs text-zinc-500 dark:text-zinc-400">{rows.length}</span>
@@ -381,9 +381,9 @@
     {/if}
   </div>
 
-  <p class="px-1 text-xs text-zinc-500 dark:text-zinc-400">{t("gpa.disclaimer")}</p>
+  <p class="px-1 text-xs text-zinc-500 xl:col-start-2 dark:text-zinc-400">{t("gpa.disclaimer")}</p>
 
   <!-- The "no affiliation" line and the freshness stamp belong on every
        surface, not only on the planner tab. -->
-  <Footer />
+  <div class="xl:col-span-2"><Footer /></div>
 </div>
