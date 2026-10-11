@@ -343,16 +343,16 @@
   class="card w-full shrink-0 overflow-x-auto dark:text-white"
 >
   <table
-    class="w-full min-w-[32rem] table-fixed text-center text-sm antialiased lg:text-base"
+    class="w-full table-fixed sm:min-w-[32rem] text-center text-sm antialiased lg:text-base"
   >
     <thead>
       <tr>
         <th
-          class="sticky left-0 z-40 w-14 border-r border-b border-zinc-100 bg-white dark:border-zinc-700/60 dark:bg-zinc-800"
+          class="sticky left-0 z-40 w-10 border-r sm:w-14 border-b border-zinc-100 bg-white dark:border-zinc-700/60 dark:bg-zinc-800"
         ></th>
         {#each DAYS as day, dayIdx}
           <th
-            class="eyebrow w-20 border-b border-zinc-100 pt-2.5 pb-2 dark:border-zinc-700/60 {day ==
+            class="eyebrow border-b sm:w-20 border-zinc-100 pt-2.5 pb-2 dark:border-zinc-700/60 {day ==
               'St' && !courseOnSaturday
               ? 'hidden'
               : ''}"
@@ -371,7 +371,7 @@
             "9". Mono and right-aligned so the hours stack into an axis.
           -->
           <th
-            class="spine sticky left-0 z-30 w-14 border-r border-zinc-100 bg-white px-2 align-top dark:border-zinc-700/60 dark:bg-zinc-800 {i ===
+            class="spine sticky left-0 z-30 w-10 border-r border-zinc-100 bg-white px-1 sm:w-14 sm:px-2 align-top dark:border-zinc-700/60 dark:bg-zinc-800 {i ===
             0
               ? ''
               : 'row-rule'}"
@@ -402,14 +402,14 @@
                   data-day={day}
                   title={occ.room === "" ? occ.course : `${occ.course} · ${occ.room}`}
                   style={boxStyle(occ)}
-                  class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1.5 text-left text-[10px] leading-[1.15] sm:text-xs {color.bg} {color.text} {color.border}
+                  class="absolute inset-y-0 overflow-hidden border-l-[3px] px-1 text-left text-[10px] leading-[1.15] [overflow-wrap:anywhere] sm:px-1.5 sm:text-xs {color.bg} {color.text} {color.border}
                   {occ.course == hoveredCourse && !selectedCourses.includes(occ.course)
                     ? 'opacity-75 ring-2 ring-zinc-400 dark:ring-zinc-200'
                     : occ.course == hoveredCourse
                       ? 'ring-2 ring-zinc-400 dark:ring-zinc-200'
                       : ''}"
-                >{#if occ.isFirst}{occ.course}{#if occ.room !== ""}<span
-                      class="u-data block truncate text-[9px] sm:text-[10px]"
+                >{#if occ.isFirst}{occ.course.replace(".", "\u200b.")}{#if occ.room !== ""}<span
+                      class="u-data block text-[9px] break-words sm:text-[10px]"
                       data-testid="tt-room">{occ.room}</span
                     >{/if}{/if}</div
                 >{/each}</td

@@ -4,6 +4,8 @@
   import { getTheme, toggleTheme } from "./theme.svelte";
   import IconSun from "./icons/IconSun.svelte";
   import IconMoon from "./icons/IconMoon.svelte";
+  import IconSearch from "./icons/IconSearch.svelte";
+  import { openCommandPalette } from "./CommandPalette.svelte";
 
   /** The two UI languages, in toggle order. @type {("en" | "tr")[]} */
   const LANGS = ["en", "tr"];
@@ -28,6 +30,19 @@
 
     <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
       <SemesterSelect />
+
+      <!-- Phones: the catalogue search sits below the plan, so search is one
+           tap away here too. It opens the same command palette as Ctrl/Cmd+K. -->
+      <button
+        type="button"
+        class="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 transition-colors hover:text-zinc-900 md:hidden dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
+        aria-label={t("palette.openTitle")}
+        title={t("palette.openTitle")}
+        data-testid="header-search"
+        onclick={openCommandPalette}
+      >
+        <IconSearch />
+      </button>
 
       <!--
         Same well as the language control, one control wide. The icon is the

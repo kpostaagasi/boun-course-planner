@@ -194,6 +194,8 @@ test("a final-exam collision between two selected sections is reported on the ca
       { deliveryMethod?: string; examDate?: string; examSlot?: string; finalExamLocation?: string }
     >;
     data["CMPE101.01"] = { ...data["CMPE101.01"], examDate: "10.01.2022", examSlot: "1" };
+    // Pin a placeholder instructor: live data drifts (this lab got a real name).
+    data["CMPE150.02 LAB 1"] = { ...data["CMPE150.02 LAB 1"], instructor: "STAFF STAFF" } as (typeof data)[string];
     data["CMPE150.01"] = {
       ...data["CMPE150.01"],
       deliveryMethod: "Online/Classroom",
