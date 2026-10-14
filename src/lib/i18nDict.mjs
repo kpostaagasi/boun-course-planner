@@ -248,33 +248,6 @@ export const dict = {
     en: "The registration system publishes no seat allocation for this section yet, so this is the wording from its own quota cell — not a rule we inferred.",
     tr: "Kayıt sistemi bu şube için henüz kontenjan sayısı yayınlamadı; bu metin doğrudan sistemin kendi kontenjan hücresinden geliyor — bizim çıkardığımız bir kural değil.",
   },
-  // Local-only registration check. English must stay free of Turkish letters;
-  // the badge words, not the colour, carry the meaning.
-  "fit.title": { en: "Does this fit me?", tr: "Bana uygun mu?" },
-  "fit.dept": { en: "Department", tr: "Bölüm" },
-  "fit.classYear": { en: "Class year", tr: "Sınıf" },
-  "fit.surname": { en: "Surname", tr: "Soyadı" },
-  "fit.deptPlaceholder": { en: "Select department", tr: "Bölüm seç" },
-  "fit.classPlaceholder": { en: "Year", tr: "Yıl" },
-  "fit.surnamePlaceholder": { en: "Surname", tr: "Soyadı" },
-  "fit.localOnly": {
-    en: "Stored only on this device. Nothing is sent.",
-    tr: "Yalnızca bu cihazda durur. Hiçbir yere gönderilmez.",
-  },
-  "fit.authority": {
-    en: "The official registration system decides. This is a snapshot, not a registration.",
-    tr: "Kararı resmi kayıt sistemi verir. Bu bir anlık görüntüdür, kayıt değildir.",
-  },
-  "fit.clear": { en: "Clear", tr: "Temizle" },
-  "fit.badge.fit": { en: "Fits", tr: "Uygun" },
-  "fit.badge.surname": { en: "Outside surname range", tr: "Soyadı dışında" },
-  "fit.badge.dept": { en: "Outside department", tr: "Bölüm dışı" },
-  "fit.badge.class": { en: "Outside class year", tr: "Sınıf dışı" },
-  "fit.badge.noData": { en: "No data", tr: "Veri yok" },
-  "fit.noDepts": {
-    en: "Department list loads with quota data.",
-    tr: "Bölüm listesi kota verisiyle gelir.",
-  },
   // Prefilled GitHub issue for a data error. The body used to be hardcoded
   // Turkish no matter the UI language.
   "report.title": { en: "Data error", tr: "Veri hatası" },
