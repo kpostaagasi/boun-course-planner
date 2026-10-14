@@ -36,6 +36,7 @@
   import { examConflictFor, type ExamSection } from "./examConflict";
   import { termHistory } from "./termHistory";
   import { describeSchedule, uniqueRooms, DAY_NAMES } from "./paletteSearch";
+  import FitBadges from "./FitBadges.svelte";
 
   let { course, courseName, currentSemester, selected } = $props();
 
@@ -430,6 +431,15 @@
           {/if}
         </div>
       {/if}
+
+      <!--
+        Fit is a separate claim from the seat count. It stays outside
+        course-quota-state so an unknown enrolment row still has no digits,
+        and it does not replace the snapshot clock above.
+      -->
+      <div class="mt-1.5">
+        <FitBadges section={getQuotaFor(courseName)} />
+      </div>
 
       <!--
         Exam facts are blank for a whole term until the registrar publishes

@@ -116,6 +116,11 @@ missing an entry there.
   each stamped with the snapshot time, because the numbers move continuously
   during registration. A section we have no data for says so rather than
   showing a zero.
+- "Does this fit me?": department, class year and surname are entered once
+  and stored only on this device. Each selected and listed section is checked
+  against that quota snapshot. The official registration system remains the
+  authority, the snapshot time stays visible, and a section with no quota
+  record says no data rather than fit or unfit.
 - Final exam date, session and location where the registration system
   publishes them, with a warning when two selected sections share a final.
 
