@@ -271,9 +271,9 @@ export function timetableCell(page: Page, dayIndex: number, hour: number): Locat
     .nth(dayIndex);
 }
 
-/** The semester `<select>` in the header. */
+/** The semester `<select>` in the header. Addressed by testid: the fit panel adds a second select. */
 export function semesterSelect(page: Page): Locator {
-  return page.locator("select");
+  return page.getByTestId("semester-select");
 }
 
 /**
