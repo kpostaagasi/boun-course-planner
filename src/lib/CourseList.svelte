@@ -11,10 +11,7 @@
     setSolverUndo,
     getSolverOutcome,
     setSolverOutcome,
-    getQuotaFor,
-    loadQuota,
   } from "./globalState.svelte";
-  import FitBadges from "./FitBadges.svelte";
   import { groupKey, solveConflictFree } from "./solver";
   import { buildSelectionSearch } from "./urlState";
   import IconX from "./icons/IconX.svelte";
@@ -23,8 +20,6 @@
   import Footer from "./Footer.svelte";
   import CalendarExport from "./CalendarExport.svelte";
   import { t } from "./i18n.svelte";
-
-  loadQuota();
 
   const courseCount = $derived(
     getSelectedCourseNames().filter(
@@ -193,7 +188,7 @@
     >
       {#each getSelectedCourseNames() as courseName (courseName)}
         <div
-          class="flex flex-wrap items-center gap-2 px-4 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+          class="flex items-center gap-2 px-4 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
           onmouseenter={() => setHoveredCourse(courseName)}
           role="listitem"
         >
@@ -208,9 +203,7 @@
             }}
           >
             <IconX />
-          </button>
-          <span class="u-data text-sm font-medium">{courseName}</span>
-          <FitBadges section={getQuotaFor(courseName)} showClock={true} />
+          </button><span class="u-data text-sm font-medium">{courseName}</span>
           <div class="ml-auto flex shrink-0 items-center gap-1">
             {#if "credits" in getCurSemesterData()[courseName]}
               <!-- Credits are data, not a status: no green pill. Green means seats. -->

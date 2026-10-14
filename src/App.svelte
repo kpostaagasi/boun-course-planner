@@ -7,8 +7,6 @@
   import CourseList from "./lib/CourseList.svelte";
   import GpaCalculator from "./lib/GpaCalculator.svelte";
   import CommandPalette from "./lib/CommandPalette.svelte";
-  import RegistrationFitPanel from "./lib/RegistrationFitPanel.svelte";
-  import { loadRegistrationProfile } from "./lib/registrationFitState.svelte";
   import {
     loadPrereqs,
     loadCompleted,
@@ -37,9 +35,6 @@
     loadOfferings();
     // Fire-and-forget: localStorage restore, errors handled inside loadCompleted
     loadCompleted();
-    // Same restore contract as loadCompleted: the "Bana uygun mu?"
-    // profile, errors handled inside loadRegistrationProfile.
-    loadRegistrationProfile();
     return () => {
       stopUrlSync();
       stopTheme();
@@ -67,14 +62,8 @@
         id="panel-planner"
         role="tabpanel"
         aria-labelledby="tab-planner"
-        class="flex grow flex-col gap-3 md:min-h-0 md:overflow-hidden"
+        class="flex grow flex-col gap-3 md:min-h-0 md:flex-row md:gap-4 md:overflow-hidden"
       >
-        <RegistrationFitPanel />
-        <!--
-          The form stays above both columns. This inner row is the plan and the
-          catalogue; it used to be the panel itself.
-        -->
-        <div class="flex min-h-0 grow flex-col gap-3 md:flex-row md:gap-4 md:overflow-hidden">
         <!-- The plan: what you have chosen, and when it happens. -->
         <div
           class="flex w-full shrink-0 flex-col gap-3 md:w-5/12 md:min-h-0 md:grow md:overflow-y-auto md:pr-1"
@@ -85,7 +74,6 @@
         <!-- The choosing: search, filter, browse. -->
         <div class="flex h-full w-full grow flex-col md:w-7/12">
           <CourseCatalogue />
-        </div>
         </div>
       </div>
     {:else}
