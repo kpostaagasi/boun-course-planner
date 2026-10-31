@@ -1,11 +1,117 @@
 # BOUN Course Planner
 
-Course schedule planning tool for Boğaziçi University
+Plan your Boğaziçi University semester: find courses, build a conflict-free timetable, check prerequisites, project your GPA and export the result to your calendar.
 
-Automated course-schedule pipeline for Boğaziçi University. Data is scraped
-from [registration.boun.edu.tr](https://registration.boun.edu.tr) and deployed
-to GitHub Pages without manual intervention — a newly published semester
-appears on the site within 24 hours.
+**[Open the planner](https://kpostaagasi.github.io/boun-course-planner/)**
+
+It runs in your browser and keeps your selections on your device. Course data is scraped daily from [registration.boun.edu.tr](https://registration.boun.edu.tr), so a newly published semester appears within 24 hours.
+
+Forked from [kilicbaran/boun-course-planner](https://github.com/kilicbaran/boun-course-planner).
+
+## Features
+
+**Search and browse**
+
+- Course search that matches the code first, then falls back to course name,
+  instructor and finally the catalogue description text.
+- Category badges and day/hour filters for narrowing the catalogue.
+- Cmd+K / Ctrl+K command palette, showing each result's section number,
+  meeting times and free seats so sibling sections are told apart.
+- LAB and P.S. sessions are listed as separate, individually selectable
+  entries.
+- Official catalogue descriptions shown on each course, loaded on demand.
+- Instructor view: click a name to filter the catalogue to that person's
+  sections, or open a panel covering a window of recent terms.
+
+**Planning**
+
+- Colour-coded timetable of the selected sections, with individual and total
+  credits and an ECTS load warning.
+- Conflict-free section solver: picks a non-overlapping set of sections for
+  the courses you want.
+- Prerequisites on every course, with an expandable tree of the transitive
+  prerequisite chain.
+- Mark courses as taken → Taken / Eligible / "Needs: …" badges on every row,
+  plus a panel listing the courses your completed set has just unlocked.
+- Offering history: in which past terms a course was actually offered.
+- Live quota and enrolment per section: seats taken, seats left, FULL and
+  over-enrolment, classroom capacity, departmental and surname restrictions —
+  each stamped with the snapshot time, because the numbers move continuously
+  during registration. A section we have no data for says so rather than
+  showing a zero.
+- Final exam date, session and location where the registration system
+  publishes them, with a warning when two selected sections share a final.
+
+**GPA**
+
+- A second tab that grades the plan you just built: every selected section
+  (LAB and P.S. sub-rows excepted — they carry no credits of their own) is
+  listed with its credits and a BOUN grade picker, and the term GPA is the
+  credit-weighted average of what you entered.
+- Enter your standing cumulative GPA and completed credits to project where
+  the term leaves you, with BOUN's repeat rule applied: a course repeated
+  from FF, DD or DC counts once, and the old attempt is withdrawn from the
+  baseline.
+- Nothing is graded until you say so: an unentered term reports no GPA rather
+  than a 0.00, and a cumulative record outside 0–4 is refused rather than
+  quietly clamped. The figures are a projection from your own input, never an
+  official record.
+
+**Export and sharing**
+
+- `.ics` download and Google Calendar export using the real semester
+  start/end dates and official holidays.
+- Semester date/holiday strip above the timetable.
+- Share links that encode the selected sections.
+- Download the timetable as a PNG.
+- Works offline: a service worker caches the app and its data, and the app is
+  installable.
+- EN/TR interface, dark mode, data-freshness indicator and a "report bad
+  data" button.
+
+Selections, completed courses, the grades entered on the GPA tab and the
+standing cumulative GPA typed into it are persisted in `localStorage` (keys
+`semesterSelCourses2`, `completedCourses`, `gpaEntries`, `gpaBaseline`).
+"Clear grades" clears the term's grades only; the standing record is cleared by
+emptying its two fields. Nothing leaves the device.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/kpostaagasi/boun-course-planner.git
+   ```
+2. Install NPM packages
+   ```sh
+   npm install
+   ```
+3. Start up a development server
+   ```sh
+   npm run dev -- --open
+   ```
+
+### Checks
+
+The same five gates the [`CI` workflow](.github/workflows/ci.yml) runs on every
+pull request and on `main` after a merge:
+
+```sh
+npm run check      # svelte-check + tsc
+npm test           # node --test over the pure logic in src/lib/*.mjs
+npm run build      # production bundle
+npm run payload    # observed initial-load budget, fails over 180 KB gzipped
+npm run test:e2e   # Playwright; needs `npx playwright install chromium` once
+```
+
+`npm run test:e2e` starts its own dev and preview servers, so nothing has to be
+running first.
 
 ## How data stays fresh
 
@@ -85,73 +191,6 @@ used by the calendar export) comes from the academic calendar and is not
 scraped automatically. The scraper prints a reminder when a new semester is
 missing an entry there.
 
-## Features
-
-**Search and browse**
-
-- Course search that matches the code first, then falls back to course name,
-  instructor and finally the catalogue description text.
-- Category badges and day/hour filters for narrowing the catalogue.
-- Cmd+K / Ctrl+K command palette, showing each result's section number,
-  meeting times and free seats so sibling sections are told apart.
-- LAB and P.S. sessions are listed as separate, individually selectable
-  entries.
-- Official catalogue descriptions shown on each course, loaded on demand.
-- Instructor view: click a name to filter the catalogue to that person's
-  sections, or open a panel covering a window of recent terms.
-
-**Planning**
-
-- Colour-coded timetable of the selected sections, with individual and total
-  credits and an ECTS load warning.
-- Conflict-free section solver: picks a non-overlapping set of sections for
-  the courses you want.
-- Prerequisites on every course, with an expandable tree of the transitive
-  prerequisite chain.
-- Mark courses as taken → Taken / Eligible / "Needs: …" badges on every row,
-  plus a panel listing the courses your completed set has just unlocked.
-- Offering history: in which past terms a course was actually offered.
-- Live quota and enrolment per section: seats taken, seats left, FULL and
-  over-enrolment, classroom capacity, departmental and surname restrictions —
-  each stamped with the snapshot time, because the numbers move continuously
-  during registration. A section we have no data for says so rather than
-  showing a zero.
-- Final exam date, session and location where the registration system
-  publishes them, with a warning when two selected sections share a final.
-
-**GPA**
-
-- A second tab that grades the plan you just built: every selected section
-  (LAB and P.S. sub-rows excepted — they carry no credits of their own) is
-  listed with its credits and a BOUN grade picker, and the term GPA is the
-  credit-weighted average of what you entered.
-- Enter your standing cumulative GPA and completed credits to project where
-  the term leaves you, with BOUN's repeat rule applied: a course repeated
-  from FF, DD or DC counts once, and the old attempt is withdrawn from the
-  baseline.
-- Nothing is graded until you say so: an unentered term reports no GPA rather
-  than a 0.00, and a cumulative record outside 0–4 is refused rather than
-  quietly clamped. The figures are a projection from your own input, never an
-  official record.
-
-**Export and sharing**
-
-- `.ics` download and Google Calendar export using the real semester
-  start/end dates and official holidays.
-- Semester date/holiday strip above the timetable.
-- Share links that encode the selected sections.
-- Download the timetable as a PNG.
-- Works offline: a service worker caches the app and its data, and the app is
-  installable.
-- EN/TR interface, dark mode, data-freshness indicator and a "report bad
-  data" button.
-
-Selections, completed courses, the grades entered on the GPA tab and the
-standing cumulative GPA typed into it are persisted in `localStorage` (keys
-`semesterSelCourses2`, `completedCourses`, `gpaEntries`, `gpaBaseline`).
-"Clear grades" clears the term's grades only; the standing record is cleared by
-emptying its two fields. Nothing leaves the device.
-
 ## Architecture
 
 Static SPA: Vite + Svelte 5 (runes) + Tailwind 4 + TypeScript, no backend.
@@ -197,51 +236,3 @@ writing to `public/data/`:
 - Vite
 - Svelte
 - Tailwind CSS
-
-### Project Scaffolding
-
-This project is scaffolded with these commands:
-
-```sh
-npm create vite@latest
-# choose svelte, cd into project directory
-npm install
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js
-- npm
-
-### Installation
-
-1. Clone the repo
-   ```sh
-   git clone https://github.com/kilicbaran/boun-course-planner.git
-   ```
-2. Install NPM packages
-   ```sh
-   npm install
-   ```
-3. Start up a development server
-   ```sh
-   npm run dev -- --open
-   ```
-
-### Checks
-
-The same five gates the [`CI` workflow](.github/workflows/ci.yml) runs on every
-pull request and on `main` after a merge:
-
-```sh
-npm run check      # svelte-check + tsc
-npm test           # node --test over the pure logic in src/lib/*.mjs
-npm run build      # production bundle
-npm run payload    # observed initial-load budget, fails over 180 KB gzipped
-npm run test:e2e   # Playwright; needs `npx playwright install chromium` once
-```
-
-`npm run test:e2e` starts its own dev and preview servers, so nothing has to be
-running first.
