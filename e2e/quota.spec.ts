@@ -203,8 +203,16 @@ test("a final-exam collision between two selected sections is reported on the ca
       examSlot: "1",
       finalExamLocation: "Classroom",
     };
-    data["CMPE250.01"] = { ...data["CMPE250.01"], examDate: "10.01.2022" };
+    // Same date, session explicitly unknown (live data later gained a slot).
+    data["CMPE250.01"] = { ...data["CMPE250.01"], examDate: "10.01.2022", examSlot: undefined };
     data["CMPE300.01"] = { ...data["CMPE300.01"], examDate: "12.01.2022", examSlot: "2" };
+    // No exam data at all (live data later gained an exam date for this section).
+    data["CMPE150.02"] = {
+      ...data["CMPE150.02"],
+      examDate: undefined,
+      examSlot: undefined,
+      finalExamLocation: undefined,
+    };
     await route.fulfill({ response, json: data });
   });
 

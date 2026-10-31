@@ -6,13 +6,15 @@
  *
  *   CMPE101.01          M slots 1-2 (09:00, 10:00) + T slot 3 (11:00)
  *   CMPE599.01          M slots 1-2                 -> clashes across Mon 09:00-10:00
+ *                       (injected by `pinClashSection`: the live section was
+ *                       withdrawn mid-term, so it is no longer in the scrape)
  *   CMPE150.01          M slot 5 (13:00)
  *   CMPE101.01 LAB 1    F slots 3-4 (11:00, 12:00)
  *   CMPE101.01 LAB 2    F slots 3-4                 -> two-hour, two-column clash
  */
 import { stat } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import type { Locator } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import {
   FIRST_HOUR,
   gotoFresh,
@@ -27,6 +29,32 @@ const TUE = 1;
 const FRI = 4;
 const SAT = 5;
 
+const TERM = "2026-2027-1";
+
+/**
+ * Serve a fixed Monday 09:00-10:00 section that clashes with CMPE101.01, so the
+ * overlap tests do not depend on a live section surviving the daily scrape.
+ * Must be registered before navigation.
+ */
+async function pinClashSection(page: Page) {
+  await page.route(`**/data/${TERM}.json`, async (route) => {
+    const response = await route.fetch();
+    const data = (await response.json()) as Record<string, unknown>;
+    data["CMPE599.01"] = {
+      code: "CMPE599.01",
+      credits: 4,
+      days: ["M", "M"],
+      dept: ["CMPE"],
+      ects: 10,
+      hours: [1, 2],
+      instructor: "STAFF STAFF",
+      name: "GUIDED RESEARCH IN MS-I",
+      rooms: ["", ""],
+    };
+    await route.fulfill({ response, json: data });
+  });
+}
+
 /** Bounding box of a laid-out element, asserting it has one. */
 async function rect(locator: Locator) {
   const box = await locator.boundingBox();
@@ -37,6 +65,7 @@ async function rect(locator: Locator) {
 test("overlapping courses sit side by side instead of stacking the row", async ({
   page,
 }) => {
+  await pinClashSection(page);
   await gotoFresh(page);
   await selectCourse(page, "CMPE101.01");
   await selectCourse(page, "CMPE599.01");
@@ -78,6 +107,7 @@ test("overlapping courses sit side by side instead of stacking the row", async (
 test("a multi-hour course keeps one horizontal offset across every hour it spans", async ({
   page,
 }) => {
+  await pinClashSection(page);
   await gotoFresh(page);
   // Mon 09:00-10:00 becomes a two-column cluster: CMPE101.01 vs CMPE599.01.
   await selectCourse(page, "CMPE101.01");
