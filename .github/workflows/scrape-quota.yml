@@ -14,17 +14,18 @@ name: Scrape section quotas
 #   * workflow_dispatch is the PRIMARY trigger. Registration and add-drop dates
 #     are published human-known dates; a human kicking this off on the right
 #     morning beats any fixed cron.
-#   * The cron is a twice-daily safety net restricted to the four months that
-#     contain BOUN's registration and add-drop windows for both terms
-#     (August/September for the fall term, January/February for the spring one).
-#     06:00 and 18:00 Istanbul, so a snapshot exists at the start and the end of
-#     each working day.
+#   * The cron is a weekly safety net (Mondays 06:00 Istanbul) restricted to the
+#     four months that contain BOUN's registration and add-drop windows for both
+#     terms (August/September for the fall term, January/February for the spring
+#     one). A full term is ~2900 requests and ~25 minutes, so weekly is the right
+#     trade-off against the university's server: a snapshot exists even if nobody
+#     remembers to press the button.
 #   * There is deliberately NO cron in the other eight months. A snapshot that
 #     is labelled stale (quota.json carries meta.scrapedAt) is strictly better
 #     than 2900 pointless requests, and workflow_dispatch covers the exceptions.
 #
 # This workflow is intentionally NOT wired into update-data.yml: the schedule
-# scrape runs daily and must not grow a 25-minute tail.
+# scrape is weekly and must not grow a 25-minute tail.
 
 on:
   workflow_dispatch:
@@ -38,8 +39,8 @@ on:
         required: false
         type: string
   schedule:
-    # 03:00 and 15:00 UTC = 06:00 and 18:00 Istanbul, Jan/Feb and Aug/Sep only.
-    - cron: "0 3,15 * 1,2,8,9 *"
+    # Mondays 03:00 UTC = 06:00 Istanbul, Jan/Feb and Aug/Sep only.
+    - cron: "0 3 * 1,2,8,9 1"
 
 permissions:
   contents: write

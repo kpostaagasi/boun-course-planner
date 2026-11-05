@@ -1,8 +1,17 @@
 name: Update course data
 
 # Scrapes registration.boun.edu.tr, commits fresh data, rebuilds the site and
-# deploys it to GitHub Pages. Runs daily so a newly published semester shows
-# up within 24h without any manual step.
+# deploys it to GitHub Pages.
+#
+# CADENCE: weekly (Mondays). The catalogue moves rarely — sections and
+# instructors are fixed once a term is published, so scraping ~70 pages every
+# day just adds load on the university's server. A new semester shows up within
+# a week, pushes to main still rebuild the site, and workflow_dispatch covers
+# same-day needs.
+#
+# GitHub's `schedule` delivery on this account is delayed by 5-7 hours (measured
+# across five workflows); for this job that is harmless — the data is weekly,
+# not intraday.
 #
 # One-time setup: Repository -> Settings -> Pages -> Source: "GitHub Actions".
 
@@ -10,7 +19,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 5 * * *" # daily at 05:00 UTC (08:00 Istanbul)
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC (08:00 Istanbul)
   workflow_dispatch:
     inputs:
       semester:
