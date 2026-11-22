@@ -4,7 +4,7 @@ Plan your Boğaziçi University semester: find courses, build a conflict-free ti
 
 **[Open the planner](https://kpostaagasi.github.io/boun-course-planner/)**
 
-It runs in your browser and keeps your selections on your device. Course data is scraped daily from [registration.boun.edu.tr](https://registration.boun.edu.tr), so a newly published semester appears within 24 hours.
+It runs in your browser and keeps your selections on your device. Course data is scraped weekly (Mondays) from [registration.boun.edu.tr](https://registration.boun.edu.tr), so a newly published semester appears within a week (or sooner via a manual run).
 
 Forked from [kilicbaran/boun-course-planner](https://github.com/kilicbaran/boun-course-planner).
 
@@ -116,14 +116,14 @@ running first.
 ## How data stays fresh
 
 ```
-registration.boun.edu.tr ──daily cron──▶ tools/scrape.mjs ──▶ public/data/*.json
+registration.boun.edu.tr ──weekly cron─▶ tools/scrape.mjs ──▶ public/data/*.json
                                                                      │
                                               changed? ──yes──▶ build + deploy (GitHub Pages)
                                                      └──no──▶ nothing happens
 ```
 
-The [`update-data` workflow](.github/workflows/update-data.yml) runs daily at
-05:00 UTC:
+The [`update-data` workflow](.github/workflows/update-data.yml) runs weekly on Mondays at
+05:00 UTC (and on manual dispatch):
 
 1. **Discover** — probes candidate term codes and finds the semester that is
    newly published or currently in its teaching window.
@@ -182,7 +182,7 @@ node tools/scrape-prereqs.mjs --resume   # continues where it left off
 
 or via the *Scrape prerequisites* workflow (manual dispatch). Output lands
 in `public/data/prereqs.json`; `--resume` skips courses already present.
-The daily schedule pipeline does not touch this file.
+The weekly schedule pipeline does not touch this file.
 
 ### Manual data
 
@@ -226,10 +226,10 @@ writing to `public/data/`:
 
 | Entry point | Output | Trigger |
 | --- | --- | --- |
-| `tools/scrape.mjs` | `<term>.json`, `semesters.json`, `meta.json`, `offerings.json` | daily cron |
+| `tools/scrape.mjs` | `<term>.json`, `semesters.json`, `meta.json`, `offerings.json` | weekly cron |
 | `tools/scrape-prereqs.mjs` | `prereqs.json` | manual |
 | `tools/scrape-descriptions.mjs` | `descriptions.json` | manual |
-| `tools/scrape-calendar.mjs` | `semester-dates.json` | daily cron |
+| `tools/scrape-calendar.mjs` | `semester-dates.json` | weekly cron |
 
 ## Built With
 

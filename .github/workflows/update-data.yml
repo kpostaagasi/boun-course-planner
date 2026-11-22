@@ -128,7 +128,7 @@ jobs:
           fi
 
       - name: Build site
-        # Deploy on every push and manual run; on the daily cron only when the
+        # Deploy on every push and manual run; on the weekly cron only when the
         # scrape actually produced new data.
         if: github.event_name != 'schedule' || steps.commit.outputs.changed == 'true'
         run: npm run build
